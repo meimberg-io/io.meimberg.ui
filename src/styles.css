@@ -1,0 +1,10 @@
+/* @meimberg/ui — DS-Stylesheet.
+ * Tailwind v4 + Design-System-Tokens (@meimberg/ui/tokens) + Radix-Animationen.
+ * Konsumiert vom DS-Storybook (Preview) und potenziell von App 2 als
+ * Basis-Stylesheet. `@source` scannt die Package-Quelle nach Utility-Klassen.
+ * Tokens package-intern relativ importiert (gleiches Package). */
+@import "tailwindcss";
+@import "./tokens/theme.css";
+@import "tw-animate-css";
+
+@source ".";
