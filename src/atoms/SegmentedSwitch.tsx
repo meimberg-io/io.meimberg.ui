@@ -12,9 +12,10 @@ import type {ReactNode} from 'react'
 
 export interface SegmentedOption<T extends string> {
   value: T
-  label: ReactNode
+  /** Optional — weglassen für icon-only-Segmente (dann `ariaLabel` setzen). */
+  label?: ReactNode
   icon?: ReactNode
-  /** Optionaler a11y-Label-Override, falls `label` ein Icon ist. */
+  /** Optionaler a11y-Label-Override, falls `label` fehlt oder ein Icon ist. */
   ariaLabel?: string
 }
 
@@ -65,7 +66,7 @@ export function SegmentedSwitch<T extends string>({value, options, onChange, dis
             className="relative z-[1] flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md border-0 bg-transparent px-3 text-[13px] font-medium text-muted-foreground transition-colors duration-150 data-[on=true]:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {opt.icon}
-            <span>{opt.label}</span>
+            {opt.label != null && <span>{opt.label}</span>}
           </button>
         )
       })}

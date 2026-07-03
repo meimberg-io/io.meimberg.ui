@@ -2,61 +2,54 @@
 
 import {useEffect, useState} from 'react'
 import {useTheme} from 'next-themes'
-import {Sun, Moon} from '../atoms/icons'
-import {Button} from '../ui/button'
-import {Tooltip, TooltipContent, TooltipTrigger} from '../ui/tooltip'
+import {Sun, Moon, Monitor} from '../atoms/icons'
+import {SegmentedSwitch, type SegmentedOption} from './SegmentedSwitch'
 
 /**
- * Pulse-Theme-Toggle (PUL-319). Wandert vom Sidebar-Footer in die App-Topbar.
+ * Theme-Switcher (PUL-319, System-Mode ergänzt). Sitzt in der App-Topbar.
  *
- * Verhalten: binary toggle Light ↔ Dark. System-Preference-Cycle ist bewusst
- * nicht abgedeckt (ggf. eigenes Folge-Ticket).
+ * Verhalten: Segmented Control mit drei Zuständen Light / Dark / System.
+ * "System" folgt der OS-Preference (`prefers-color-scheme`) — dafür muss der
+ * `ThemeProvider` mit `enableSystem` laufen.
  *
  * Diese Datei ist die **einzige** Stelle im App-Code, an der `setTheme(...)`
- * aufgerufen werden darf (ESLint `no-restricted-syntax` in eslint.config.mjs).
+ * aufgerufen werden darf (ESLint-Regel in der Consumer-Config).
  *
- * SSR-Safe: `next-themes` resolved das aktive Theme erst nach Mount (liest
- * localStorage / system preference). Bis dahin rendern wir einen leeren
- * 36×36 px Placeholder, damit Hydration-Markup stabil bleibt.
+ * `value` liest `theme` (die *Einstellung* — 'light' | 'dark' | 'system'),
+ * NICHT `resolvedTheme` (das aufgelöste 'light'|'dark'), damit "System" als
+ * eigener Zustand sichtbar bleibt.
+ *
+ * SSR-Safe: `next-themes` resolved die Einstellung erst nach Mount (liest
+ * localStorage / system preference). Bis dahin rendern wir denselben, aber
+ * disabled Control in Segmented-Größe → kein Layout-Shift, kein Flash von
+ * Theme-Info im SSR-Markup.
  */
+
+type ThemeChoice = 'light' | 'dark' | 'system'
+
+const THEME_OPTIONS: ReadonlyArray<SegmentedOption<ThemeChoice>> = [
+  {value: 'light', icon: <Sun width={15} height={15} />, ariaLabel: 'Light Mode'},
+  {value: 'dark', icon: <Moon width={15} height={15} />, ariaLabel: 'Dark Mode'},
+  {value: 'system', icon: <Monitor width={15} height={15} />, ariaLabel: 'System — folgt dem Betriebssystem'},
+]
+
 export function ThemeToggle() {
-  const {resolvedTheme, setTheme} = useTheme()
+  const {theme, setTheme} = useTheme()
   const [mounted, setMounted] = useState(false)
   // Established mounted-Idiom — setMounted im Effect triggert einen Re-Render
-  // nach Hydration, damit das Theme-spezifische Markup erst dann rendert.
-   
+  // nach Hydration, damit der Theme-spezifische Zustand erst dann rendert.
+
   useEffect(() => setMounted(true), [])
 
   if (!mounted) {
-    // SSR + erster Client-Render: stabiler Placeholder ohne Theme-Info.
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 text-muted-foreground"
-        aria-hidden
-        tabIndex={-1}
-      />
-    )
+    return <SegmentedSwitch value="system" options={THEME_OPTIONS} onChange={() => {}} disabled />
   }
 
-  const isDark = resolvedTheme === 'dark'
-  const targetLabel = isDark ? 'In den Light Mode wechseln' : 'In den Dark Mode wechseln'
-
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={targetLabel}
-          onClick={() => setTheme(isDark ? 'light' : 'dark')}
-          className="h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
-        >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>{targetLabel}</TooltipContent>
-    </Tooltip>
+    <SegmentedSwitch<ThemeChoice>
+      value={(theme as ThemeChoice | undefined) ?? 'system'}
+      options={THEME_OPTIONS}
+      onChange={setTheme}
+    />
   )
 }
