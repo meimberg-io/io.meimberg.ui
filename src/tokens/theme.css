@@ -123,12 +123,17 @@
   --warning: 45 65% 55%;
   --info: 195 50% 50%;
 
-  --elev-card: 0 1px 2px hsl(var(--foreground) / 0.18),
-               0 1px 1px hsl(var(--foreground) / 0.14);
-  --elev-floating: 0 4px 12px hsl(var(--foreground) / 0.25),
-                   0 2px 4px hsl(var(--foreground) / 0.15);
-  --elev-modal: 0 16px 48px hsl(var(--foreground) / 0.40),
-                0 4px 12px hsl(var(--foreground) / 0.25);
+  /* Dark-Mode: Schatten sind schwarz-basiert, NICHT foreground-basiert.
+   * `--foreground` ist im Dark-Mode nahezu weiß — als Schatten ergäbe das
+   * einen invertierten hellen Glow um die Fläche. Elevation entsteht hier über
+   * die hellere Surface (bg-card/bg-popover) + feinen Border; der Schatten
+   * vertieft nur dezent gegen den abgedunkelten Hintergrund. */
+  --elev-card: 0 1px 2px hsl(0 0% 0% / 0.35),
+               0 1px 1px hsl(0 0% 0% / 0.30);
+  --elev-floating: 0 4px 12px hsl(0 0% 0% / 0.45),
+                   0 2px 4px hsl(0 0% 0% / 0.30);
+  --elev-modal: 0 16px 48px hsl(0 0% 0% / 0.60),
+                0 4px 12px hsl(0 0% 0% / 0.40);
 
   --surface-0: 200 10% 4%;
   --surface-1: 200 8% 8%;
