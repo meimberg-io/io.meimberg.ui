@@ -52,6 +52,7 @@ export * from './atoms/WeightDots'
 
 // ── molecules/ — Kompositionen ────────────────────────────────────────────
 export * from './molecules/DashboardCard'
+export * from './molecules/DetailField'
 export * from './molecules/EmptyState'
 export * from './molecules/FormField'
 export * from './molecules/FormHelpText'
