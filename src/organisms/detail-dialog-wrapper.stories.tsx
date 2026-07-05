@@ -2,6 +2,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
 import {DetailDialogWrapper} from './detail-dialog-wrapper'
 import {Button} from '../ui/button'
+import {MetaPill} from '../atoms/MetaPill'
 import {Zap, Sprout, Inbox} from '../atoms/icons'
 
 const meta: Meta<typeof DetailDialogWrapper> = {
@@ -107,6 +108,40 @@ export const TintedIconBg: Story = {
             <p className="body-sm text-muted-foreground">
               Promoted aus Signal #218. Bereit für nächsten Lifecycle-Schritt.
             </p>
+          </DetailDialogWrapper>
+        </>
+      )
+    }
+    return <Demo />
+  },
+}
+
+// `description` trägt Block-Inhalt (Meta-Pill-Reihe) statt eines Strings.
+// Dank asChild rendert der Wrapper hier einen <div> statt <p> — sonst wäre
+// der verschachtelte <div>/<span> ungültiges HTML (Hydration-Error).
+export const BlockDescription: Story = {
+  render: () => {
+    function Demo() {
+      const [open, setOpen] = useState(true)
+      return (
+        <>
+          <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+          <DetailDialogWrapper
+            open={open}
+            onOpenChange={setOpen}
+            icon={<Inbox className="size-5 text-primary" />}
+            iconBgClass="bg-primary/10"
+            size="lg"
+            title="Inbox-Item: Tagesplanung Donnerstag"
+            description={
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <MetaPill icon={<Inbox size={12} />}>Notiz</MetaPill>
+                <span className="caption text-muted-foreground">Microsoft Graph · 14:32</span>
+                <MetaPill title="Abgeleitete Items">→ 2</MetaPill>
+              </div>
+            }
+          >
+            <p className="body-sm">Bitte morgen früh die Pulse-Demo durchgehen.</p>
           </DetailDialogWrapper>
         </>
       )

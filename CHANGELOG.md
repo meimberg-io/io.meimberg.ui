@@ -1,5 +1,16 @@
 # @meimberg/ui
 
+## 1.2.1
+
+### Patch Changes
+
+- DetailDialogWrapper: `description` darf jetzt beliebigen Block-Inhalt tragen
+  (z. B. eine Meta-Pill-Reihe). Zuvor rendert Radix die Description als `<p>`;
+  ein `<div>` darin war ungültiges HTML und löste einen Hydration-Error aus
+  (real aufgetreten in Pulse' InboxItemDetailDialog). Fix: Description via
+  `asChild` in einen `<div>` rendern — id/aria-Verdrahtung und Styling bleiben
+  erhalten. String-Descriptions funktionieren unverändert.
+
 ## 1.2.0
 
 ### Minor Changes
