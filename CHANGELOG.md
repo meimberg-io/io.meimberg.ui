@@ -1,5 +1,15 @@
 # @meimberg/ui
 
+## 1.2.0
+
+### Minor Changes
+
+- DetailField: Definition-Zeile für Detail-Dialoge (feste Label-Spalte + freier
+  Wert-Slot). Read-Display-Pendant zu `FormField`. Ersetzt das bisher je
+  Detail-Dialog einkopierte lokale `FieldRow` und behebt damit dessen
+  Duplizierung (no-half-generalization). `align`-Prop (`start` default für
+  mehrzeilige Werte, `center` für einzeilige Zeilen).
+
 ## 1.1.1
 
 ### Patch Changes
