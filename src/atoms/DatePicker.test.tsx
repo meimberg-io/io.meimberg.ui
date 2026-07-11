@@ -70,4 +70,19 @@ describe('DatePicker', () => {
     render(<DatePicker value="2026-05-19" onChange={() => {}} disabled />)
     expect(screen.getByRole('button')).toBeDisabled()
   })
+
+  // Regression: die Calendar-Nav-Chevrons sind `absolute top-0` positioniert.
+  // In react-day-picker v9 sitzt die Nav als Sibling des Month (nicht mehr in
+  // der Caption wie v8), also muss der `.rdp-root` selbst `position: relative`
+  // tragen, sonst hängen sich die Buttons an den nächsten positionierten
+  // Vorfahren (Radix PopoverContent) und überlappen die Shortcut-Liste oben.
+  it('renders the calendar root as a positioning context for the nav buttons', async () => {
+    const user = userEvent.setup()
+    render(<DatePicker value="2026-05-19" onChange={() => {}} />)
+    await user.click(screen.getByRole('button'))
+    const grid = await screen.findByRole('grid')
+    const root = grid.closest('.rdp-root')
+    expect(root).not.toBeNull()
+    expect(root).toHaveClass('relative')
+  })
 })

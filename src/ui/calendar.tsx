@@ -13,7 +13,12 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      // `relative` macht den rdp-root zum Positionierungs-Kontext für die
+      // `absolute` Nav-Chevrons (button_previous/next). react-day-picker v9
+      // rendert die Nav als Sibling des Month, nicht mehr in der `relative`
+      // Caption — ohne das hängen sich die Buttons an den nächsten
+      // positionierten Vorfahren (Popover) und überlappen den Content.
+      className={cn("relative p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row gap-2",
         month: "flex flex-col gap-4",
