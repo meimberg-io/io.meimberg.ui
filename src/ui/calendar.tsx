@@ -25,13 +25,17 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         month_caption: "flex justify-center pt-1 relative items-center w-full",
         caption_label: "body font-medium",
         nav: "flex items-center gap-1",
+        // `top-3` (nicht `top-0`) kompensiert das `p-3` des rdp-root: die
+        // absolut positionierten Chevrons sitzen sonst am Padding-Rand und
+        // wirken gegenüber dem Monats-Label (das im gepaddeten Content liegt)
+        // nach oben verrutscht. Mit `top-3` liegen sie auf einer Linie.
         button_previous: cn(
           buttonVariants({ variant: "outline" }),
-          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1 top-0",
+          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1 top-3",
         ),
         button_next: cn(
           buttonVariants({ variant: "outline" }),
-          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1 top-0",
+          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1 top-3",
         ),
         month_grid: "w-full border-collapse space-x-1",
         weekdays: "flex",
