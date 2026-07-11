@@ -1,5 +1,17 @@
 # @meimberg/ui
 
+## 1.2.2
+
+### Patch Changes
+
+- Calendar/DatePicker: Die Monats-Navigations-Chevrons (‹ ›) überlappen nicht
+  mehr die Shortcut-Liste oben im Popover. react-day-picker v9 rendert die Nav
+  als Sibling des Monats (nicht mehr in der `relative` Caption wie v8); die
+  `absolute` Buttons hängten sich mangels positioniertem Vorfahren an das Radix
+  `PopoverContent` und landeten am oberen Rand über „Heute/Morgen/…". Fix:
+  `position: relative` auf den DayPicker-Root, analog zur Anforderung aus der
+  react-day-picker `style.css`.
+
 ## 1.2.1
 
 ### Patch Changes
