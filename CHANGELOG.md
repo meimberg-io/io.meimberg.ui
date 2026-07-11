@@ -1,5 +1,14 @@
 # @meimberg/ui
 
+## 1.2.3
+
+### Patch Changes
+
+- Calendar/DatePicker: Die Monats-Navigations-Chevrons (‹ ›) liegen jetzt vertikal
+  auf einer Linie mit dem Monats-Label. Zuvor saßen sie durch `top-0` am
+  Padding-Rand des rdp-root und wirkten gegenüber dem Label (im gepaddeten
+  Content) nach oben verrutscht; `top-3` kompensiert das `p-3`.
+
 ## 1.2.2
 
 ### Patch Changes
