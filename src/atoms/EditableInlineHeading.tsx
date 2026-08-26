@@ -1,6 +1,6 @@
 'use client'
 
-import {useState, type KeyboardEvent, type ReactNode} from 'react'
+import {useState, type FocusEvent, type KeyboardEvent, type ReactNode} from 'react'
 import {cn} from '../lib/cn'
 import {IconButton} from '../ui/icon-button'
 import {TextField} from './TextField'
@@ -31,7 +31,7 @@ export interface EditableInlineHeadingProps {
  * Pulse-EditableInlineHeading — präsentationsloser Inline-Title-Editor:
  * Display-Mode (Wert + Edit-Trigger + optionale `displayActions`) → Edit-Mode
  * (`<input>`/`<textarea>` mit expliziten Save/Cancel-Buttons). Enter speichert,
- * Escape verwirft, Auto-Focus beim Einstieg.
+ * Escape verwirft, Fokus-Verlust speichert ebenfalls, Auto-Focus beim Einstieg.
  *
  * Bündelt die zwei divergent gebauten Inline-Title-Editoren (PUL-414 § G2a-B5,
  * Inbox + Signal). **Domain-frei** — Persistenz/Override-Logik bleibt im
@@ -65,6 +65,14 @@ export function EditableInlineHeading({
     setDraft(value)
     onCancel?.()
   }
+  // Fokus verlässt die Edit-Zeile (Klick irgendwo anders hin, Tab raus) →
+  // speichern statt den Entwurf stillschweigend zu verlieren. Wandert der Fokus
+  // innerhalb der Zeile (Save-/Cancel-Button), passiert hier nichts — die
+  // Buttons erledigen das selbst.
+  const handleBlur = (e: FocusEvent<HTMLSpanElement>) => {
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    save()
+  }
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !(multiline && e.shiftKey)) {
       e.preventDefault()
@@ -78,7 +86,7 @@ export function EditableInlineHeading({
   if (editing) {
     const fieldClass = cn('flex-1 min-w-0', SIZE_CLASSES[size])
     return (
-      <span className="inline-flex w-full items-center gap-1.5">
+      <span className="inline-flex w-full items-center gap-1.5" onBlur={handleBlur}>
         {multiline ? (
           <TextField
             as="textarea"
