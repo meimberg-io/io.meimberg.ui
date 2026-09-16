@@ -1,5 +1,11 @@
 # @meimberg/ui
 
+## 1.2.5
+
+### Patch Changes
+
+- EditableInlineHeading: Klick auf den Titel startet den Edit-Mode — nicht mehr nur das Stift-Icon.
+
 ## 1.2.4
 
 ### Patch Changes

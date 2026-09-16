@@ -18,6 +18,16 @@ describe('EditableInlineHeading', () => {
     expect(onSave).toHaveBeenCalledWith('Neu')
   })
 
+  it('startet den Edit-Mode auch beim Klick auf den Titel selbst', async () => {
+    const onSave = vi.fn()
+    render(<EditableInlineHeading value="Alt" onSave={onSave} />)
+    await userEvent.click(screen.getByRole('button', {name: 'Alt'}))
+    const field = screen.getByRole('textbox')
+    await userEvent.clear(field)
+    await userEvent.type(field, 'Neu{Enter}')
+    expect(onSave).toHaveBeenCalledWith('Neu')
+  })
+
   it('verwirft bei Escape', async () => {
     const onSave = vi.fn()
     render(<EditableInlineHeading value="Alt" onSave={onSave} />)

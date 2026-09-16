@@ -30,8 +30,10 @@ export interface EditableInlineHeadingProps {
 /**
  * Pulse-EditableInlineHeading — präsentationsloser Inline-Title-Editor:
  * Display-Mode (Wert + Edit-Trigger + optionale `displayActions`) → Edit-Mode
- * (`<input>`/`<textarea>` mit expliziten Save/Cancel-Buttons). Enter speichert,
- * Escape verwirft, Fokus-Verlust speichert ebenfalls, Auto-Focus beim Einstieg.
+ * (`<input>`/`<textarea>` mit expliziten Save/Cancel-Buttons). In den Edit-Mode
+ * führt sowohl ein Klick auf den Titel selbst als auch das Stift-Icon. Enter
+ * speichert, Escape verwirft, Fokus-Verlust speichert ebenfalls, Auto-Focus
+ * beim Einstieg.
  *
  * Bündelt die zwei divergent gebauten Inline-Title-Editoren (PUL-414 § G2a-B5,
  * Inbox + Signal). **Domain-frei** — Persistenz/Override-Logik bleibt im
@@ -120,7 +122,20 @@ export function EditableInlineHeading({
 
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span className={SIZE_CLASSES[size]}>{value || placeholder}</span>
+      {/* Der Titel selbst ist der primäre Edit-Trigger; das Stift-Icon bleibt als
+          sichtbare Affordanz daneben. Accessible Name des Text-Buttons ist der
+          Titel — so liest ein Screenreader „Titel bearbeiten" nicht doppelt. */}
+      <button
+        type="button"
+        onClick={startEdit}
+        title="Titel bearbeiten"
+        className={cn(
+          SIZE_CLASSES[size],
+          '-mx-1 cursor-text rounded-sm px-1 text-left transition-colors hover:bg-muted/60',
+        )}
+      >
+        {value || placeholder}
+      </button>
       <IconButton variant="muted" size="sm" onClick={startEdit} aria-label="Titel bearbeiten" title="Titel bearbeiten">
         <EditIcon aria-hidden="true" />
       </IconButton>

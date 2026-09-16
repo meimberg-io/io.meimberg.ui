@@ -6,6 +6,16 @@ import {DeleteIcon} from '../ui/action-icons'
 
 const meta: Meta<typeof EditableInlineHeading> = {
   title: 'Atoms/EditableInlineHeading',
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Inline-Title-Editor. In den Edit-Mode führt ein Klick auf den Titel selbst ' +
+          'ebenso wie das Stift-Icon daneben. Enter speichert, Escape verwirft, ' +
+          'Fokus-Verlust speichert.',
+      },
+    },
+  },
 }
 
 export default meta
