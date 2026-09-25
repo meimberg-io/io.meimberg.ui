@@ -18,7 +18,7 @@ import { Markdown, type MarkdownStorage } from 'tiptap-markdown'
 import type { Node as PMNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
 import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react'
-import { Button } from '../ui/button'
+import { Button } from '../atoms/Button'
 import { Popover, PopoverAnchor, PopoverContent } from '../ui/popover'
 import { TextField } from '../atoms/TextField'
 import { useLabels } from '../i18n/context'
@@ -322,10 +322,10 @@ function UrlForm({ label, initial, labels: l, onSubmit, onCancel, onRemove }: Ur
       <TextField id={inputId} type='url' value={url} onChange={e => setUrl(e.target.value)} autoFocus />
       <div className='flex items-center justify-end gap-2'>
         {onRemove && (
-          <Button type='button' variant='ghost' size='sm' className='mr-auto' onClick={onRemove}>{l.removeLink}</Button>
+          <Button type='button' variant='ghost' className='mr-auto' onClick={onRemove}>{l.removeLink}</Button>
         )}
-        <Button type='button' variant='ghost' size='sm' onClick={onCancel}>{l.cancel}</Button>
-        <Button type='submit' size='sm'>{l.apply}</Button>
+        <Button type='button' variant='ghost' onClick={onCancel}>{l.cancel}</Button>
+        <Button type='submit'>{l.apply}</Button>
       </div>
     </form>
   )
@@ -343,9 +343,10 @@ function ToolbarButton({ onClick, active, disabled, title, children }: BtnProps)
   return (
     <Button
       type='button'
-      variant={active ? 'secondary' : 'ghost'}
-      size='icon'
-      className='size-8'
+      variant={active ? 'solid' : 'ghost'}
+      tone='neutral'
+      size='sm'
+      className='w-8 px-0'
       onClick={onClick}
       disabled={disabled}
       title={title}

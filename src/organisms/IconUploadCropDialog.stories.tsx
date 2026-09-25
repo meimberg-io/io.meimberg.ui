@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
 import {IconUploadCropDialog} from './IconUploadCropDialog'
-import {Button} from '../ui/button'
+import {Button} from '../atoms/Button'
 
 const meta: Meta<typeof IconUploadCropDialog> = {
   title: 'Organisms/IconUploadCropDialog',
@@ -17,7 +17,7 @@ function Trigger({label, title}: {label: string; title?: string}) {
   const [submittedSize, setSubmittedSize] = useState<number | null>(null)
   return (
     <div className="p-6 space-y-3">
-      <Button onClick={() => setOpen(true)}>{label}</Button>
+      <Button size="lg" onClick={() => setOpen(true)}>{label}</Button>
       {submittedSize !== null && (
         <p className="caption text-muted-foreground">
           Last submit: {submittedSize} bytes
@@ -48,7 +48,7 @@ function ClosedDemo() {
       <p className="body-sm text-muted-foreground mb-3">
         The dialog drives the file picker itself — this story only renders the open trigger.
       </p>
-      <Button variant="outline" onClick={() => setOpen(true)}>
+      <Button size="lg" variant="outline" onClick={() => setOpen(true)}>
         Open dialog
       </Button>
       <IconUploadCropDialog open={open} onOpenChange={setOpen} onSubmit={() => {}} />

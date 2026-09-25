@@ -2,9 +2,9 @@
 
 import {useState, type FocusEvent, type KeyboardEvent, type ReactNode} from 'react'
 import {cn} from '../lib/cn'
-import {IconButton} from '../ui/icon-button'
+import {IconButton} from './IconButton'
 import {TextField} from './TextField'
-import {SaveIcon, CancelIcon, EditIcon} from '../ui/action-icons'
+import {SaveIcon, CancelIcon, EditIcon} from './icons'
 import {useLabels} from '../i18n/context'
 
 export interface EditableInlineHeadingLabels {
@@ -130,10 +130,10 @@ export function EditableInlineHeading({
             className={fieldClass}
           />
         )}
-        <IconButton variant="success" size="sm" onClick={save} aria-label={l.save} title={l.saveHint}>
+        <IconButton tone="success" onClick={save} aria-label={l.save} title={l.saveHint}>
           <SaveIcon aria-hidden="true" />
         </IconButton>
-        <IconButton variant="destructive" size="sm" onClick={cancel} aria-label={l.cancel} title={l.cancelHint}>
+        <IconButton tone="destructive" onClick={cancel} aria-label={l.cancel} title={l.cancelHint}>
           <CancelIcon aria-hidden="true" />
         </IconButton>
       </span>
@@ -156,7 +156,7 @@ export function EditableInlineHeading({
       >
         {value || placeholder}
       </button>
-      <IconButton variant="muted" size="sm" onClick={startEdit} aria-label={l.edit} title={l.edit}>
+      <IconButton onClick={startEdit} aria-label={l.edit} title={l.edit}>
         <EditIcon aria-hidden="true" />
       </IconButton>
       {displayActions}

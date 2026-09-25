@@ -8,23 +8,21 @@
 //   import { Folder } from './icons'
 //   <Icon icon={Folder} size="md" />
 
-import type { ComponentProps, ComponentType, SVGProps } from 'react'
-import type { LucideProps } from './icons'
+import type { ComponentProps, SVGProps } from 'react'
+import type { IconComponent } from '../lib/variants'
 
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg'
 
-const PIXELS: Record<IconSize, number> = {
+export const ICON_PIXELS: Record<IconSize, number> = {
   xs: 12,
   sm: 14,
   md: 16,
   lg: 20,
 }
 
-type LucideIconComponent = ComponentType<LucideProps>
-
 export interface IconProps extends Omit<ComponentProps<'svg'>, 'children'> {
   /** Lucide-Icon (oder anderes SVG-Forwarding-Component) als Component-Reference. */
-  icon: LucideIconComponent
+  icon: IconComponent
   /** Größen-Skala. Default: `md` (16 px). */
   size?: IconSize
 }
@@ -41,6 +39,6 @@ export interface IconProps extends Omit<ComponentProps<'svg'>, 'children'> {
  *   <Icon icon={Inbox} size="lg" className="text-primary" />
  */
 export function Icon({ icon: Cmp, size = 'md', ...rest }: IconProps) {
-  const px = PIXELS[size]
+  const px = ICON_PIXELS[size]
   return <Cmp width={px} height={px} aria-hidden {...(rest as SVGProps<SVGSVGElement>)} />
 }

@@ -1,4 +1,4 @@
-import type {IconPickerLabels} from '../../ui/icon-picker'
+import type {IconPickerLabels} from '../../molecules/IconPicker'
 
 export const iconPicker: IconPickerLabels = {
   trigger: 'Icon auswählen…',

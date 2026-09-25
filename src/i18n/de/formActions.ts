@@ -1,4 +1,4 @@
-import type {FormActionsLabels} from '../../ui/form-actions'
+import type {FormActionsLabels} from '../../molecules/FormActions'
 
 export const formActions: FormActionsLabels = {
   cancel: 'Abbrechen',

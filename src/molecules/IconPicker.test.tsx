@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { IconPicker } from './icon-picker'
+import { IconPicker } from './IconPicker'
 
 describe('IconPicker', () => {
   it('renders the English trigger label without a value', () => {

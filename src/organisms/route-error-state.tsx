@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { AlertTriangle } from '../atoms/icons'
-import { Button } from '../ui/button'
+import { Button } from '../atoms/Button'
 import { useLabels } from '../i18n/context'
 
 export interface RouteErrorStateLabels {
@@ -45,7 +45,7 @@ export function RouteErrorState({ error, reset, labels }: Props) {
       <p className='body text-muted-foreground max-w-md mb-6'>
         {l.description}
       </p>
-      <Button onClick={reset}>{l.retry}</Button>
+      <Button size='lg' onClick={reset}>{l.retry}</Button>
       {isDev && (
         <details className='mt-6 w-full max-w-2xl text-left'>
           <summary className='caption text-muted-foreground cursor-pointer'>{l.details}</summary>

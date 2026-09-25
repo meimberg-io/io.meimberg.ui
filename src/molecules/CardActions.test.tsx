@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { CardActions } from './card-actions'
+import { CardActions } from './CardActions'
 
 describe('CardActions', () => {
   it('click on card body invokes the card onClick', async () => {

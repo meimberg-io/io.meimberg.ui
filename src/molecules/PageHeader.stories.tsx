@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {PageHeader} from './PageHeader'
-import {Button} from '../ui/button'
+import {Button} from '../atoms/Button'
 import {Plus, Inbox, FolderKanban} from '../atoms/icons'
 
 const meta: Meta<typeof PageHeader> = {
@@ -44,11 +44,11 @@ export const WithActionNoIcon: Story = {
 export const WithChildren: Story = {
   render: () => (
     <PageHeader title="Messages" description="Filters on the right">
-      <Button variant="outline" size="sm">
+      <Button variant="outline">
         <Inbox className="size-4" />
         Filter
       </Button>
-      <Button size="sm">
+      <Button>
         <Plus className="size-4" />
         New
       </Button>
@@ -65,7 +65,7 @@ export const WithChildrenAndAction: Story = {
       actionIcon={FolderKanban}
       onAction={() => {}}
     >
-      <Button variant="ghost" size="sm">
+      <Button variant="ghost">
         Export
       </Button>
     </PageHeader>
@@ -88,10 +88,10 @@ export const WithJsxDescription: Story = {
         </>
       }
     >
-      <Button variant="outline" size="sm">
+      <Button variant="outline">
         Sync
       </Button>
-      <Button size="sm">Quick add</Button>
+      <Button>Quick add</Button>
     </PageHeader>
   ),
 }

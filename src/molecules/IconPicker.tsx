@@ -2,13 +2,13 @@
 
 import { useState, useMemo, createElement } from 'react'
 import { icons, Search } from 'lucide-react'
-import { CancelIcon } from './action-icons'
+import { CancelIcon } from '../atoms/icons'
 import { cn } from '../lib/cn'
 import {
   Popover, PopoverContent, PopoverTrigger,
-} from './popover'
-import { Button } from './button'
-import { IconButton } from './icon-button'
+} from '../ui/popover'
+import { Button } from '../atoms/Button'
+import { IconButton } from '../atoms/IconButton'
 import { useLabels } from '../i18n/context'
 
 // Lucide icon picker. Stores kebab-case icon names (e.g. 'lightbulb',
@@ -94,7 +94,7 @@ export function IconPicker({ value, onChange, className, triggerLabel, labels }:
           variant='outline'
           size='sm'
           className={cn(
-            'justify-start gap-2 caption cursor-pointer h-8',
+            'justify-start gap-2 caption',
             !value && 'text-muted-foreground',
             className,
           )}
@@ -120,7 +120,7 @@ export function IconPicker({ value, onChange, className, triggerLabel, labels }:
             autoFocus
           />
           {value && (
-            <IconButton size='sm' onClick={handleClear} title={l.clear} aria-label={l.clear}>
+            <IconButton onClick={handleClear} title={l.clear} aria-label={l.clear}>
               <CancelIcon />
             </IconButton>
           )}
@@ -134,7 +134,6 @@ export function IconPicker({ value, onChange, className, triggerLabel, labels }:
             return (
               <IconButton
                 key={kebab}
-                size='default'
                 onClick={() => handleSelect(kebab)}
                 title={kebab}
                 className={value === kebab ? 'bg-primary/20 text-primary' : undefined}
@@ -160,4 +159,4 @@ export function IconPicker({ value, onChange, className, triggerLabel, labels }:
 }
 
 // This file imports the full Lucide registry — load `IconPicker` lazily
-// (e.g. `next/dynamic`). For rendering a single icon use `./lucide-icon`.
+// (e.g. `next/dynamic`). For rendering a single icon by name use `IconByName`.

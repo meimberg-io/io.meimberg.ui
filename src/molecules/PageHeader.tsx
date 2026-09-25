@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '../ui/button';
+import { Button } from '../atoms/Button';
 import type { LucideIcon } from '../atoms/icons';
 import type { ReactNode } from 'react';
 
@@ -36,8 +36,7 @@ export function PageHeader({ title, description, actionLabel, actionIcon: Action
       <div className="flex items-center gap-2">
         {children}
         {actionLabel && onAction && (
-          <Button onClick={onAction} size="sm" data-testid="page-header-action">
-            {ActionIcon && <ActionIcon />}
+          <Button onClick={onAction} icon={ActionIcon} data-testid="page-header-action">
             {actionLabel}
           </Button>
         )}

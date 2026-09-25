@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
 import {DetailDialogWrapper} from './detail-dialog-wrapper'
-import {Button} from '../ui/button'
+import {Button} from '../atoms/Button'
 import {MetaPill} from '../atoms/MetaPill'
 import {Zap, Rocket, FileText} from '../atoms/icons'
 
@@ -17,7 +17,7 @@ type Story = StoryObj<typeof DetailDialogWrapper>
 function Trigger({label, onClick}: {label: string; onClick: () => void}) {
   return (
     <div className="p-6">
-      <Button onClick={onClick}>{label}</Button>
+      <Button size="lg" onClick={onClick}>{label}</Button>
     </div>
   )
 }
@@ -41,7 +41,7 @@ function BasicDialog({
         description="Reported May 17 · alex@example.com · #support"
         headerAside={
           withHeaderAside ? (
-            <Button size="sm" variant="outline">
+            <Button variant="outline">
               Open in tracker
             </Button>
           ) : undefined
@@ -49,10 +49,10 @@ function BasicDialog({
         footer={
           withFooter ? (
             <div className="flex w-full justify-end gap-2">
-              <Button variant="ghost" onClick={() => setOpen(false)}>
+              <Button size="lg" variant="ghost" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => setOpen(false)}>Accept</Button>
+              <Button size="lg" onClick={() => setOpen(false)}>Accept</Button>
             </div>
           ) : undefined
         }
@@ -162,10 +162,10 @@ export const ItemPreview: Story = {
             description="Shared drive · 14:32 · unread"
             footer={
               <div className="flex w-full justify-between">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost">
                   Archive
                 </Button>
-                <Button size="sm">Convert to task</Button>
+                <Button>Convert to task</Button>
               </div>
             }
           >

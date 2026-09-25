@@ -2,8 +2,8 @@
 
 import type { ReactNode } from 'react';
 import type { LucideIcon } from '../atoms/icons';
-import { Button } from '../ui/button';
-import { AddIcon } from '../ui/action-icons';
+import { Button } from '../atoms/Button';
+import { AddIcon } from '../atoms/icons';
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -38,8 +38,7 @@ export function EmptyState({
     const dashedAction =
       action ??
       (actionLabel && onAction ? (
-        <Button onClick={onAction} size="sm" data-testid="empty-state-action">
-          <AddIcon />
+        <Button onClick={onAction} icon={AddIcon} data-testid="empty-state-action">
           {actionLabel}
         </Button>
       ) : null);
@@ -67,8 +66,7 @@ export function EmptyState({
       <p className="body text-muted-foreground max-w-xs mb-6">{description}</p>
       {action ??
         (actionLabel && onAction && (
-          <Button onClick={onAction} size="sm" data-testid="empty-state-action">
-            <AddIcon />
+          <Button onClick={onAction} icon={AddIcon} data-testid="empty-state-action">
             {actionLabel}
           </Button>
         ))}

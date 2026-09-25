@@ -1,8 +1,8 @@
 'use client'
 
 import type {ReactNode} from 'react'
-import {Button} from '../ui/button'
-import {CloseIcon} from '../ui/action-icons'
+import {Button} from '../atoms/Button'
+import {CloseIcon} from '../atoms/icons'
 import {useLabels} from '../i18n/context'
 
 export interface SelectedItemsBarLabels {
@@ -53,8 +53,8 @@ export function SelectedItemsBar({
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
       <span className="caption text-muted-foreground">{label ?? l.selected}</span>
       {children}
-      <Button type="button" variant="ghost" size="sm" className="ml-auto" onClick={onClearAll}>
-        <CloseIcon /> {clearLabel ?? l.clearAll}
+      <Button type="button" variant="ghost" icon={CloseIcon} className="ml-auto" onClick={onClearAll}>
+        {clearLabel ?? l.clearAll}
       </Button>
     </div>
   )

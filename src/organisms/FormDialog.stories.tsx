@@ -7,7 +7,7 @@ import {FormField} from '../molecules/FormField'
 import {FormHelpText} from '../molecules/FormHelpText'
 import {TextField} from '../atoms/TextField'
 import {SegmentedSwitch, type SegmentedOption} from '../atoms/SegmentedSwitch'
-import {Button} from '../ui/button'
+import {Button} from '../atoms/Button'
 
 const meta: Meta<typeof FormDialog> = {
   title: 'Organisms/FormDialog',
@@ -27,7 +27,7 @@ const PROJECT_TYPES: ReadonlyArray<SegmentedOption<ProjectType>> = [
 function Trigger({label, onClick}: {label: string; onClick: () => void}) {
   return (
     <div className="p-6">
-      <Button onClick={onClick}>{label}</Button>
+      <Button size="lg" onClick={onClick}>{label}</Button>
     </div>
   )
 }
@@ -179,13 +179,13 @@ export const WithFooterActions: Story = {
             cancelLabel="Close"
             footerActions={
               <>
-                <Button size="sm" variant="outline">
+                <Button variant="outline">
                   Approve
                 </Button>
-                <Button size="sm" variant="outline">
+                <Button variant="outline">
                   Assign
                 </Button>
-                <Button size="sm" variant="destructive">
+                <Button tone="destructive">
                   Delete
                 </Button>
               </>

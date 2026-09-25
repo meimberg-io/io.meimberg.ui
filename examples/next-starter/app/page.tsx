@@ -1,7 +1,6 @@
 'use client'
 
-import { Button } from '@meimberg/ui/ui/button'
-import { EmptyState, FormField, FormSection, PageContainer, PageHeader, TextField, toast } from '@meimberg/ui'
+import { Button, EmptyState, FormField, FormSection, PageContainer, PageHeader, TextField, toast } from '@meimberg/ui'
 import { useState } from 'react'
 
 export default function HomePage() {
@@ -14,7 +13,7 @@ export default function HomePage() {
         <FormField label="Name">
           <TextField value={name} onChange={e => setName(e.target.value)} placeholder="Ada" />
         </FormField>
-        <Button onClick={() => toast.success(`Hallo ${name || 'Welt'}`)}>Toast zeigen</Button>
+        <Button size="lg" onClick={() => toast.success(`Hallo ${name || 'Welt'}`)}>Toast zeigen</Button>
       </FormSection>
       <EmptyState title="Noch nichts da" description="So sieht ein Leerzustand aus." />
     </PageContainer>

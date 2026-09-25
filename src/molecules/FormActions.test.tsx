@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { CancelButton, SaveButton } from './form-actions'
+import userEvent from '@testing-library/user-event'
+import { CancelButton, SaveButton } from './FormActions'
 
 describe('CancelButton / SaveButton', () => {
   it('render English default labels', () => {
@@ -30,9 +31,13 @@ describe('CancelButton / SaveButton', () => {
     expect(screen.getByRole('button', { name: 'Apply' })).toBeInTheDocument()
   })
 
-  it('loading disables the save button and announces the saving label', () => {
-    render(<SaveButton loading />)
+  it('busy marks the save button, announces the saving label and ignores clicks', async () => {
+    const onClick = vi.fn()
+    render(<SaveButton busy onClick={onClick} />)
     const button = screen.getByRole('button', { name: 'Saving…' })
-    expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-busy', 'true')
+    expect(button).not.toBeDisabled()
+    await userEvent.click(button)
+    expect(onClick).not.toHaveBeenCalled()
   })
 })

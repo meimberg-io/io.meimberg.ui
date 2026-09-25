@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { Input } from '../ui/input'
-import { IconButton } from '../ui/icon-button'
-import { Search } from '../atoms/icons'
-import { CloseIcon } from '../ui/action-icons'
+import { IconButton } from './IconButton'
+import { CloseIcon, Search } from './icons'
 import { cn } from '../lib/cn'
 import { useLabels } from '../i18n/context'
 
@@ -62,7 +61,6 @@ export function SearchInput({
       />
       {inner && (
         <IconButton
-          size='sm'
           className='absolute right-1 top-1/2 -translate-y-1/2'
           onClick={() => handleChange('')}
           aria-label={l.clear}

@@ -4,7 +4,7 @@
 
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {DataTable, type DataTableColumn} from './DataTable'
-import {Button} from '../ui/button'
+import {Button} from '../atoms/Button'
 import {Pill} from '../atoms/Pill'
 
 const meta: Meta<typeof DataTable> = {
@@ -48,7 +48,7 @@ const COLUMNS: DataTableColumn<Job>[] = [
     cellClassName: 'text-right',
     hideOnCard: true,
     cell: () => (
-      <Button variant="ghost" size="sm">
+      <Button variant="ghost">
         Retry
       </Button>
     ),

@@ -16,7 +16,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from '../ui/dropdown-menu'
-import {IconButton} from '../ui/icon-button'
+import {IconButton} from '../atoms/IconButton'
+import type {ControlSize} from '../lib/variants'
 import {MoreVertical} from '../atoms/icons'
 import {useLabels} from '../i18n/context'
 
@@ -44,6 +45,12 @@ export interface ItemActionsMenuProps {
   labels?: Partial<ItemActionsMenuLabels>
 }
 
+// Both trigger sizes share the 32 px box of the control scale.
+const TRIGGER_SIZE: Record<NonNullable<ItemActionsMenuProps['size']>, ControlSize> = {
+  default: 'sm',
+  sm: 'sm',
+}
+
 /**
  * ItemActionsMenu — IconButton (MoreVertical) + DropdownMenu frame for item
  * action menus on cards / rows.
@@ -69,7 +76,7 @@ export function ItemActionsMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <IconButton size={size} aria-label={ariaLabel ?? l.trigger} data-testid={testId}>
+        <IconButton size={TRIGGER_SIZE[size]} aria-label={ariaLabel ?? l.trigger} data-testid={testId}>
           <MoreVertical />
         </IconButton>
       </DropdownMenuTrigger>

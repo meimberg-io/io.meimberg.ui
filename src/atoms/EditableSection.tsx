@@ -8,7 +8,8 @@
 
 import type {ReactNode} from 'react'
 import {Pencil, Plus} from './icons'
-import {Button} from '../ui/button'
+import {Button} from './Button'
+import {IconButton} from './IconButton'
 import {cn} from '../lib/cn'
 import {useLabels} from '../i18n/context'
 
@@ -65,32 +66,21 @@ export function EditableSection({
       </div>
       <div className="flex items-center gap-1">
         {onAdd && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="cursor-pointer h-8 w-8"
-            onClick={onAdd}
-            aria-label={add}
-            title={add}
-          >
-            <Plus width={16} height={16} aria-hidden />
-          </Button>
+          <IconButton variant="ghost" onClick={onAdd} aria-label={add} title={add}>
+            <Plus aria-hidden />
+          </IconButton>
         )}
         {onToggleEdit && (
           <Button
-            variant={editing ? 'default' : 'ghost'}
-            size="icon"
-            className={cn(
-              'cursor-pointer h-8 w-8',
-              editing ? '' : 'text-muted-foreground',
-            )}
+            variant={editing ? 'solid' : 'ghost'}
+            size="sm"
+            icon={Pencil}
+            className={cn('w-8 px-0', !editing && 'text-muted-foreground')}
             onClick={onToggleEdit}
             aria-pressed={editing}
             aria-label={edit}
             title={edit}
-          >
-            <Pencil width={14} height={14} aria-hidden />
-          </Button>
+          />
         )}
       </div>
     </header>

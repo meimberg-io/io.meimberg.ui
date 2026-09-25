@@ -1,8 +1,8 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
 import {EditableInlineHeading} from './EditableInlineHeading'
-import {IconButton} from '../ui/icon-button'
-import {DeleteIcon} from '../ui/action-icons'
+import {IconButton} from './IconButton'
+import {DeleteIcon} from './icons'
 
 const meta: Meta<typeof EditableInlineHeading> = {
   title: 'Atoms/EditableInlineHeading',
@@ -37,7 +37,7 @@ function WithDisplayActionsDemo() {
       value={value}
       onSave={setValue}
       displayActions={
-        <IconButton variant="destructive" size="sm" aria-label="Reset title" title="Reset title">
+        <IconButton tone="destructive" aria-label="Reset title" title="Reset title">
           <DeleteIcon aria-hidden="true" />
         </IconButton>
       }

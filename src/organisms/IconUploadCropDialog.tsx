@@ -5,7 +5,7 @@ import Cropper, { type Area } from 'react-easy-crop'
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription,
 } from '../ui/dialog'
-import { Button } from '../ui/button'
+import { Button } from '../atoms/Button'
 import { Slider } from '../ui/slider'
 import { useLabels } from '../i18n/context'
 
@@ -183,10 +183,10 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title, labe
             </>
           )}
           <DialogFooter>
-            <Button variant='outline' onClick={() => onOpenChange(false)} disabled={submitting}>
+            <Button variant='outline' size='lg' onClick={() => onOpenChange(false)} disabled={submitting}>
               {l.cancel}
             </Button>
-            <Button onClick={() => void handleSubmit()} disabled={submitting || !croppedAreaPx}>
+            <Button size='lg' onClick={() => void handleSubmit()} disabled={submitting || !croppedAreaPx}>
               {submitting ? l.uploading : l.save}
             </Button>
           </DialogFooter>

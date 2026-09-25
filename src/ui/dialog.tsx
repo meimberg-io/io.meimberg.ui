@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { CloseIcon } from "./action-icons";
+import { CloseIcon } from "../atoms/icons";
 
 import { cn } from "../lib/cn";
 import { useLabels } from "../i18n/context";

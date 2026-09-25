@@ -7,7 +7,7 @@ import { PanelLeft } from "lucide-react";
 
 import { useIsMobile } from "../hooks/use-mobile";
 import { cn } from "../lib/cn";
-import { Button } from "./button";
+import { IconButton, type IconButtonProps } from "../atoms/IconButton";
 import { Input } from "./input";
 import { Separator } from "./separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "./sheet";
@@ -241,20 +241,20 @@ const Sidebar = React.forwardRef<
 Sidebar.displayName = "Sidebar";
 
 const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button> & { labels?: Partial<SidebarLabels> }
+  HTMLButtonElement,
+  IconButtonProps & { labels?: Partial<SidebarLabels> }
 >(
   ({ className, onClick, labels, ...props }, ref) => {
     const { toggleSidebar } = useSidebar();
     const l = useLabels("sidebar", defaultLabels, labels);
 
     return (
-      <Button
+      <IconButton
         ref={ref}
         data-sidebar="trigger"
         variant="ghost"
-        size="icon"
-        className={cn("size-8", className)}
+        size="sm"
+        className={className}
         onClick={(event) => {
           onClick?.(event);
           toggleSidebar();
@@ -263,7 +263,7 @@ const SidebarTrigger = React.forwardRef<
       >
         <PanelLeft />
         <span className="sr-only">{l.toggle}</span>
-      </Button>
+      </IconButton>
     );
   },
 );

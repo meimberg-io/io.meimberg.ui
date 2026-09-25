@@ -12,7 +12,7 @@ import {forwardRef} from 'react'
 import type {ReactNode} from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Info, Loader2, X} from '../atoms/icons'
-import {Button} from '../ui/button'
+import {Button} from '../atoms/Button'
 import {useIsMobile} from '../hooks/use-mobile'
 import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
@@ -260,6 +260,7 @@ export function FormDialog({
               <Button
                 type="button"
                 variant="ghost"
+                size="lg"
                 onClick={handleCancel}
                 disabled={submitPending}
               >

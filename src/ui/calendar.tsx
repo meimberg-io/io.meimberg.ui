@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 
 import { cn } from "../lib/cn";
-import { buttonVariants } from "./button";
+import { buttonVariants } from "../atoms/Button";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -30,11 +30,11 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         // wirken gegenüber dem Monats-Label (das im gepaddeten Content liegt)
         // nach oben verrutscht. Mit `top-3` liegen sie auf einer Linie.
         button_previous: cn(
-          buttonVariants({ variant: "outline" }),
+          buttonVariants({ variant: "outline", size: "lg" }),
           "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1 top-3",
         ),
         button_next: cn(
-          buttonVariants({ variant: "outline" }),
+          buttonVariants({ variant: "outline", size: "lg" }),
           "size-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1 top-3",
         ),
         month_grid: "w-full border-collapse space-x-1",
@@ -48,7 +48,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
           "first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md",
         ),
         day_button: cn(
-          buttonVariants({ variant: "ghost" }),
+          buttonVariants({ variant: "ghost", size: "lg" }),
           "size-8 p-0 font-normal aria-selected:opacity-100",
         ),
         range_end: "day-range-end",

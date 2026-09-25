@@ -7,8 +7,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from '../ui/dropdown-menu'
-import {EditIcon, DeleteIcon} from '../ui/action-icons'
-import {ArrowRight, FolderKanban} from '../atoms/icons'
+import {ArrowRight, DeleteIcon, EditIcon, FolderKanban} from '../atoms/icons'
 
 const meta: Meta<typeof ItemActionsMenu> = {
   title: 'Molecules/ItemActionsMenu',
