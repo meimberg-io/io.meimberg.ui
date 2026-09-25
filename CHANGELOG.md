@@ -1,5 +1,56 @@
 # @meimberg/ui
 
+## 2.0.0
+
+### Major Changes
+
+- 96a4b67: Neutral und anpassbar (Konsolidierung Phase 2).
+
+  **Sprache**
+
+  - Alle Komponenten-Texte sind englisch und über einen Label-Mechanismus überschreibbar: App-weit per `<UiProviders messages={…}>`, pro Instanz per `labels`-Prop. Label-Typen `<Komponente>Labels`, Gesamt-Typ `UiMessages`, Hooks `useLabels`/`useUiLocale`/`useDateLocale`.
+  - Deutsches Paket: `import {de} from '@meimberg/ui/i18n/de'` → `<UiProviders {...de}>` (Labels, `de-DE`, date-fns-Locale).
+  - **Migration:** Apps, die bisher die deutschen Defaults genutzt haben, übergeben `{...de}` an `UiProviders`.
+  - `formatAbsoluteDate(date, mode, locale)`: `locale` ist jetzt Pflicht.
+  - DatePicker: Kalender-Locale und Datumsformat kommen aus dem Provider (Default `en-US`/`enUS`); bisher war `de` fest, das Trigger-Label ignorierte die `locale`-Prop.
+
+  **Theme**
+
+  - Neutrale Default-Palette (Slate + blaues Primary), `--info` eigenständig. **Migration:** Eine App, die das bisherige Aussehen behalten will, überschreibt die Farb-Tokens nach dem Tokens-Import (siehe README § Eigene Marke).
+  - Neue Tokens `--warning-foreground`, `--info-foreground`; Typografie über `--type-<rolle>-size/-leading`; `rounded-xl/2xl`, Form-Felder und Dialoge leiten sich von `--radius` ab.
+  - `heading-*`, `body`, `body-sm`, `caption`, `pill`, `pill-hover`, `hover-card`, `skeleton-shimmer` sind `@utility` statt plain Klassen: Varianten wie `max-sm:body-sm` funktionieren jetzt.
+  - `UiProviders`: Default-Theme `system` mit `enableSystem`; die Option `attribute: 'data-theme'` entfällt (Dark Mode hängt an `.dark`).
+
+  **Produkt-Neutralität**
+
+  - `ComingSoon` (Atom): `label` → `title`, `dashlet`/`data-dashlet` entfallen.
+  - `ui/coming-soon`: `dashlet` entfällt, `title` optional.
+  - `WeightDots`: `value`/`onChange` als `number`, neue Prop `max` (Default 5), Typ `WeightValue` und fest verdrahtetes `data-testid` entfallen (dafür `data-testid`-Prop).
+  - `KpiTile`: Vergleichstext als Label `comparison` (Default „vs. previous period").
+  - `EmptyState`: Action-Button-`data-testid` `page-header-action` → `empty-state-action`.
+  - `MarkdownRenderer`: Sonderfall für eine Pulse-Route entfernt (relative URLs sind unverändert erlaubt).
+  - `MarkdownEditor`: `window.prompt` für Links/Bilder durch ein Inline-Popover ersetzt.
+  - `SubNavLayout`, `IconUploadCropDialog`: Text-Defaults kommen aus den Labels.
+  - Stories, Kommentare und Foundations ohne Pulse-Bezug; Storybook mit Sprach-Umschalter und Demo-Marke.
+
+- 89c4d48: Konsolidiert (Konsolidierung Phase 3). Einheitliches Vokabular: `size` `xs|sm|md|lg` (26/32/36/40 px), `tone` `neutral|primary|success|warning|info|destructive`, `variant` beschreibt nur die Form. `icon`-Props sind Komponenten-Referenzen (`IconComponent`), keine fest verdrahteten `data-testid` mehr.
+
+  **Buttons** — `Button`/`IconButton` sind Atoms im Root (`@meimberg/ui/ui/button`, `ui/icon-button` entfallen). Button: `variant` `solid|outline|ghost|link` + `tone`, `size` Default `md` (36 px, bisher 40 → `size="lg"`), neu `icon`, `busy`. Mapping: `variant="default"` → weglassen, `secondary` → `tone="neutral"`, `success`/`destructive` → `tone`, `size="sm"` → `md`, `size="icon"` → `<IconButton size="lg">`. IconButton: `variant="muted|primary|success|destructive"` → `tone`, `variant` `quiet|ghost`, `size="default"` → `sm`. `AlertDialogAction variant="destructive"` → `tone="destructive"`. `SaveButton`/`CancelButton` aus dem Root, `loading` → `busy`.
+
+  **Selects** — `Select` (Radix Select, `variant` `field|pill`, Compound `Select.Root/Trigger/TriggerIcon/IconTrigger/Content/Item/ClearItem/Separator/GroupLabel`) ersetzt `Dropdown` und `SelectField`; `Combobox` (Radix Popover, Tastatur-Navigation, eindeutige IDs) ersetzt `RichSelect`. Mapping: `Dropdown` → `Select variant="pill"` (`size` `sm` → `xs`, `chip` → `sm`; `allLabel` → `clearLabel` bzw. `placeholder` bei `allowClear={false}`; Option-`icon` → `leading`), `Dropdown.Pill` → `Select.Trigger variant="pill"`, `.Avatar` → `.IconTrigger`, `.Row` → `.Item`, `.AllRow` → `.ClearItem`, `DROPDOWN_SIZE[…].iconBox` → `Select.TriggerIcon`; `SelectField` → `Select` (`size="md"` → Default `lg`); `RichSelect` → `Combobox` (`selected` → `value` = ID, `onSelect(item)` → `onChange(id, item)`, `leadingIcon` → `leading`), i18n-Key `richSelect` → `combobox`.
+
+  **Badges** — `Badge` (`tone`, `variant` `solid|soft|outline|plain`, `shape`, `compact`, `leading`/`trailing`, `iconOnly`, `href`) + `BadgeDot` ersetzen `Pill`, `CounterPill`, `MetaPill`, `IconBadge`, `IconBadgeDot`, `ui/badge`. `Chip` vereint Toggle- und entfernbare Chips (ersetzt `FilterChip`; `label` → `prefix`, `size` `sm` → `xs`, `md` → `sm`, `activeClassName` → `tone`), neu `compactBelow`; i18n-Key `filterChip` → `chip`. `SegmentedControl` (`size` `xs|lg`, Thumb-Optik) ersetzt `SegControl`/`SegmentedSwitch`.
+
+  **Formulare** — `ui/field` → `FormField` (injiziert die ID auch per cloneElement), `ui/coming-soon` → `ComingSoon` (i18n `comingSoonCard` → `comingSoon`), `Avatar` mit `shape`/`tone`/`2xl`. `FormDialog`: `submitVariant` → `submitTone`, `submitPending` → `submitBusy`, `submitIcon` als Komponente. `TextField` `leadingIcon/trailingIcon` → `leading/trailing`. `DatePicker` `size="default"` → `lg`.
+
+  **Layout** — `FilterBar` (neu als Molecule; die config-getriebene Organism-Variante entfällt), `SearchInput size="xs"` (Filterleisten-Optik), `Card interactive`, `PageHeader` `leading`/`meta`, `EmptyState`/`InfoBanner` `tone` → `variant`, `KpiTile` `tone` `warn` → `warning`, `danger` → `destructive`, `icon` als Komponente, `ItemActionsMenu` `testId` → `data-testid`, `size` → `ControlSize`. `AppSidebar` `header`/`footer` bekommen `({collapsed, isMobile, closeMobile})`. `UserMenu`-Items mit `onSelect` und `tone`.
+
+  **Entfernt** — `IconByKey`, `ui/lucide-icon` (→ `IconByName`), `ui/action-icons` (→ Aliase in `@meimberg/ui/atoms/icons`), `ui/icon-picker` (→ Subpath `@meimberg/ui/molecules/icon-picker`), `ui/card-actions`/`ui/form-actions` (→ Root), Radix-Toast (`ui/toast`, `use-toast`), `formatAbsoluteDate` und `usePopoverPosition` aus dem Public API.
+
+### Patch Changes
+
+- e1de300: Deutsches Paket: Der Schließen-Button oben rechts im Dialog heißt „Dialog schließen", damit er sich von einem „Schließen" im Footer unterscheidet.
+
 ## 2.0.0-next.2
 
 ### Major Changes

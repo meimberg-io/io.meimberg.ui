@@ -98,6 +98,8 @@ Die Phasen bauen aufeinander auf. Phase 1 ist klein und nicht-brechend; ab Phase
 
 ### Phase 3 — Konsolidieren (v2.0)
 
+**Erledigt mit v2.0.0 (2026-09-25).** Entwurf und Entscheidungen standen in `docs/phase-3-entwurf.md` (mit dem Release gelöscht; API-Konventionen jetzt im README, alle Zuordnungen alt → neu im CHANGELOG). Pulse ist vollständig migriert. Offen für später: ein gefüllter quadratischer Icon-Button (Pulse-CaptureTrigger ist dafür 4 px breiter), `Select.TriggerIcon` ohne Zugriff auf die Pixelgröße für Kinder mit numerischer Größe (Pulse-ContextDropdown spiegelt die Tabelle), `EditableInlineHeading.size` nutzt noch die Typo-Skala.
+
 1. Selects zusammenführen: ein `Select` (einfach) + ein `Combobox` (Suche/Rich-Items, Tastatur-Navigation); `Dropdown` als Filter-Variante davon.
 2. Pills/Badges auf zwei Konzepte reduzieren: `Badge` (passiv, mit Tönen) und `Chip` (interaktiv, toggle/removable).
 3. Dubletten auflösen: SegControl/SegmentedSwitch, ComingSoon, Avatar, `ui/field`, SubmitButton, Icon-Helfer (ein Icon-Prop-Typ); toten Radix-Toast (`ui/toast`, `hooks/use-toast`, `@radix-ui/react-toast`) löschen.
