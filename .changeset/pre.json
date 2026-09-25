@@ -6,6 +6,7 @@
   },
   "changesets": [
     "dialog-close-de",
-    "phase-2-neutral"
+    "phase-2-neutral",
+    "phase-3-konsolidierung"
   ]
 }
