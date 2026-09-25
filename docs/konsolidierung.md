@@ -74,6 +74,8 @@ Die Phasen bauen aufeinander auf. Phase 1 ist klein und nicht-brechend; ab Phase
 
 ### Phase 1 — Einbaubar machen (v1.3, nicht brechend)
 
+**Erledigt mit v1.3.0 (2026-09-25).** Pulse ist auf v1.3.0 umgestellt, CI grün.
+
 1. `@source "../";` in `src/tokens/theme.css`; Pulse-Hack danach entfernen.
 2. Peers: `next-themes`, `sonner`, `tailwindcss@^4`, `tw-animate-css`; optional-Peers: `@tailwindcss/typography`, TipTap-Set, `react-markdown`-Set, `react-easy-crop`. `engines`-Feld.
 3. README-Setup korrigieren (Tag, Fonts, Provider/Toaster, lauffähiges Shell-Beispiel, Tailwind-Plugins).
