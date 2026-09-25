@@ -86,7 +86,7 @@ Die Phasen bauen aufeinander auf. Phase 1 ist klein und nicht-brechend; ab Phase
 
 ### Phase 2 — Neutral und themebar (v2.0)
 
-**Erledigt als Vorab-Version v2.0.0-next.0 (2026-09-25).** Pulse pinnt die Vorab-Version; v2.0.0 final nach Phase 3. Abweichungen vom Plan: Die Attachment-Sonderregel im MarkdownRenderer war wirkungslos (relative URLs waren ohnehin erlaubt) und ist ersatzlos entfallen, eine `allowedUrlPrefixes`-Prop war nicht nötig. WeightDots bleibt generisch (`max`) im DS.
+**Erledigt als Vorab-Version v2.0.0-next.1 (2026-09-25).** Pulse pinnt die Vorab-Version; v2.0.0 final nach Phase 3. Abweichungen vom Plan: Die Attachment-Sonderregel im MarkdownRenderer war wirkungslos (relative URLs waren ohnehin erlaubt) und ist ersatzlos entfallen, eine `allowedUrlPrefixes`-Prop war nicht nötig. WeightDots bleibt generisch (`max`) im DS.
 
 1. Label-Mechanismus: jede Komponente mit UI-Text bekommt `labels`-Props mit englischem Default, zusätzlich ein `UiProviders`-weites `locale` + Messages-Objekt; deutsche Messages als mitgelieferter Export für Pulse.
 2. DatePicker-Locale-Bug, KpiTile-Vergleichstext als Prop, `window.prompt` im Editor ersetzen.
