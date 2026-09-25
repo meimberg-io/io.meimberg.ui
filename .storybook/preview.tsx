@@ -4,7 +4,7 @@
 import type {Preview} from '@storybook/react-vite'
 import {withThemeByClassName} from '@storybook/addon-themes'
 
-import '../src/styles.css'
+import './preview.css'
 
 const preview: Preview = {
   parameters: {

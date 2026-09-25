@@ -10,7 +10,7 @@ import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 
 export default tseslint.config(
-  {ignores: ['storybook-static/**']},
+  {ignores: ['storybook-static/**', 'examples/**']},
   ...tseslint.configs.recommended,
   // React-Hooks-Regeln (recommended) — die Primitives sind Client-Components;
   // exhaustive-deps & Co. gelten hier genauso wie in der App (PUL-462 Schritt 6).

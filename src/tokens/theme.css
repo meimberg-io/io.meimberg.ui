@@ -10,6 +10,12 @@
  * Token-Änderung = Foundations-Story-Update im selben Changeset (PUL-412).
  * ==========================================================================*/
 
+/* Tailwind v4 scannt `node_modules` nicht. Ohne diese Zeile fehlen in der
+ * Consumer-App alle Utility-Klassen, die nur in @meimberg/ui-Komponenten
+ * vorkommen. Der Pfad ist relativ zu dieser Datei (src/tokens/ → src/) und
+ * funktioniert daher unabhängig vom node-linker der App. */
+@source "../";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* MIPUL-289: Pointer-Fine-Geräte (Maus/Trackpad). Wird verwendet, um
@@ -291,6 +297,37 @@
  * unstyled. App-spezifische Utilities (prio-filter-chip, stagger-fade-in,
  * col-chev, sync-icon-spinning) bleiben in der App-`globals.css`.
  * ==========================================================================*/
+
+/* Hover-Reveal — Aktionen, die erst beim Hover auf der Karte/Zeile erscheinen.
+ *
+ * Der Gate ist der **Zeiger**, nicht der Viewport: `@media (hover: none)` zeigt
+ * die Aktionen dauerhaft. Eine Viewport-Variante (`md:opacity-0`) greift auf
+ * einem iPad nicht — das Gerät ist breiter als `md` und hat trotzdem keinen
+ * Hover, die Aktionen blieben unsichtbar.
+ *
+ * Reveal-Trigger auf Hover-Geräten: Hover ODER Fokus im `group`-Container (die
+ * Keyboard-Route darf nicht schlechter sein als die Maus-Route) sowie Fokus im
+ * Element selbst, falls es keinen `group`-Vorfahren gibt.
+ *
+ * Nur die Sichtbarkeit — Trefferfläche bleibt Sache des Buttons
+ * (`IconButton`/`Button` tragen `pointer-coarse:min-h-tap`). */
+@utility hover-reveal {
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:focus-within {
+    opacity: 1;
+  }
+
+  :where(.group):hover &,
+  :where(.group):focus-within & {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    opacity: 1;
+  }
+}
 
 /* PUL-397-followup: Vereinheitlichter Active-State-Cue auf Form-Triggern.
  *   `:focus-visible` — Tastatur-Fokus · `[data-state="open"]` — Radix-Trigger

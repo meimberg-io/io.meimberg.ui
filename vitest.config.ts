@@ -9,6 +9,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     globals: true,
-    exclude: ['**/node_modules/**', '**/storybook-static/**'],
+    exclude: ['**/node_modules/**', '**/storybook-static/**', 'examples/**'],
   },
 })

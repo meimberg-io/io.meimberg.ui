@@ -36,20 +36,19 @@ describe('CardActions', () => {
     expect(onCardClick).not.toHaveBeenCalled()
   })
 
-  it('permanent prop removes opacity-0 hover-gating', () => {
+  it('permanent prop removes the hover-reveal gate', () => {
     const { rerender, container } = render(
       <CardActions>
         <button onClick={() => {}}>A</button>
       </CardActions>,
     )
-    expect(container.firstChild).toHaveClass('md:opacity-0')
+    expect(container.firstChild).toHaveClass('hover-reveal')
 
     rerender(
       <CardActions permanent>
         <button onClick={() => {}}>A</button>
       </CardActions>,
     )
-    expect(container.firstChild).not.toHaveClass('md:opacity-0')
-    expect(container.firstChild).toHaveClass('opacity-100')
+    expect(container.firstChild).not.toHaveClass('hover-reveal')
   })
 })

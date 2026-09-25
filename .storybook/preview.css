@@ -1,0 +1,5 @@
+/* Storybook-Stylesheet: DS-Basis plus das optionale Typography-Plugin, das
+ * MarkdownRenderer/-Editor (`prose`) brauchen. Bewusst nicht in src/styles.css,
+ * damit Consumer ohne Markdown das Plugin nicht installieren müssen. */
+@import "../src/styles.css";
+@plugin "@tailwindcss/typography";

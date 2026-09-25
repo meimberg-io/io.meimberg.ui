@@ -57,11 +57,9 @@ export function CardActions({
   return (
     <div
       className={cn(
-        'flex items-center gap-1 transition-opacity',
+        'flex items-center gap-1',
         position === 'top-right' && 'absolute top-2 right-2 z-10',
-        permanent
-          ? 'opacity-100'
-          : 'opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100',
+        !permanent && 'hover-reveal',
         className,
       )}
     >

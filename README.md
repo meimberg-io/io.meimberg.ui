@@ -42,53 +42,80 @@ Volle Atomic-Design-Dreiteilung (nach **Komposition**, nicht nach Feature-Topf):
 
 ## Getting Started — neue App aufsetzen
 
-### 1. Dependency + Transpile
+Voraussetzungen: Next.js (App Router), React 19, Tailwind CSS v4. Eine lauffähige Vorlage mit allen Schritten liegt unter [`examples/next-starter/`](examples/next-starter/); CI baut sie bei jedem Push und Tag.
 
-Das Package wird als **Quelle** konsumiert (kein Build-Step), die App transpiliert
-es via Next `transpilePackages`:
+### 1. Dependencies
+
+```jsonc
+// package.json der App
+"dependencies": {
+  "@meimberg/ui": "github:meimberg-io/io.meimberg.ui#v1.3.0",
+  "next-themes": "^0.4.6",
+  "sonner": "^1.7.4"
+},
+"devDependencies": {
+  "tailwindcss": "^4",
+  "@tailwindcss/postcss": "^4",
+  "tw-animate-css": "^1.4.0",
+  "@tailwindcss/typography": "^0.5"   // nur für MarkdownRenderer/-Editor
+}
+```
+
+`next-themes` und `sonner` sind Peers: Die App installiert sie selbst, damit es genau eine Instanz von Theme-Context und Toast-Store gibt. Das Tag immer auf ein Release pinnen, siehe [CHANGELOG](CHANGELOG.md).
+
+### 2. Next- und PostCSS-Konfiguration
+
+Das Package wird als TypeScript-Quelle ausgeliefert, die App baut es mit:
 
 ```ts
 // next.config.ts
 const nextConfig = { transpilePackages: ['@meimberg/ui'] }
+export default nextConfig
 ```
 
-`package.json` der App — je nach Setup:
-
-```jsonc
-// externe App: git-Dependency, gepinnt auf einen Release-Tag
-"@meimberg/ui": "github:meimberg-io/io.meimberg.ui#v0.1.0"
-
-// oder im selben pnpm-Monorepo als Workspace-Member
-"@meimberg/ui": "workspace:*"
+```js
+// postcss.config.mjs
+export default { plugins: { '@tailwindcss/postcss': {} } }
 ```
 
-`@meimberg/ui/tokens` ist ein Subpath **desselben** Packages — keine separate
-Dependency, kein eigener transpile-Eintrag.
-
-### 2. Stylesheet (Tailwind v4)
-
-Die `globals.css` der App importiert Tailwind, das Tokens-Preset und die
-Animationen — in dieser Reihenfolge:
+### 3. Stylesheet
 
 ```css
+/* app/globals.css */
 @import "tailwindcss";
-@import "@meimberg/ui/tokens";   /* Foundations: Farben, Surfaces, Typografie, pill/hover-card/skeleton, Form-@utilities */
+@import "@meimberg/ui/tokens";
+@import "./brand.css";          /* optional: eigene Marke, siehe unten */
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";   /* nur mit MarkdownRenderer/-Editor */
 ```
 
-`@meimberg/ui/tokens` liefert **neutrale** Foundations. Produktspezifische
-semantische Farb-Tokens (bei Pulse z. B. `--p1..p4`, `--signal`/`--sprout`,
-`--vocab-*`) gehören **nicht** ins Package — die neue App definiert ihre eigenen
-`:root`/`.dark` + `@theme inline`-Mappings in einer eigenen CSS-Datei (Muster:
-`app/src/app/domain-tokens.css`).
+`@meimberg/ui/tokens` bringt ein `@source` auf die Package-Quelle mit. Tailwind generiert dadurch auch die Utility-Klassen, die nur in DS-Komponenten vorkommen; ein eigenes `@source` in der App ist nicht nötig.
 
-### 3. Root-Layout + Font + Provider
+`@meimberg/ui/styles.css` ist das Stylesheet des DS-Storybooks und bringt ein eigenes `@import "tailwindcss"` mit. Nicht zusätzlich zur eigenen `globals.css` importieren.
+
+### 4. Eigene Marke und Produkt-Tokens
+
+Die Tokens sind HSL-Kanäle ohne `hsl()` (`--primary: 262 70% 50%`). Eine App überschreibt sie nach dem Tokens-Import. Die Markenfarbe steckt in `--primary`, `--ring`, `--sidebar-primary` und `--sidebar-ring`, jeweils in `:root` und `.dark`:
+
+```css
+/* app/brand.css */
+:root { --primary: 262 70% 50%; --ring: 262 70% 50%; --sidebar-primary: 262 70% 50%; --sidebar-ring: 262 70% 50%; }
+.dark { --primary: 262 80% 68%; --ring: 262 80% 68%; --sidebar-primary: 262 80% 68%; --sidebar-ring: 262 80% 68%; }
+```
+
+Eigene semantische Tokens (bei Pulse z. B. Prioritäts- und Stage-Farben) gehören nicht ins Package. Die App legt sie in einer eigenen Datei an: Werte in `:root`/`.dark`, dazu ein `@theme inline`-Block, der sie als Tailwind-Farben verfügbar macht (`--color-p1: hsl(var(--p1));`). Diese Datei per `@import` einbinden: Ein zweiter `@theme inline`-Block direkt in der Einstiegsdatei wird von Tailwind v4 nicht zuverlässig gemergt.
+
+### 5. Root-Layout, Font und Provider
+
+Die Tokens erwarten die Schrift in der CSS-Variable `--font-inter`:
 
 ```tsx
 // app/layout.tsx
-import { Inter } from 'next/font/local'   // oder next/font/google
+import { Inter } from 'next/font/google'
 import { Providers } from './providers'
-import '@meimberg/ui/styles.css'          // oder die app-eigene globals.css, die das Preset importiert
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -102,47 +129,47 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 ```tsx
-// app/providers.tsx  ('use client')
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { UiProviders, Toaster } from '@meimberg/ui'
-import { useState, type ReactNode } from 'react'
+// app/providers.tsx
+'use client'
+
+import type { ReactNode } from 'react'
+import { Toaster, UiProviders } from '@meimberg/ui'
 
 export function Providers({ children }: { children: ReactNode }) {
-  const [qc] = useState(() => new QueryClient())
   return (
-    <QueryClientProvider client={qc}>
-      <UiProviders>{children}</UiProviders>   {/* Theme + Tooltip — der Provider-Contract */}
+    <UiProviders theme={{ defaultTheme: 'system', enableSystem: true }}>
+      {children}
       <Toaster />
-    </QueryClientProvider>
+    </UiProviders>
   )
 }
 ```
 
-`UiProviders` bündelt die von `@meimberg/ui` vorausgesetzten Contexts
-(next-themes `ThemeProvider` + Radix `TooltipProvider`). Consumer mit eigenem
-Stack können die beiden auch direkt setzen — das ist der dokumentierte Contract.
-`QueryClient` ist App-Sache (nicht im Package).
+`UiProviders` bündelt die Contexts, die das DS voraussetzt: next-themes `ThemeProvider` (Dark Mode über die Klasse `.dark`) und Radix `TooltipProvider`. Der `Toaster` muss innerhalb sitzen, sonst folgt er dem Theme nicht. `ThemeToggle` bietet Hell/Dunkel/System an und braucht dafür `enableSystem: true`.
 
-### 4. App-Gerüst (Navigation)
+### 6. App-Gerüst (Navigation)
 
-Die komplette Shell ist config-getrieben und framework-agnostisch (Pfad als
-Prop, Links über `linkComponent`-Slot):
+Die Shell ist config-getrieben. Routing kommt von außen: der aktuelle Pfad als Prop, Links über den `linkComponent`-Slot.
 
 ```tsx
-import { AppShell, AppSidebar, Breadcrumbs, UserMenu, type SidebarNavGroup } from '@meimberg/ui'
+// app/shell.tsx
+'use client'
+
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { House, Inbox } from '@meimberg/ui/atoms/icons'
+import { AppShell, AppSidebar, Breadcrumbs, ThemeToggle, UserMenu, type SidebarNavGroup } from '@meimberg/ui'
+import { House, Settings } from '@meimberg/ui/atoms/icons'
 
 const groups: SidebarNavGroup[] = [{
   label: 'Navigation',
   items: [
     { label: 'Home', href: '/', icon: <House className="h-4 w-4" /> },
-    { label: 'Inbox', href: '/inbox', icon: <Inbox className="h-4 w-4" /> },
+    { label: 'Settings', href: '/settings', icon: <Settings className="h-4 w-4" /> },
   ],
 }]
 
-export function Shell({ children }: { children: React.ReactNode }) {
+export function Shell({ children }: { children: ReactNode }) {
   const path = usePathname()
   return (
     <AppShell
@@ -151,11 +178,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
           groups={groups}
           currentPath={path}
           linkComponent={Link}
-          header={collapsed => (collapsed ? <Logo mark /> : <Logo full />)}
-          footer={collapsed => <UserMenu name="…" email="…" collapsed={collapsed} linkComponent={Link} footer={<SignOutForm />} />}
+          header={collapsed => <span className="heading-3">{collapsed ? 'A' : 'App'}</span>}
+          footer={collapsed => <UserMenu name="Ada Lovelace" email="ada@example.com" collapsed={collapsed} linkComponent={Link} />}
         />
       }
-      headerStart={<Breadcrumbs rootLabel="App" items={crumbs} linkComponent={Link} className="hidden md:block" />}
+      headerStart={<Breadcrumbs rootLabel="App" rootHref="/" items={[{ label: 'Home' }]} linkComponent={Link} />}
       headerEnd={<ThemeToggle />}
     >
       {children}
@@ -164,13 +191,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Sekundär-Navigation (Settings-Stil): `<SubNavLayout items currentPath linkComponent onNavigate>`.
-Filter-Leisten: `<FilterBar fields value onChange>` (`custom`-Feld für app-eigene Controls).
+Sekundär-Navigation (Settings-Stil): `<SubNavLayout items currentPath linkComponent onNavigate>`. Fehlerseite: `app/error.tsx` rendert `<RouteErrorState error reset />`.
 
-### 5. Toast
+### 7. Toast
 
-`<Toaster />` einmal am Root mounten (siehe Providers). Toasts auslösen mit
-`toast()` — aus `@meimberg/ui` (re-exportiert) oder direkt aus `sonner`:
+Den `<Toaster />` einmal in den Providern mounten (Schritt 5). Toasts auslösen:
 
 ```tsx
 import { toast } from '@meimberg/ui'

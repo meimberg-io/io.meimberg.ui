@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Typecheck, Lint, Stories, Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: make check
+      - run: make storybook-build
+
+  starter:
+    name: Next-Starter bauen (Integrationstest)
+    runs-on: ubuntu-latest
+    needs: check
+    defaults:
+      run:
+        working-directory: examples/next-starter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: examples/next-starter/pnpm-lock.yaml
+      # Nicht frozen: das Beispiel soll immer gegen den aktuellen DS-Stand
+      # (file:../..) bauen, auch wenn sich dessen Dependencies geändert haben.
+      - run: pnpm install --no-frozen-lockfile
+      # next build läuft inklusive TypeScript-Check über App und DS-Quelle.
+      - run: pnpm build

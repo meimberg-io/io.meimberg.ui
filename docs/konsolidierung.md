@@ -80,7 +80,7 @@ Die Phasen bauen aufeinander auf. Phase 1 ist klein und nicht-brechend; ab Phase
 4. Pulse auf `UiProviders` und Root-`Toaster` umstellen (erster echter Konsument des Vertrags).
 5. CI (GitHub Actions): `make check` auf Push und Tag.
 6. `examples/next-starter/` im DS-Repo, in CI gebaut: Integrationstest für jeden Tag und Vorlage für App #2.
-7. Toten Code löschen (`ui/toast`, `use-toast`, Spike-Test), `card-actions`-iPad-Bug fixen, `hover-reveal` ins DS ziehen.
+7. Spike-Test löschen, `card-actions`-iPad-Bug fixen, `hover-reveal` ins DS ziehen. `ui/toast` + `use-toast` sind über den Subpath `ui/*` öffentlich — ihr Löschen ist ein Bruch und wandert nach v2.0 (Phase 3).
 
 ### Phase 2 — Neutral und themebar (v2.0)
 
@@ -96,7 +96,7 @@ Die Phasen bauen aufeinander auf. Phase 1 ist klein und nicht-brechend; ab Phase
 
 1. Selects zusammenführen: ein `Select` (einfach) + ein `Combobox` (Suche/Rich-Items, Tastatur-Navigation); `Dropdown` als Filter-Variante davon.
 2. Pills/Badges auf zwei Konzepte reduzieren: `Badge` (passiv, mit Tönen) und `Chip` (interaktiv, toggle/removable).
-3. Dubletten auflösen: SegControl/SegmentedSwitch, ComingSoon, Avatar, `ui/field`, SubmitButton, Icon-Helfer (ein Icon-Prop-Typ).
+3. Dubletten auflösen: SegControl/SegmentedSwitch, ComingSoon, Avatar, `ui/field`, SubmitButton, Icon-Helfer (ein Icon-Prop-Typ); toten Radix-Toast (`ui/toast`, `hooks/use-toast`, `@radix-ui/react-toast`) löschen.
 4. Eigenbau aus `ui/` in die Layer verschieben (mit Stories); `ui/` nur noch Vendor, Änderungen dokumentiert.
 5. Einheitliches Vokabular für `size`/`tone`/`variant`, `className` überall, keine hart verdrahteten Test-IDs, Interna aus dem Public API.
 6. Filter: Pulse-`FilterBarShell`/`FilterSearch` ins DS, DS-`FilterBar` darauf aufbauen oder streichen.

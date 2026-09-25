@@ -6,10 +6,9 @@
 //   • Theme (next-themes) — ThemeToggle liest/setzt das Theme.
 //   • Tooltip (Radix TooltipProvider) — Dropdown & Co. rendern Tooltips.
 //
-// `UiProviders` bündelt genau diese Contexts, damit eine Consumer-App (App 2)
-// das Package mit einem einzigen Wrapper lauffähig mounten kann. Die Pulse-App
-// mountet dieselben Contexts bereits in ihrer eigenen `providers.tsx` (plus
-// QueryClient/Toaster) und muss `UiProviders` daher nicht zusätzlich nutzen.
+// `UiProviders` bündelt genau diese Contexts, damit eine Consumer-App das
+// Package mit einem einzigen Wrapper lauffähig mounten kann. Den <Toaster>
+// setzt die App innerhalb von UiProviders (sonst folgt er dem Theme nicht).
 
 import type {ReactNode} from 'react'
 import {ThemeProvider} from 'next-themes'

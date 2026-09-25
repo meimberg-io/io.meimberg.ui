@@ -17,8 +17,8 @@ export { usePopoverPosition } from './hooks/use-popover-position'
 export { UiProviders } from './providers'
 export type { UiProvidersProps } from './providers'
 
-// Toast: der <Toaster> (sonner) kuratiert aus dem Root-Barrel. Die `toast()`-
-// Funktion selbst kommt direkt aus `sonner` (Peer) — siehe README § Toast.
+// Toast: <Toaster> und toast() (sonner) kuratiert aus dem Root-Barrel. sonner
+// ist Peer-Dependency, damit App und DS denselben Toast-Store teilen.
 export { Toaster, toast } from './ui/sonner'
 
 // ── atoms/ — ein Element ──────────────────────────────────────────────────

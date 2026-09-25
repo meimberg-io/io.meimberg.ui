@@ -1,0 +1,15 @@
+/* Eigene Marke: Tokens aus @meimberg/ui/tokens überschreiben (HSL-Kanäle ohne
+ * `hsl()`). Die Markenfarbe steckt in primary, ring und den Sidebar-Pendants. */
+:root {
+  --primary: 262 70% 50%;
+  --ring: 262 70% 50%;
+  --sidebar-primary: 262 70% 50%;
+  --sidebar-ring: 262 70% 50%;
+}
+
+.dark {
+  --primary: 262 80% 68%;
+  --ring: 262 80% 68%;
+  --sidebar-primary: 262 80% 68%;
+  --sidebar-ring: 262 80% 68%;
+}
