@@ -108,11 +108,10 @@ Die Phasen bauen aufeinander auf. Phase 1 ist klein und nicht-brechend; ab Phase
 1. ESLint-Config `@meimberg/ui/eslint` mit den DS-Nutzungsregeln; Pulse konsumiert sie, veraltete Pulse-Overrides und Meldungen raus.
 2. Test-Setup (`vitest.setup`, `renderWithProviders`) und Story-Coverage-Check als Export; Pulse-Duplikate raus.
 3. Storybook veröffentlichen (GitHub Pages).
-4. Optional: Publish auf GitHub Packages via `changeset publish`, ggf. mit Build für `.d.ts` (entkoppelt die TS-Config des Konsumenten).
 
-## Offene Entscheidungen
+## Entscheidungen (2026-09-25)
 
-- **Sprache der Defaults:** Englisch mit deutschem Messages-Paket (Plan) oder Deutsch als Default?
-- **App #2:** Next.js oder auch Vite/React-Router? Bestimmt, ob ein Vite-Beispiel und ein Build-Schritt Pflicht sind.
-- **Verteilung:** beim Git-Tag bleiben oder GitHub Packages?
-- **Breaking Changes:** gesammelt als v2.0.0 (Plan) oder schrittweise?
+- **Sprache:** Englische Default-Labels, deutsches Messages-Paket als Export (Pulse nutzt es).
+- **Stack für weitere Apps:** nur Next.js. Keine Vite-Variante, kein Build-Schritt nötig.
+- **Verteilung:** Git-Tag bleibt, nur die Peers werden korrigiert. Kein Registry-Publish.
+- **Versionierung:** Phase 1 als v1.3 ohne Bruch; Phasen 2 und 3 gesammelt als v2.0.0 mit Migrationshinweisen.
