@@ -13,6 +13,22 @@ import { Separator } from "./separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "./sheet";
 import { Skeleton } from "./skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
+import { useLabels } from "../i18n/context";
+
+export interface SidebarLabels {
+  /** Accessible name of trigger and rail. */
+  toggle: string;
+  /** Screen-reader title of the mobile sheet. */
+  navigation: string;
+  /** Screen-reader description of the mobile sheet. */
+  navigationDescription: string;
+}
+
+const defaultLabels: SidebarLabels = {
+  toggle: "Toggle Sidebar",
+  navigation: "Navigation",
+  navigationDescription: "Main app navigation",
+};
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -136,9 +152,11 @@ const Sidebar = React.forwardRef<
     side?: "left" | "right";
     variant?: "sidebar" | "floating" | "inset";
     collapsible?: "offcanvas" | "icon" | "none";
+    labels?: Partial<SidebarLabels>;
   }
->(({ side = "left", variant = "sidebar", collapsible = "offcanvas", className, children, ...props }, ref) => {
+>(({ side = "left", variant = "sidebar", collapsible = "offcanvas", className, children, labels, ...props }, ref) => {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const l = useLabels("sidebar", defaultLabels, labels);
 
   if (collapsible === "none") {
     return (
@@ -167,8 +185,8 @@ const Sidebar = React.forwardRef<
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Navigation</SheetTitle>
-            <SheetDescription>Hauptnavigation der App</SheetDescription>
+            <SheetTitle>{l.navigation}</SheetTitle>
+            <SheetDescription>{l.navigationDescription}</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -222,9 +240,13 @@ const Sidebar = React.forwardRef<
 });
 Sidebar.displayName = "Sidebar";
 
-const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.ComponentProps<typeof Button>>(
-  ({ className, onClick, ...props }, ref) => {
+const SidebarTrigger = React.forwardRef<
+  React.ElementRef<typeof Button>,
+  React.ComponentProps<typeof Button> & { labels?: Partial<SidebarLabels> }
+>(
+  ({ className, onClick, labels, ...props }, ref) => {
     const { toggleSidebar } = useSidebar();
+    const l = useLabels("sidebar", defaultLabels, labels);
 
     return (
       <Button
@@ -240,25 +262,29 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
         {...props}
       >
         <PanelLeft />
-        <span className="sr-only">Toggle Sidebar</span>
+        <span className="sr-only">{l.toggle}</span>
       </Button>
     );
   },
 );
 SidebarTrigger.displayName = "SidebarTrigger";
 
-const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<"button">>(
-  ({ className, ...props }, ref) => {
+const SidebarRail = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<"button"> & { labels?: Partial<SidebarLabels> }
+>(
+  ({ className, labels, ...props }, ref) => {
     const { toggleSidebar } = useSidebar();
+    const l = useLabels("sidebar", defaultLabels, labels);
 
     return (
       <button
         ref={ref}
         data-sidebar="rail"
-        aria-label="Toggle Sidebar"
+        aria-label={l.toggle}
         tabIndex={-1}
         onClick={toggleSidebar}
-        title="Toggle Sidebar"
+        title={l.toggle}
         className={cn(
           "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] group-data-[side=left]:-right-4 group-data-[side=right]:left-0 hover:after:bg-sidebar-border sm:flex",
           "[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",

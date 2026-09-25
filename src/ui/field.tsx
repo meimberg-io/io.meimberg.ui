@@ -22,7 +22,7 @@ interface FieldProps {
 }
 
 /**
- * MIPUL-275 — Shared Label↔Input wrapper.
+ * Shared Label↔Input wrapper.
  *
  * Hängt das `<Label>` und die geslotted `<Input>`/`<Textarea>` über `htmlFor`/`id`
  * automatisch zusammen. ID wird intern via `useId()` generiert. Damit greifen

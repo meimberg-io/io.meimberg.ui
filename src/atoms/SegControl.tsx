@@ -20,20 +20,18 @@ interface Props<T extends string> {
 }
 
 /**
- * Pulse-SegControl — kompakter Segmented-Switch im Button-Group-Stil
+ * SegControl — kompakter Segmented-Switch im Button-Group-Stil
  * (`inline-flex rounded-md border overflow-hidden`, kein sliding-thumb) für
  * Sort-/Display-Toggles.
  *
- * Bündelt das in PUL-414 (G2b-T1) identifizierte Inline-Button-Group-Pattern
- * (SortToggle / DisplayToggle in tags-view). Abgrenzung zur
- * `<SegmentedSwitch>`-Molecule: die nutzt einen gleitenden Thumb (`.type-seg`-
- * CSS) und ist form-orientiert; SegControl ist die schlanke Button-Group.
+ * Abgrenzung zu `<SegmentedSwitch>`: der nutzt einen gleitenden Thumb und ist
+ * form-orientiert; SegControl ist die schlanke Button-Group.
  *
  * @example
  *   <SegControl
  *     value={sort}
  *     onChange={setSort}
- *     options={[{value: 'count', label: 'Häufigkeit'}, …]}
+ *     options={[{value: 'count', label: 'Frequency'}, …]}
  *   />
  */
 export function SegControl<T extends string>({value, options, onChange, className}: Props<T>) {

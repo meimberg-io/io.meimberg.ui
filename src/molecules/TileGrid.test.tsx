@@ -7,7 +7,7 @@ type P = 'a' | 'b' | 'c'
 const OPTIONS: ReadonlyArray<TileDef<P>> = [
   {id: 'a', label: 'Alpha', glyph: <span>A</span>},
   {id: 'b', label: 'Beta', glyph: <span>B</span>},
-  {id: 'c', label: 'Gamma', glyph: <span>C</span>, disabled: true, title: 'In Vorbereitung'},
+  {id: 'c', label: 'Gamma', glyph: <span>C</span>, disabled: true, title: 'Coming soon'},
 ]
 
 describe('TileGrid', () => {
@@ -44,7 +44,6 @@ describe('TileGrid', () => {
     const {container} = render(
       <TileGrid<P> value={null} options={OPTIONS} onChange={() => {}} cols={4} />,
     )
-    // PUL-456: < md immer 2-spaltig, konfigurierte Spaltenzahl ab md.
     expect(container.firstChild).toHaveClass('grid-cols-2')
     expect(container.firstChild).toHaveClass('md:grid-cols-4')
   })

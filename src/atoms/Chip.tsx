@@ -17,11 +17,11 @@ export interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>,
   /** Optional: Tonal-Klasse für aktiven Zustand. Default: primary. */
   activeClassName?: string
   /**
-   * Größen-Variante (PUL-429):
+   * Größen-Variante:
    *   - `sm` (Default): `.pill`-Geometrie, rounded-full, ~24 px hoch, 12 px Font.
    *     Für Filter-Bars, Saved-Views, Tab-artige Auswahlen.
    *   - `md`: rounded-md, 32 px hoch, 14 px Font. Für Property-Bars in
-   *     Editor-Surfaces (ActionItem-Detail-Dialog etc.), wo die Chip neben
+   *     Editor-Surfaces (Detail-Dialoge etc.), wo die Chip neben
    *     Form-Triggern (Dropdown/DatePicker/TagSelector size='sm' / `h-8`)
    *     sitzt und visuell zu denen aligned sein muss.
    *
@@ -33,7 +33,7 @@ export interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>,
 }
 
 /**
- * Pulse-Chip-Atom — klickbare Toggle-Pill für Filter, Saved-Views, Tab-artige
+ * Chip-Atom — klickbare Toggle-Pill für Filter, Saved-Views, Tab-artige
  * Auswahlen. `cursor-pointer` ist **in der Komponente** verankert
  * (Regel `clickable-cursor-pointer`).
  *
@@ -58,7 +58,7 @@ export function Chip({
   ...rest
 }: ChipProps) {
   // `sm` = `.pill` (rounded-full, py-0.5 px-2, 12px font) — Filter-Bar-Variante.
-  // `md` = rounded-md, h-8 px-2.5, 14px font — Property-Bar-Variante (PUL-429).
+  // `md` = rounded-md, h-8 px-2.5, 14px font — Property-Bar-Variante.
   // Beide teilen den Toggle-/Hover-/Active-State.
   const sizeClass: string =
     size === 'md'

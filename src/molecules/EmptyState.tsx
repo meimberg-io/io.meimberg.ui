@@ -38,7 +38,7 @@ export function EmptyState({
     const dashedAction =
       action ??
       (actionLabel && onAction ? (
-        <Button onClick={onAction} size="sm" data-testid="page-header-action">
+        <Button onClick={onAction} size="sm" data-testid="empty-state-action">
           <AddIcon />
           {actionLabel}
         </Button>
@@ -67,7 +67,7 @@ export function EmptyState({
       <p className="body text-muted-foreground max-w-xs mb-6">{description}</p>
       {action ??
         (actionLabel && onAction && (
-          <Button onClick={onAction} size="sm" data-testid="page-header-action">
+          <Button onClick={onAction} size="sm" data-testid="empty-state-action">
             <AddIcon />
             {actionLabel}
           </Button>

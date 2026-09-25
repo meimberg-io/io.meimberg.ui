@@ -17,12 +17,12 @@ describe('RouteErrorState', () => {
     errorSpy.mockRestore()
   })
 
-  it('renders the German title and description', () => {
+  it('renders the default title and description', () => {
     renderWithProviders(
       <RouteErrorState error={new Error('boom')} reset={vi.fn()} />,
     )
-    expect(screen.getByRole('heading', { name: /Etwas ist schiefgegangen/ })).toBeInTheDocument()
-    expect(screen.getByText(/Die Seite konnte nicht geladen werden/)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Something went wrong/ })).toBeInTheDocument()
+    expect(screen.getByText(/The page could not be loaded/)).toBeInTheDocument()
     expect(errorSpy).toHaveBeenCalledWith(expect.any(Error))
   })
 
@@ -31,7 +31,15 @@ describe('RouteErrorState', () => {
     renderWithProviders(
       <RouteErrorState error={new Error('boom')} reset={reset} />,
     )
-    await userEvent.click(screen.getByRole('button', { name: /Erneut laden/ }))
+    await userEvent.click(screen.getByRole('button', { name: /Try again/ }))
     expect(reset).toHaveBeenCalledOnce()
+  })
+
+  it('overrides labels via the labels prop', () => {
+    renderWithProviders(
+      <RouteErrorState error={new Error('boom')} reset={vi.fn()} labels={{ title: 'Oops', retry: 'Reload' }} />,
+    )
+    expect(screen.getByRole('heading', { name: 'Oops' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reload' })).toBeInTheDocument()
   })
 })

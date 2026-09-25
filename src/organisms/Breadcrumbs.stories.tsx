@@ -16,12 +16,12 @@ export const RootOnly: Story = {
 
 export const TwoLevels: Story = {
   render: () => (
-    <Breadcrumbs rootLabel="Home" items={[{label: 'Einstellungen', href: '/settings'}, {label: 'Konten'}]} />
+    <Breadcrumbs rootLabel="Home" items={[{label: 'Settings', href: '/settings'}, {label: 'Team'}]} />
   ),
 }
 
 export const WithoutRoot: Story = {
   render: () => (
-    <Breadcrumbs items={[{label: 'Missions', href: '/missions'}, {label: 'Q3 Roadmap'}]} />
+    <Breadcrumbs items={[{label: 'Projects', href: '/projects'}, {label: 'Q3 Roadmap'}]} />
   ),
 }

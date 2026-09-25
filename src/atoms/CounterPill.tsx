@@ -8,7 +8,7 @@ const TONE_CLASSES = {
 } as const
 
 const SIZE_CLASSES = {
-  // Default: erbt das `.pill`-Padding (py-0.5 px-2) aus globals.css.
+  // Default: erbt das `.pill`-Padding (py-0.5 px-2).
   default: '',
   // Kompakt: für enge Slots (Sidebar-Menüitems, Group-Header-Inline-Counts).
   // `min-w-[20px] text-center` sorgt für stabile Tabular-Breite bei
@@ -21,7 +21,7 @@ export interface CounterPillProps
   /**
    * Visuelle Tönung.
    * - `muted` (Default) — neutrale Standard-Counter (Group-Header, Sidebar).
-   * - `primary` — Hervorhebung (Pulse-Cyan), z. B. für Unread-Indikatoren.
+   * - `primary` — Hervorhebung in der Primärfarbe, z. B. für Unread-Indikatoren.
    */
   tone?: keyof typeof TONE_CLASSES
   /**
@@ -36,17 +36,14 @@ export interface CounterPillProps
 }
 
 /**
- * Pulse-Counter-Pill — numerischer Badge mit konsistenter Tönung + Tabular-Nums.
- *
- * Bündelt das mehrfach inline-replicierte Counter-Pill-Pattern (Group-Header-
- * Anzahl, Sidebar-Unread-Count, Unread-Badge im Posteingang) aus PUL-413 G1b
- * in einem Atom. `<CounterPill>` setzt `font-medium tabular-nums border-
+ * CounterPill — numerischer Badge mit konsistenter Tönung + Tabular-Nums
+ * (Group-Header-Anzahl, Sidebar-Unread-Count, Unread-Badge). `<CounterPill>` setzt `font-medium tabular-nums border-
  * transparent` plus die ausgewählte Tone- + Size-Variante; rendert intern
- * über `<Pill>` (gleiche Pill-Geometrie aus `globals.css` `.pill`).
+ * über `<Pill>` (gleiche Pill-Geometrie aus der `.pill`-Utility).
  *
  * Konsumenten geben **nur Layout-Klassen** am Call-Site (z. B. `ml-auto`,
  * `gap-1`). Tone und Size sind Props — kein direktes Tailwind-Override am
- * Call-Site (siehe `guidelines.md` § Style-Linie).
+ * Call-Site.
  *
  * @example
  *   // Standard-Group-Header-Counter:

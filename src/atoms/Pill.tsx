@@ -4,8 +4,8 @@ import {cn} from '../lib/cn'
 export type PillProps = HTMLAttributes<HTMLSpanElement>
 
 /**
- * Pulse-Pill-Atom — generische Pill-Geometrie für Counter, Status-Label,
- * Badges. Nutzt die `.pill`-Utility aus globals.css (inline-flex, rounded-full,
+ * Pill-Atom — generische Pill-Geometrie für Counter, Status-Label,
+ * Badges. Nutzt die `.pill`-Utility (inline-flex, rounded-full,
  * gap-1, py-0.5 px-2, 12 px / 16 px Typo, 1 px Border).
  *
  * Tone/Color wird via className am Call-Site (oder über höhere Molecules wie

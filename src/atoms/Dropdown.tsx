@@ -1,33 +1,27 @@
 'use client'
 
-// PUL-446-followup: `Dropdown` als **Compound Component** (Vercel
-// composition-patterns) auf Radix Select. Es gibt KEINE „L1/L2/L3"-Ebenen —
-// ein Compound-Primitive + dünne explizite Varianten (Context/Bucket/
-// OrgSwitcher), die seine Teile komponieren. „Icon" ist ein Slot an Row/Pill,
-// keine eigene Komponente.
+// `Dropdown` als **Compound Component** auf Radix Select: ein Compound-
+// Primitive, dessen Teile Konsumenten zu eigenen Varianten komponieren.
+// „Icon" ist ein Slot an Row/Pill, keine eigene Komponente.
 //
 // Warum Compound statt Render-Props/Mode-Flags: Radix Select IST schon ein
-// Compound (`Select.Root/.Trigger/.Content/.Item`). Frühere Iterationen haben
-// das in eine `DropdownWithIcon`-Fassade mit `trigger='pill'|'avatar'`,
-// `renderTriggerIcon`/`renderRowIcon`-Callbacks + `allowAll`/`extraRow`-Flags
-// gewickelt — genau die „boolean prop proliferation", die das composition-
-// patterns-Skill (HIGH-Prio) verbietet. Hier liegt die Pulse-Geometrie einmal,
-// Konsumenten komponieren die Teile.
+// Compound (`Select.Root/.Trigger/.Content/.Item`). Eine Fassade mit
+// `trigger='pill'|'avatar'`, Render-Callbacks und Boolean-Flags wäre „boolean
+// prop proliferation". Hier liegt die Geometrie einmal, Konsumenten
+// komponieren die Teile.
 //
 // Zwei Nutzungsformen:
 //   1. Convenience `<Dropdown options={…} />` — simple Text/Inline-Icon-Listen
 //      (Status-, Prio-, Typ-Filter). Trigger-Icon = Row-Icon (beide inline).
 //   2. Compound `<Dropdown.Root>…<Dropdown.Pill/.Avatar>…<Dropdown.Content>
 //      <Dropdown.Row>` — reiche Fälle mit border-flush Trigger-Icon ≠ Row-Icon
-//      (ContextDropdown, BucketDropdown) oder Avatar-Trigger (OrgSwitcher).
+//      oder Avatar-Trigger (z. B. Org-Switcher).
 //      Die Convenience baut intern auf denselben Teilen → eine Quelle.
 //
-// Geometrie (Höhe/Font/Chevron/Padding/Icon-Box) ist 1:1 das alte
-// FilterPillButton + FilterPopover-Design (Pre-Cascade, pixelverifiziert).
-// Bewusst direkt auf `@radix-ui/react-select`, nicht auf `@/components/ui/
-// select` — shadcn-Defaults (Trigger `h-10 px-3`, Item `pl-8` + Indicator
-// links) decken den Filter-Pill-Look nicht. Form-Felder (`molecules/form/
-// Dropdown`) sind ein eigener Input-Look-Use-Case auf shadcn-`<Select>`.
+// Bewusst direkt auf `@radix-ui/react-select`, nicht auf `../ui/select` —
+// shadcn-Defaults (Trigger `h-10 px-3`, Item `pl-8` + Indicator
+// links) decken den Filter-Pill-Look nicht. Form-Felder (`SelectField`) sind
+// ein eigener Input-Look-Use-Case auf shadcn-`<Select>`.
 //
 // React 19: kein `forwardRef` — `ref` ist reguläre Prop.
 
@@ -44,9 +38,9 @@ export type DropdownSize = 'sm' | 'md' | 'chip'
 
 /**
  * Geometrie-Tabelle pro Size — Höhe, Font, Chevron, Label-Cap, Tail-Padding,
- * Icon-Slot. 1:1 aus dem alten FilterPillButton (PUL-320/-384/-429).
- *   - `sm` (26 px, 12 px Font, 24×24 Icon-Slot) — FilterBars (Todo, Inbox).
- *   - `md` (36 px, 14 px Font, 34×34 Icon-Slot) — Missions-Toolbar.
+ * Icon-Slot.
+ *   - `sm` (26 px, 12 px Font, 24×24 Icon-Slot) — FilterBars.
+ *   - `md` (36 px, 14 px Font, 34×34 Icon-Slot) — Page-Toolbars.
  *   - `chip` (32 px, 14 px Font, 30×30 Icon-Slot) — Editor-Property-Bars.
  */
 export const DROPDOWN_SIZE: Record<DropdownSize, {
@@ -62,9 +56,8 @@ export const DROPDOWN_SIZE: Record<DropdownSize, {
   chip: {height: 32, fontSize: 14, chevron: 12, tailMaxWidth: 'max-w-[160px]', tailPadding: 'gap-1.5 px-2.5', iconBox: 30},
 }
 
-// Hintergrund pro Size — `sm` (Todo) auf bg-card-FilterBar → eigene Card-
-// Fläche; `md` (Missions) auf Page-Fläche → transparent; `chip` (Dialog) →
-// `bg-background`.
+// Hintergrund pro Size — `sm` auf bg-card-FilterBar → eigene Card-Fläche;
+// `md` auf Page-Fläche → transparent; `chip` (Dialog) → `bg-background`.
 const BG_BY_SIZE: Record<DropdownSize, string> = {
   sm: 'bg-card',
   md: 'bg-transparent',
@@ -87,7 +80,7 @@ const SHOW_TAIL_AT: Record<DropdownBreakpoint, string> = {
 // ─── Dropdown.Root ────────────────────────────────────────────────────────
 // Select.Root + null↔ALL-Sentinel-Mapping. `value: string | null` (null =
 // „Alle"-Option aktiv). Wer eine andere Wert-Semantik braucht (Tri-State),
-// mappt extern auf `string | null` (siehe ContextDropdown inbox).
+// mappt extern auf `string | null`.
 
 interface DropdownRootProps {
   value: string | null
@@ -137,7 +130,7 @@ function DropdownPill({size = 'sm', icon, children, compactBelow = 'none', class
         height: geo.height,
         fontSize: geo.fontSize,
         fontWeight: 500,
-        // Pulse-Fix (aus FilterPillButton): inline-flex defaultet auf `baseline`
+        // inline-flex defaultet auf `baseline`
         // → divergente Baselines bei verschiedenen Icon-Höhen → Höhenversatz.
         verticalAlign: 'middle',
         ...style,
@@ -186,8 +179,8 @@ function DropdownAvatar({tooltip, children, className, ...rest}: DropdownAvatarP
 }
 
 // ─── Dropdown.Content ───────────────────────────────────────────────────────
-// Portal + Popover-Panel. Wie der alte FilterPopoverContent: `bg-card border
-// rounded-lg shadow-floating`, `p-0` Viewport, `minWidth=200`, `sideOffset=6`.
+// Portal + Popover-Panel: `bg-card border rounded-lg shadow-floating`, `p-0`
+// Viewport, `minWidth=200`, `sideOffset=6`.
 
 interface DropdownContentProps extends Omit<ComponentPropsWithoutRef<typeof SelectPrimitive.Content>, 'children'> {
   children: ReactNode
@@ -221,16 +214,15 @@ function DropdownContent({
 }
 
 // ─── Dropdown.Row / Dropdown.AllRow ─────────────────────────────────────────
-// Auswahl-Zeile (Select.Item). Markup 1:1 wie alter FilterPopoverRow:
-// `flex items-center gap-2.5 px-3 py-2`, selected → `bg-accent/30`, Check
-// rechts (12 px). `icon`/`meta` sind Slots, `children` das Label.
+// Auswahl-Zeile (Select.Item): `flex items-center gap-2.5 px-3 py-2`,
+// selected → `bg-accent/30`, Check rechts (12 px). `icon`/`meta` sind Slots, `children` das Label.
 
 interface DropdownRowProps {
   value: string
   disabled?: boolean
-  /** Führendes Visual (Dot, Icon, ContextChip, ProviderGlyph, …). */
+  /** Führendes Visual (Dot, Icon, Avatar, Glyph, …). */
   icon?: ReactNode
-  /** Trailing vor dem Check (z. B. Provider-Label mono). */
+  /** Trailing vor dem Check (z. B. Kürzel in mono). */
   meta?: ReactNode
   children: ReactNode
 }
@@ -308,11 +300,16 @@ export function Dropdown<T extends string>({
 }: DropdownProps<T>) {
   const selected = value != null ? options.find(o => o.value === value) ?? null : null
   const emptyLabel = allLabel ?? ''
-  const ariaLabel = selected && typeof selected.label === 'string' ? `${emptyLabel}: ${selected.label}` : emptyLabel
+  const selectedText = selected && typeof selected.label === 'string' ? selected.label : null
+  // Ohne `allLabel` kein „: <Wert>"-Präfix; ohne beides übernimmt der
+  // Trigger-Inhalt den accessible Name.
+  const ariaLabel = selectedText != null
+    ? (allLabel ? `${allLabel}: ${selectedText}` : selectedText)
+    : allLabel || undefined
   // Convenience-Icons sind kleine Inline-Symbole (size-4), keine border-flush
   // Squares. Daher mit linkem Padding (`pl-2.5`, konsistent zur Row-`gap-2.5`)
   // statt am Border zu kleben. Der flush `icon`-Slot bleibt den Compound-
-  // Usages (Bucket/Context: full-height Square) vorbehalten.
+  // Usages (full-height Square) vorbehalten.
   const triggerIcon = selected?.icon != null
     ? <span className="inline-flex shrink-0 items-center pl-2.5">{selected.icon}</span>
     : undefined

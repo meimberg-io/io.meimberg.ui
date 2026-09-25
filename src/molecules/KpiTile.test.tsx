@@ -1,11 +1,11 @@
 import {describe, expect, it} from 'vitest'
 import {render, screen} from '@testing-library/react'
 import {KpiTile} from './KpiTile'
-
-// PUL-326/PUL-361 · Konsolidiertes KpiTile-Atom Smoke-Tests.
+import {UiI18nProvider} from '../i18n/context'
+import {kpiTile as kpiTileDe} from '../i18n/de/kpiTile'
 
 const baseProps = {
-  label: 'OFFEN',
+  label: 'OPEN',
   value: 42,
   sparklineValues: [3, 5, 4, 8, 6, 9, 12, 10, 11, 8, 7, 9, 11, 14],
   delta: {value: 4, direction: 'up' as const, isPositive: true},
@@ -14,7 +14,7 @@ const baseProps = {
 describe('KpiTile', () => {
   it('renders label and value', () => {
     render(<KpiTile {...baseProps} />)
-    expect(screen.getByText('OFFEN')).toBeInTheDocument()
+    expect(screen.getByText('OPEN')).toBeInTheDocument()
     expect(screen.getByText('42')).toBeInTheDocument()
   })
 
@@ -27,7 +27,7 @@ describe('KpiTile', () => {
     render(<KpiTile {...baseProps} />)
     const delta = screen.getByTestId('kpi-tile-delta')
     expect(delta.textContent).toContain('+4')
-    expect(delta.textContent).toContain('vs. letzte Woche')
+    expect(delta.textContent).toContain('vs. previous period')
   })
 
   it('renders flat-delta as placeholder text', () => {
@@ -59,15 +59,13 @@ describe('KpiTile', () => {
     expect(container.querySelector('polyline')).toBeNull()
   })
 
-  // PUL-361 — neue API-Aspekte.
-
   it('accepts string values', () => {
-    render(<KpiTile label="Quote" value="87 %" />)
+    render(<KpiTile label="Rate" value="87 %" />)
     expect(screen.getByText('87 %')).toBeInTheDocument()
   })
 
   it('renders without sparkline and without delta (both optional)', () => {
-    const {container} = render(<KpiTile label="Buckets" value={4} />)
+    const {container} = render(<KpiTile label="Projects" value={4} />)
     expect(container.querySelector('svg')).toBeNull()
     expect(container.querySelector('[data-testid="kpi-tile-delta"]')).toBeNull()
   })
@@ -75,7 +73,7 @@ describe('KpiTile', () => {
   it('renders icon chip when icon is provided', () => {
     const {container} = render(
       <KpiTile
-        label="Buckets"
+        label="Projects"
         value={4}
         icon={<svg data-testid="kpi-icon" />}
       />,
@@ -100,7 +98,7 @@ describe('KpiTile', () => {
 
   it('variant="emphasis" applies the success ring', () => {
     const {container} = render(
-      <KpiTile label="Aktiv" value={3} variant="emphasis" />,
+      <KpiTile label="Active" value={3} variant="emphasis" />,
     )
     const tile = container.querySelector('[data-testid="kpi-tile"]') as HTMLElement
     expect(tile.className).toContain('ring-success/30')
@@ -110,7 +108,7 @@ describe('KpiTile', () => {
   it('variant="muted" greys the value and hides the sparkline', () => {
     const {container} = render(
       <KpiTile
-        label="Erledigt"
+        label="Done"
         value={9}
         variant="muted"
         sparklineValues={[1, 2, 3]}
@@ -127,12 +125,31 @@ describe('KpiTile', () => {
   it('delta.isPositive defaults to direction==="up"', () => {
     render(
       <KpiTile
-        label="OFFEN"
+        label="OPEN"
         value={1}
         delta={{value: 1, direction: 'up'}}
       />,
     )
     const delta = screen.getByTestId('kpi-tile-delta')
     expect(delta.className).toContain('text-success')
+  })
+
+  it('labels prop overrides the comparison text', () => {
+    render(<KpiTile {...baseProps} labels={{comparison: 'vs. last month'}} />)
+    expect(screen.getByTestId('kpi-tile-delta').textContent).toContain('vs. last month')
+  })
+
+  it('reads German labels from UiI18nProvider', () => {
+    render(
+      <UiI18nProvider messages={{kpiTile: kpiTileDe}}>
+        <KpiTile {...baseProps} />
+      </UiI18nProvider>,
+    )
+    expect(screen.getByTestId('kpi-tile-delta').textContent).toContain('vs. letzte Woche')
+  })
+
+  it('passes a custom data-testid through to the root', () => {
+    render(<KpiTile {...baseProps} data-testid="revenue-kpi" />)
+    expect(screen.getByTestId('revenue-kpi')).toBeInTheDocument()
   })
 })

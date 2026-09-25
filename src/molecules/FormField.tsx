@@ -1,11 +1,11 @@
 'use client'
 
-// PUL-352 · Form-Field — Label/Hint/Slot/Error in einheitlichem Spacing.
+// Form-Field — Label/Hint/Slot/Error in einheitlichem Spacing.
 // Konsumenten liefern den eigentlichen Input als `children`; wir kümmern uns
 // um Label-Abstand (`mb-1.5`), Optional-Hint rechts neben Label, sowie
 // Required-Marker und Error-Footer.
 //
-// PUL-353: `FormFieldContext` propagiert die generierte `id` an Children,
+// `FormFieldContext` propagiert die generierte `id` an Children,
 // damit `<label htmlFor>` ↔ `<input id>` auch ohne expliziten `htmlFor`-Prop
 // auto-verknüpft werden (Voraussetzung für `getByLabelText` in Tests + a11y).
 // Atoms wie `TextField` consumen den Context.
@@ -60,8 +60,8 @@ export function FormField({
       <div className={cn('min-w-0', className)}>
         {/* Label-Text steht DIREKT als Children — testing-library's
          *  `getByLabelText('Title')` matched gegen den textContent.
-         *  Required-Marker läuft per CSS-`::after` (siehe `.form-field-required`
-         *  in globals.css), damit der Asterisk NICHT in textContent landet. */}
+         *  Required-Marker läuft per CSS-`::after` (`form-field-required`-
+         *  Utility), damit der Asterisk NICHT in textContent landet. */}
         <label
           htmlFor={id}
           className={cn(

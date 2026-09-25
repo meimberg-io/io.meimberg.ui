@@ -1,12 +1,11 @@
 'use client'
 
-// PUL-352 · Pulse-Input — vereinheitlichte Input-Komponente für das v3-
-// Form-System. Eine Komponente für `<input>` UND `<textarea>` — nutzt die
-// gleiche `.pulse-input` CSS-Klasse (40px Höhe, 1.5px Border, 8px Radius,
-// Primary-Glow im Focus). Quelle: docs/frontend/redesign/source/v3/mission/
-// Buckets.html § .pulse-input.
+// TextField — vereinheitlichte Input-Komponente des Form-Systems. Eine
+// Komponente für `<input>` UND `<textarea>` — nutzt die gleiche
+// `field-shell`-Utility (40px Höhe, 1.5px Border, 8px Radius, Primary-Glow
+// im Focus).
 //
-// PUL-352 Followup — `leadingIcon` / `trailingIcon` als Slots: das Padding-
+// `leadingIcon` / `trailingIcon` als Slots: das Padding-
 // Adjustment wird inline gesetzt, damit der CSS-Cascade-Fight gegen `pl-9` /
 // `pr-9` nicht mehr stattfindet. Konsumenten geben nur das Icon, die
 // Geometrie regelt der Primitive.
@@ -48,7 +47,7 @@ const ICON_SLAB = 36
 
 export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, TextFieldProps>(
   function TextField(props, ref) {
-    // PUL-353: Wenn der Konsument keine explizite `id` setzt, fallback auf
+    // Wenn der Konsument keine explizite `id` setzt, fallback auf
     // die Id, die `<FormField>` per Context liefert — damit das umgebende
     // `<label htmlFor>` auch auto-matched.
     const contextId = useFormFieldId()
@@ -77,7 +76,7 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
     const hasTrailing = !!trailingIcon
 
     // Padding-Adjustment per inline style — schlägt jede `padding`-Regel aus
-    // `.pulse-input` (egal in welchem Layer).
+    // `field-shell` (egal in welchem Layer).
     const paddingStyle: React.CSSProperties = {}
     if (hasLeading) paddingStyle.paddingLeft = ICON_SLAB
     if (hasTrailing) paddingStyle.paddingRight = ICON_SLAB

@@ -13,22 +13,22 @@ export const Short: Story = {
   render: () => (
     <ScrollableContent>
       <p className="body text-foreground">
-        Kurzer Content — kein Scrollen nötig, der Container wächst mit dem Inhalt
-        bis zur max-Höhe.
+        Short content — no scrolling needed, the container grows with its content
+        up to the max height.
       </p>
     </ScrollableContent>
   ),
 }
 
 export const Overflowing: Story = {
-  name: 'Overflowing (scrollt bei max-h-96)',
+  name: 'Overflowing (scrolls at max-h-96)',
   render: () => (
     <ScrollableContent>
       <div className="space-y-3 body text-foreground">
         {Array.from({length: 24}, (_, i) => (
           <p key={i}>
-            Absatz {i + 1} — langer Content, der die max-Höhe überschreitet und
-            den vertikalen Scroll auslöst.
+            Paragraph {i + 1} — long content that exceeds the max height and
+            triggers vertical scrolling.
           </p>
         ))}
       </div>

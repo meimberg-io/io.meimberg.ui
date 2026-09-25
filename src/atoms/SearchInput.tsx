@@ -6,18 +6,31 @@ import { IconButton } from '../ui/icon-button'
 import { Search } from '../atoms/icons'
 import { CloseIcon } from '../ui/action-icons'
 import { cn } from '../lib/cn'
+import { useLabels } from '../i18n/context'
+
+export interface SearchInputLabels {
+  placeholder: string
+  clear: string
+}
+
+const defaultLabels: SearchInputLabels = {
+  placeholder: 'Search…',
+  clear: 'Clear search',
+}
 
 interface Props {
   value: string
   onChange: (v: string) => void
   placeholder?: string
   debounceMs?: number
+  labels?: Partial<SearchInputLabels>
   className?: string
 }
 
 export function SearchInput({
-  value, onChange, placeholder = 'Search…', debounceMs = 0, className,
+  value, onChange, placeholder, debounceMs = 0, labels, className,
 }: Props) {
+  const l = useLabels('searchInput', defaultLabels, labels)
   const [inner, setInner] = useState(value)
   const [prevValue, setPrevValue] = useState(value)
 
@@ -44,7 +57,7 @@ export function SearchInput({
       <Input
         value={inner}
         onChange={e => handleChange(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? l.placeholder}
         className='pl-9 pr-9'
       />
       {inner && (
@@ -52,7 +65,7 @@ export function SearchInput({
           size='sm'
           className='absolute right-1 top-1/2 -translate-y-1/2'
           onClick={() => handleChange('')}
-          aria-label='Suche leeren'
+          aria-label={l.clear}
         >
           <CloseIcon />
         </IconButton>

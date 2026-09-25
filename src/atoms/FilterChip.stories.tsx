@@ -6,7 +6,6 @@ const meta: Meta<typeof FilterChip> = {
   component: FilterChip,
   args: {
     onRemove: () => {},
-    ariaLabel: 'Filter entfernen',
   },
 }
 
@@ -14,24 +13,24 @@ export default meta
 type Story = StoryObj<typeof FilterChip>
 
 export const MdWithLabel: Story = {
-  name: 'md + Prefix-Label (Mission-Filter)',
+  name: 'md + prefix label',
   args: {
     size: 'md',
-    label: 'Mission:',
+    label: 'Project:',
     children: 'Q3 Roadmap',
   },
 }
 
 export const SmPlain: Story = {
-  name: 'sm ohne Prefix (primary)',
+  name: 'sm without prefix (primary)',
   args: {
     size: 'sm',
-    children: 'Wichtig',
+    children: 'Important',
   },
 }
 
 export const SmCustomTint: Story = {
-  name: 'sm + custom Tint (Tag-Vocab)',
+  name: 'sm + custom tint',
   args: {
     size: 'sm',
     tone: 'custom',

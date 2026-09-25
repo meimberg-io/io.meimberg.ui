@@ -1,6 +1,17 @@
 import type {HTMLAttributes, ReactNode} from 'react'
 import {cn} from '../lib/cn'
-/** FilterChip-Größen — sm (Tag-Filter) / md (Mission-Filter). */
+import {useLabels} from '../i18n/context'
+
+export interface FilterChipLabels {
+  /** a11y-Label des ✕-Buttons. */
+  remove: string
+}
+
+const defaultLabels: FilterChipLabels = {
+  remove: 'Remove filter',
+}
+
+/** FilterChip-Größen — sm (kompakt, z. B. Tag-Filter) / md (prominent). */
 type FilterChipSize = 'sm' | 'md'
 
 const SIZE_CLASSES: Record<FilterChipSize, string> = {
@@ -9,7 +20,7 @@ const SIZE_CLASSES: Record<FilterChipSize, string> = {
 }
 
 const TONE_CLASSES = {
-  /** Standard-Tint (Pulse-Cyan) — z. B. Mission-Filter. */
+  /** Standard-Tint in der Primärfarbe. */
   primary: 'bg-primary/10 text-primary border border-primary/30',
   /** Kein eigener Tint — Call-Site liefert dynamische Farben via `className`
    *  (z. B. Tag-Vocab-Klassen). */
@@ -18,36 +29,35 @@ const TONE_CLASSES = {
 
 export interface FilterChipProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
-  /** Optionaler Prefix vor dem Wert (z. B. „Mission:"). */
+  /** Optionaler Prefix vor dem Wert (z. B. „Project:"). */
   label?: ReactNode
   /** Remove-Handler — rendert den ✕-Button. */
   onRemove: () => void
-  /** a11y-Label des ✕-Buttons. */
-  ariaLabel: string
+  /** a11y-Label des ✕-Buttons. Überschreibt `labels.remove`. */
+  ariaLabel?: string
   /** Größe entlang der geteilten Filter-Control-Achse. Default `sm`. */
   size?: FilterChipSize
   /**
-   * Tönung. `primary` (Default) = Pulse-Cyan-Tint mit Border; `custom` = kein
+   * Tönung. `primary` (Default) = Primär-Tint mit Border; `custom` = kein
    * Tint, Call-Site liefert Farben via `className` (dynamische Vocab-Tints).
    */
   tone?: keyof typeof TONE_CLASSES
   /** Der angezeigte Filter-Wert. */
   children: ReactNode
+  labels?: Partial<FilterChipLabels>
 }
 
 /**
- * Pulse-FilterChip — entfernbare Applied-Filter-Markierung (Label + Wert +
+ * FilterChip — entfernbare Applied-Filter-Markierung (Label + Wert +
  * ✕-Remove). Größe an die geteilte `FilterPillSize`-Achse der Filter-Control-
  * Familie gekoppelt.
  *
- * Bündelt das in PUL-414 (C1) / PUL-413-Allowlist identifizierte Removable-
- * Filter-Pill-Pattern (todo-view Mission-Filter + FilterBar Tag-Filter).
  * Abgrenzung: `<Chip>` ist ein Toggle (aria-pressed), `<Pill>` passiv ohne
  * Interaktion — FilterChip ist „applied filter display + remove".
  *
  * @example
- *   <FilterChip size="md" label="Mission:" onRemove={clear} ariaLabel="Filter entfernen">
- *     {mission.name}
+ *   <FilterChip size="md" label="Project:" onRemove={clear}>
+ *     {project.name}
  *   </FilterChip>
  */
 export function FilterChip({
@@ -58,8 +68,10 @@ export function FilterChip({
   tone = 'primary',
   className,
   children,
+  labels,
   ...rest
 }: FilterChipProps) {
+  const l = useLabels('filterChip', defaultLabels, labels)
   return (
     <span
       className={cn(
@@ -75,7 +87,7 @@ export function FilterChip({
       <button
         type="button"
         onClick={onRemove}
-        aria-label={ariaLabel}
+        aria-label={ariaLabel ?? l.remove}
         className="inline-flex items-center justify-center cursor-pointer hover:opacity-70"
         style={{lineHeight: 1}}
       >

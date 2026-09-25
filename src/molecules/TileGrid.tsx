@@ -1,6 +1,6 @@
 'use client'
 
-// PUL-352 / PUL-462 · TileGrid — responsives Grid aus SelectableTiles.
+// TileGrid — responsives Grid aus SelectableTiles.
 // Generisch: Konsumenten liefern Tile-Definitionen inkl. `glyph`-Slot —
 // keine domain-spezifische Hardcoded-Liste hier.
 
@@ -17,7 +17,7 @@ export interface TileDef<T extends string> {
   /** Wenn true: Tile gerendert, aber nicht klickbar (z. B. „in Vorbereitung"). */
   disabled?: boolean
   title?: string
-  /** Pass-through Test-Hook (z. B. `bucket-provider-jira`). */
+  /** Pass-through Test-Hook (z. B. `source-tile-cloud`). */
   testId?: string
 }
 
@@ -30,7 +30,7 @@ interface Props<T extends string> {
   className?: string
 }
 
-// PUL-456: Mobile (< md) immer 2-spaltig, damit die Tiles auf 360px nicht
+// Mobile (< md) immer 2-spaltig, damit die Tiles auf 360px nicht
 // auf ~97px gequetscht werden; ab md die gewünschte Spaltenzahl.
 const COL_CLASS: Record<NonNullable<Props<string>['cols']>, string> = {
   2: 'grid-cols-2',

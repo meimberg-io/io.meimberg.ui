@@ -15,10 +15,10 @@ type Story = StoryObj<typeof FormSection>
 
 export const Default: Story = {
   args: {
-    title: 'Stammdaten',
+    title: 'General',
     children: (
       <FormField label="Name">
-        <TextField placeholder="Pulse" />
+        <TextField placeholder="Jane Doe" />
       </FormField>
     ),
   },
@@ -26,14 +26,14 @@ export const Default: Story = {
 
 export const WithDescription: Story = {
   args: {
-    title: 'Anpassen',
+    title: 'Customize',
     description: 'optional',
     children: (
       <FormRow cols={2}>
-        <FormField label="Short-Label">
-          <TextField placeholder="PUL" />
+        <FormField label="Short label">
+          <TextField placeholder="ABC" />
         </FormField>
-        <FormField label="Sort-Key">
+        <FormField label="Sort key">
           <TextField placeholder="100" />
         </FormField>
       </FormRow>
@@ -43,16 +43,16 @@ export const WithDescription: Story = {
 
 export const MultipleFields: Story = {
   args: {
-    title: 'Quelle',
+    title: 'Source',
     children: (
       <>
         <FormField label="Account">
-          <TextField placeholder="oli@meimberg.io" />
+          <TextField placeholder="jane.doe@example.com" />
         </FormField>
-        <FormField label="Resource" hint="(optional)">
-          <TextField placeholder="INBOX" />
+        <FormField label="Folder" hint="(optional)">
+          <TextField placeholder="Archive" />
         </FormField>
-        <FormField label="Filter" description="Wird auf den Sync angewendet">
+        <FormField label="Filter" description="Applied on every sync">
           <TextField placeholder="status = open" />
         </FormField>
       </>

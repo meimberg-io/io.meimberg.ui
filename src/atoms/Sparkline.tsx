@@ -14,11 +14,10 @@ export interface SparklineProps extends Omit<SVGProps<SVGSVGElement>, 'children'
 }
 
 /**
- * Pulse-Sparkline-Atom — minimale SVG-Linie für Trend-Visualisierungen in
- * KPI-Tiles und ProjectCards.
+ * Sparkline-Atom — minimale SVG-Linie für Trend-Visualisierungen in
+ * KPI-Tiles und Cards.
  *
- * Hover/Tooltip/Achsen sind bewusst **nicht** Teil von R-01 — kommen in F-01
- * (KPI-Strip) dazu, wenn echter Bedarf besteht.
+ * Hover/Tooltip/Achsen sind bewusst **nicht** Teil des Atoms.
  *
  * @example
  *   <Sparkline values={[3, 5, 4, 8, 6, 9]} />

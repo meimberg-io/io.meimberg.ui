@@ -1,6 +1,5 @@
-// PUL-456: FormRow kollabiert auf `< md` automatisch auf eine Spalte (CSS,
-// viewport-basiert). Die mehrspaltigen Stories unten zeigen das, wenn die
-// Storybook-Viewport-Breite unter 768px gestellt wird (Viewport-Toolbar).
+// FormRow collapses to one column below `md` (CSS, viewport-based). Set the
+// Storybook viewport below 768px to see it in the multi-column stories.
 
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {FormRow} from './FormRow'
@@ -22,9 +21,9 @@ export const SingleColumn: Story = {
     children: (
       <>
         <FormField label="Name">
-          <TextField placeholder="Pulse" />
+          <TextField placeholder="Jane Doe" />
         </FormField>
-        <FormField label="Beschreibung">
+        <FormField label="Description">
           <TextField as="textarea" rows={2} placeholder="…" />
         </FormField>
       </>
@@ -37,11 +36,11 @@ export const TwoColumns: Story = {
     cols: 2,
     children: (
       <>
-        <FormField label="Vorname">
-          <TextField placeholder="Oliver" />
+        <FormField label="First name">
+          <TextField placeholder="Jane" />
         </FormField>
-        <FormField label="Nachname">
-          <TextField placeholder="Meimberg" />
+        <FormField label="Last name">
+          <TextField placeholder="Doe" />
         </FormField>
       </>
     ),
@@ -53,13 +52,13 @@ export const ThreeColumns: Story = {
     cols: 3,
     children: (
       <>
-        <FormField label="Tag">
+        <FormField label="Day">
           <TextField placeholder="01" />
         </FormField>
-        <FormField label="Monat">
+        <FormField label="Month">
           <TextField placeholder="05" />
         </FormField>
-        <FormField label="Jahr">
+        <FormField label="Year">
           <TextField placeholder="2026" />
         </FormField>
       </>
@@ -72,10 +71,10 @@ export const CustomTemplate: Story = {
     cols: '1fr 240px',
     children: (
       <>
-        <FormField label="Short-Label">
-          <TextField placeholder="Pulse-Backlog" />
+        <FormField label="Short label">
+          <TextField placeholder="Backlog" />
         </FormField>
-        <FormField label="Sort-Key">
+        <FormField label="Sort key">
           <TextField placeholder="100" />
         </FormField>
       </>

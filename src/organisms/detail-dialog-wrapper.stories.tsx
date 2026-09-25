@@ -3,7 +3,7 @@ import {useState} from 'react'
 import {DetailDialogWrapper} from './detail-dialog-wrapper'
 import {Button} from '../ui/button'
 import {MetaPill} from '../atoms/MetaPill'
-import {Zap, Sprout, Inbox} from '../atoms/icons'
+import {Zap, Rocket, FileText} from '../atoms/icons'
 
 const meta: Meta<typeof DetailDialogWrapper> = {
   title: 'Organisms/DetailDialogWrapper',
@@ -31,18 +31,18 @@ function BasicDialog({
   const [open, setOpen] = useState(true)
   return (
     <>
-      <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+      <Trigger label="Open dialog" onClick={() => setOpen(true)} />
       <DetailDialogWrapper
         open={open}
         onOpenChange={setOpen}
         size={size}
         icon={withIcon ? <Zap className="size-5 text-foreground" /> : undefined}
-        title="Signal: Bug-Report aus Slack"
-        description="Eingegangen 17. Mai · oli@meimberg.io · #pulse-bugs"
+        title="Bug report: sorting resets after filter change"
+        description="Reported May 17 · alex@example.com · #support"
         headerAside={
           withHeaderAside ? (
             <Button size="sm" variant="outline">
-              Im Provider öffnen
+              Open in tracker
             </Button>
           ) : undefined
         }
@@ -50,16 +50,15 @@ function BasicDialog({
           withFooter ? (
             <div className="flex w-full justify-end gap-2">
               <Button variant="ghost" onClick={() => setOpen(false)}>
-                Abbrechen
+                Cancel
               </Button>
-              <Button onClick={() => setOpen(false)}>Übernehmen</Button>
+              <Button onClick={() => setOpen(false)}>Accept</Button>
             </div>
           ) : undefined
         }
       >
         <p className="body-sm text-muted-foreground">
-          Die Sortierung der Inbox-Items dreht sich nach dem Filter-Reset um. Aufgetreten in der
-          Mobile-Ansicht.
+          The list order flips after resetting the filters. Seen on the mobile layout.
         </p>
         <p className="body-sm text-muted-foreground">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
@@ -92,21 +91,17 @@ export const TintedIconBg: Story = {
       const [open, setOpen] = useState(true)
       return (
         <>
-          <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+          <Trigger label="Open dialog" onClick={() => setOpen(true)} />
           <DetailDialogWrapper
             open={open}
             onOpenChange={setOpen}
-            icon={
-               
-              <Sprout className="size-5 text-sprout" />
-            }
-             
-            iconBgClass="bg-sprout/15"
-            title="Seed: Topic-Routing"
-            description="Reifegrad: refined"
+            icon={<Rocket className="size-5 text-success" />}
+            iconBgClass="bg-success/15"
+            title="Release 2.4"
+            description="Status: ready to ship"
           >
             <p className="body-sm text-muted-foreground">
-              Promoted aus Signal #218. Bereit für nächsten Lifecycle-Schritt.
+              All checks passed. Ready for the next deployment window.
             </p>
           </DetailDialogWrapper>
         </>
@@ -116,32 +111,32 @@ export const TintedIconBg: Story = {
   },
 }
 
-// `description` trägt Block-Inhalt (Meta-Pill-Reihe) statt eines Strings.
-// Dank asChild rendert der Wrapper hier einen <div> statt <p> — sonst wäre
-// der verschachtelte <div>/<span> ungültiges HTML (Hydration-Error).
+// `description` carries block content (a row of pills) instead of a string.
+// Thanks to asChild the wrapper renders a <div> instead of a <p> — otherwise
+// the nested <div>/<span> would be invalid HTML (hydration error).
 export const BlockDescription: Story = {
   render: () => {
     function Demo() {
       const [open, setOpen] = useState(true)
       return (
         <>
-          <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+          <Trigger label="Open dialog" onClick={() => setOpen(true)} />
           <DetailDialogWrapper
             open={open}
             onOpenChange={setOpen}
-            icon={<Inbox className="size-5 text-primary" />}
+            icon={<FileText className="size-5 text-primary" />}
             iconBgClass="bg-primary/10"
             size="lg"
-            title="Inbox-Item: Tagesplanung Donnerstag"
+            title="Document: Thursday planning"
             description={
               <div className="flex flex-wrap items-center gap-2 mt-1">
-                <MetaPill icon={<Inbox size={12} />}>Notiz</MetaPill>
-                <span className="caption text-muted-foreground">Microsoft Graph · 14:32</span>
-                <MetaPill title="Abgeleitete Items">→ 2</MetaPill>
+                <MetaPill icon={<FileText size={12} />}>Note</MetaPill>
+                <span className="caption text-muted-foreground">Shared drive · 14:32</span>
+                <MetaPill title="Linked items">→ 2</MetaPill>
               </div>
             }
           >
-            <p className="body-sm">Bitte morgen früh die Pulse-Demo durchgehen.</p>
+            <p className="body-sm">Please review the demo script first thing tomorrow.</p>
           </DetailDialogWrapper>
         </>
       )
@@ -150,32 +145,32 @@ export const BlockDescription: Story = {
   },
 }
 
-export const InboxItemPreview: Story = {
+export const ItemPreview: Story = {
   render: () => {
     function Demo() {
       const [open, setOpen] = useState(true)
       return (
         <>
-          <Trigger label="Inbox-Item öffnen" onClick={() => setOpen(true)} />
+          <Trigger label="Open item" onClick={() => setOpen(true)} />
           <DetailDialogWrapper
             open={open}
             onOpenChange={setOpen}
-            icon={<Inbox className="size-5 text-primary" />}
+            icon={<FileText className="size-5 text-primary" />}
             iconBgClass="bg-primary/10"
             size="lg"
-            title="Inbox-Item: Tagesplanung Donnerstag"
-            description="Microsoft Graph · 14:32 · ungelesen"
+            title="Document: Thursday planning"
+            description="Shared drive · 14:32 · unread"
             footer={
               <div className="flex w-full justify-between">
                 <Button variant="ghost" size="sm">
-                  Archivieren
+                  Archive
                 </Button>
-                <Button size="sm">Als Task übernehmen</Button>
+                <Button size="sm">Convert to task</Button>
               </div>
             }
           >
             <div className="space-y-3">
-              <p className="body-sm">Bitte morgen früh die Pulse-Demo durchgehen.</p>
+              <p className="body-sm">Please review the demo script first thing tomorrow.</p>
             </div>
           </DetailDialogWrapper>
         </>

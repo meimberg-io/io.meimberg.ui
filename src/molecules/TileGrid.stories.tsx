@@ -1,6 +1,6 @@
-// PUL-456: Auf `< md` rendert das Grid immer 2-spaltig (cols=3/4 → 2), damit die
-// Tiles auf schmalen Viewports nicht zerquetscht werden. In der Storybook-
-// Viewport-Toolbar unter 768px sichtbar.
+// Below `md` the grid always renders two columns (cols=3/4 → 2) so tiles are
+// not squeezed on narrow viewports. Visible below 768px in the Storybook
+// viewport toolbar.
 
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
@@ -16,80 +16,80 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-type Provider =
-  | 'jira'
-  | 'linear'
-  | 'notion'
-  | 'raindrop'
-  | 'microsoft_graph'
-  | 'gmail'
-  | 'todoist'
-  | 'hubspot'
+type Source =
+  | 'cloud'
+  | 'automation'
+  | 'documents'
+  | 'web'
+  | 'apps'
+  | 'email'
+  | 'tasks'
+  | 'favorites'
 
-const PROVIDERS: ReadonlyArray<TileDef<Provider>> = [
+const SOURCES: ReadonlyArray<TileDef<Source>> = [
   {
-    id: 'jira',
-    label: 'Jira',
+    id: 'cloud',
+    label: 'Cloud',
     glyph: <Cloud className="size-5" aria-hidden />,
     glyphBackground: 'hsl(220 100% 96%)',
     glyphColor: 'hsl(220 100% 40%)',
   },
   {
-    id: 'linear',
-    label: 'Linear',
+    id: 'automation',
+    label: 'Automation',
     glyph: <Zap className="size-5" aria-hidden />,
     glyphBackground: 'hsl(252 96% 96%)',
     glyphColor: 'hsl(252 96% 50%)',
   },
   {
-    id: 'notion',
-    label: 'Notion',
+    id: 'documents',
+    label: 'Documents',
     glyph: <FileText className="size-5" aria-hidden />,
     glyphBackground: 'hsl(0 0% 95%)',
   },
   {
-    id: 'raindrop',
-    label: 'Raindrop',
+    id: 'web',
+    label: 'Web',
     glyph: <Globe className="size-5" aria-hidden />,
     glyphBackground: 'hsl(208 100% 95%)',
     glyphColor: 'hsl(208 100% 40%)',
   },
   {
-    id: 'microsoft_graph',
-    label: 'Microsoft 365',
+    id: 'apps',
+    label: 'Apps',
     glyph: <Grid3x3 className="size-5" aria-hidden />,
     glyphBackground: 'hsl(0 0% 95%)',
   },
   {
-    id: 'gmail',
-    label: 'Gmail',
+    id: 'email',
+    label: 'Email',
     glyph: <Mail className="size-5" aria-hidden />,
     glyphBackground: 'hsl(0 80% 96%)',
     glyphColor: 'hsl(0 80% 45%)',
   },
   {
-    id: 'todoist',
-    label: 'Todoist',
+    id: 'tasks',
+    label: 'Tasks',
     glyph: <CheckSquare className="size-5" aria-hidden />,
     glyphBackground: 'hsl(0 75% 95%)',
     glyphColor: 'hsl(0 75% 45%)',
   },
   {
-    id: 'hubspot',
-    label: 'HubSpot',
+    id: 'favorites',
+    label: 'Favorites',
     glyph: <Star className="size-5" aria-hidden />,
     disabled: true,
-    title: 'In Vorbereitung',
+    title: 'Coming soon',
   },
 ]
 
-function Demo({cols, initial = null}: {cols?: 2 | 3 | 4; initial?: Provider | null}) {
-  const [value, setValue] = useState<Provider | null>(initial)
+function Demo({cols, initial = null}: {cols?: 2 | 3 | 4; initial?: Source | null}) {
+  const [value, setValue] = useState<Source | null>(initial)
   return (
     <div style={{width: 560}}>
-      <TileGrid<Provider>
+      <TileGrid<Source>
         value={value}
-        options={PROVIDERS}
+        options={SOURCES}
         onChange={setValue}
         cols={cols}
       />
@@ -98,15 +98,15 @@ function Demo({cols, initial = null}: {cols?: 2 | 3 | 4; initial?: Provider | nu
 }
 
 export const ThreeColumns: Story = {
-  render: () => <Demo cols={3} initial="jira" />,
+  render: () => <Demo cols={3} initial="cloud" />,
 }
 
 export const TwoColumns: Story = {
-  render: () => <Demo cols={2} initial="linear" />,
+  render: () => <Demo cols={2} initial="automation" />,
 }
 
 export const FourColumns: Story = {
-  render: () => <Demo cols={4} initial="notion" />,
+  render: () => <Demo cols={4} initial="documents" />,
 }
 
 export const Empty: Story = {

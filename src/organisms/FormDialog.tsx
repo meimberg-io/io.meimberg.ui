@@ -1,20 +1,12 @@
 'use client'
 
-// PUL-352 · Form-Dialog — das komplette Modal-Pattern in einer Komponente.
-// Konsumenten liefern nur Header-Metadaten + Body-Sections — das Modal
-// kümmert sich um Overlay, Hero-Header (mit optionalem Tint-Gradient + Live-
-// Preview-Slot), sticky Footer mit Cancel + Submit, Escape-/Outside-Schließen,
-// Focus-Trap (via Radix-Dialog).
+// Form dialog — the complete modal pattern in one component. Consumers only
+// supply header metadata and body sections; the dialog owns overlay, hero
+// header (optional tint gradient + preview slot), sticky footer with
+// Cancel + Submit, Escape/outside closing and focus trap (Radix Dialog).
 //
-// Wer ein Form anlegt, muss NICHT mehr nachdenken über:
-// - Wo der Cancel-Button hingehört (immer im Footer links neben Submit)
-// - Wie sticky Footer + scrollbarer Body zusammenspielen
-// - Wie der Submit-Button bei Pending aussieht
-// - Wie der Close-X positioniert ist
-// - Welche Submit-Variants es gibt (primary / success / destructive)
-//
-// Wenn ein Form das nicht abdeckt, ist DAS hier zu erweitern, nicht das
-// Form selbst zu verbiegen.
+// If a form doesn't fit this pattern, extend this component rather than
+// bending the form.
 
 import {forwardRef} from 'react'
 import type {ReactNode} from 'react'
@@ -22,53 +14,68 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Info, Loader2, X} from '../atoms/icons'
 import {Button} from '../ui/button'
 import {useIsMobile} from '../hooks/use-mobile'
+import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
 
 type SubmitVariant = 'primary' | 'success' | 'destructive'
 
+export interface FormDialogLabels {
+  /** Footer cancel button in form mode. */
+  cancel: string
+  /** Footer button in view-only mode (no `submitLabel`). */
+  close: string
+  /** aria-label of the close X in the hero header. */
+  closeHero: string
+}
+
+const defaultLabels: FormDialogLabels = {
+  cancel: 'Cancel',
+  close: 'Close',
+  closeHero: 'Close dialog',
+}
+
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** Caption-Text über dem Titel im Hero (z. B. „Neuen Bucket anlegen"). */
+  /** Caption above the title in the hero (e.g. "Create project"). */
   caption?: ReactNode
-  /** Heading-2 im Hero. */
+  /** Heading in the hero. */
   title: ReactNode
-  /** HSL-Token-String (ohne `hsl()`), z. B. `"4 55% 50%"` — rendert den
-   *  Radial-Gradient oben rechts im Hero. */
+  /** HSL channel string (without `hsl()`), e.g. `"4 55% 50%"` — renders the
+   *  radial gradient at the top right of the hero. */
   heroTint?: string | null
-  /** Beliebiger Slot unter dem Hero-Header (z. B. Live-Preview-Card). */
+  /** Arbitrary slot below the hero header (e.g. a live preview card). */
   hero?: ReactNode
-  /** Maximalbreite in px (default 620). */
+  /** Max width in px (default 620). */
   maxWidth?: number
-  /** PUL-456 Escape-Hatch: erzwingt auch auf `< md` den zentrierten Dialog
-   *  statt des Bottom-Sheets. */
+  /** Escape hatch: keeps the centred dialog below `md` instead of the
+   *  bottom sheet. */
   disableMobileSheet?: boolean
-  /** Wenn weggelassen → View-Only-Mode: kein Submit-Button, Cancel-Button
-   *  wird zum „Schließen"-Button (Variant default). Konsumenten wie das
-   *  ItemDetailDialog nutzen das. */
+  /** When omitted → view-only mode: no submit button, the cancel button
+   *  becomes a "Close" button. */
   submitLabel?: ReactNode
   submitVariant?: SubmitVariant
   submitDisabled?: boolean
   submitPending?: boolean
-  /** Optionaler Icon-Override im Submit (default: Checkmark für `success`,
-   *  kein Icon sonst). */
+  /** Optional submit icon override (default: checkmark for `success`,
+   *  none otherwise). */
   submitIcon?: ReactNode
-  /** Footer-Cancel-Label. Default „Abbrechen" bei Form-Mode, „Schließen" bei
-   *  View-Only-Mode (kein `submitLabel`). */
+  /** Footer cancel label. Takes precedence over `labels.cancel` /
+   *  `labels.close`. */
   cancelLabel?: ReactNode
-  /** Info-Stempel links im Footer (kleiner Hinweistext mit Info-Icon). */
+  /** Info note on the left of the footer (small text with info icon). */
   footerInfo?: ReactNode
-  /** Zusätzliche Buttons im Footer-Right-Group, links neben Cancel/Submit.
-   *  Use-Case: Detail-Dialoge mit mehreren Aktionen (z. B. Inbox-Item:
-   *  Signal/Task/Delete + Schließen). Konsument liefert eigene `<Button>`s. */
+  /** Extra buttons in the footer's right group, left of Cancel/Submit —
+   *  for detail dialogs with several actions. */
   footerActions?: ReactNode
-  /** Pflicht im Form-Mode (mit `submitLabel`), ignoriert im View-Only-Mode. */
+  /** Required in form mode (with `submitLabel`), ignored in view-only mode. */
   onSubmit?: () => void | Promise<void>
   onCancel?: () => void
-  /** Body — i. d. R. mehrere `<FormSection>`. */
+  /** Body — usually several `<FormSection>`s. */
   children: ReactNode
-  /** Test-Hook auf dem Submit-Button. */
+  /** Test hook on the submit button. */
   submitTestId?: string
+  labels?: Partial<FormDialogLabels>
 }
 
 export function FormDialog({
@@ -92,9 +99,11 @@ export function FormDialog({
   onCancel,
   children,
   submitTestId,
+  labels,
 }: Props) {
+  const l = useLabels('formDialog', defaultLabels, labels)
   const viewOnly = submitLabel === undefined
-  const effectiveCancelLabel = cancelLabel ?? (viewOnly ? 'Schließen' : 'Abbrechen')
+  const effectiveCancelLabel = cancelLabel ?? (viewOnly ? l.close : l.cancel)
   const handleCancel = () => {
     if (onCancel) onCancel()
     else onOpenChange(false)
@@ -104,8 +113,8 @@ export function FormDialog({
     if (onSubmit) void onSubmit()
   }
 
-  // PUL-456: Auf `< md` fährt der Dialog als unten angedocktes Bottom-Sheet ein
-  // (volle Breite, oben abgerundet, höher). Desktop bleibt zentriert wie zuvor.
+  // Below `md` the dialog slides in as a bottom sheet (full width, rounded
+  // top, taller). Desktop stays centred.
   const isMobile = useIsMobile()
   const mobileSheet = isMobile && !disableMobileSheet
 
@@ -120,11 +129,10 @@ export function FormDialog({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="form-dialog-overlay" />
         <DialogPrimitive.Content
-          // PUL-360: Kein `transform: translateX(-50%)` mehr — der erzeugte
-          // Stacking-Context blockt das Hit-Test des RichSelect-Listbox-Portals
-          // (Chromium routet den Click an Dialog-Footer statt Item). Stattdessen
-          // zentrieren wir per `inset-x-0` + `mx-auto` mit der `width`-Style-
-          // Constraint — gleiche Optik, ohne Stacking-Context-Bruch.
+          // No `transform: translateX(-50%)`: the resulting stacking context
+          // breaks hit-testing of portalled listboxes (Chromium routes the
+          // click to the dialog footer instead of the item). Centring via
+          // `inset-x-0` + `mx-auto` + width constraint looks the same.
           className={cn(
             'form-dialog-shell fixed z-50',
             mobileSheet
@@ -137,12 +145,10 @@ export function FormDialog({
               : {maxWidth, width: 'calc(100vw - 32px)'}
           }
           onEscapeKeyDown={event => {
-            // Popover-Surfaces (RichSelect/TagTrigger via eigenes Portal mit
-            // `data-portal-popover`, plus Radix-DropdownMenu/Select/Popover/
-            // Tooltip via Radix-Popper-Wrapper `data-radix-popper-content-
-            // wrapper`) sind DOM-mäßig außerhalb des DialogContent. Wenn
-            // eines offen ist, soll Escape ZUERST nur das Popover schließen
-            // (handled dort intern), nicht den Dialog selbst.
+            // Popover surfaces (own portals marked `data-portal-popover`,
+            // Radix floats inside `data-radix-popper-content-wrapper`) live
+            // outside DialogContent in the DOM. While one is open, Escape
+            // must only close the popover (handled there), not the dialog.
             if (
               document.querySelector(
                 '[data-portal-popover],[data-radix-popper-content-wrapper]',
@@ -154,52 +160,33 @@ export function FormDialog({
             handleCancel()
           }}
           onInteractOutside={event => {
-            // Click auf ein Portal-Popover (Tag-Auswahl, RichSelect-Option,
-            // DropdownMenuItem, …) zählt für Radix als „outside DialogContent".
-            // Ohne diesen Filter würde jeder Klick im Popover den ganzen
-            // Dialog schließen — Symptom: DropdownMenuItem-Click via Inbox-
-            // Triage triggert `setConfirm(...)`, aber der Dialog wird im
-            // selben Frame geschlossen, also rendert TriageConfirmDialog nie.
+            // A click inside a portalled popover (select option, dropdown
+            // item, …) counts as "outside DialogContent" for Radix. Without
+            // this filter every popover click would close the whole dialog.
             //
-            // ⚠ Radix wrapped das DOM-Event in ein CustomEvent — `event.target`
-            // ist die DialogContent selbst (immer „outside"), das echte Target
-            // sitzt in `event.detail.originalEvent.target`.
+            // Radix wraps the DOM event in a CustomEvent — `event.target` is
+            // DialogContent itself; the real target is in
+            // `event.detail.originalEvent`.
             //
-            // Selektor matched mehrere Konventionen:
-            //   • `[data-portal-popover]` — eigenes Marker (RichSelect, TagTrigger)
-            //   • `[data-radix-popper-content-wrapper]` — alle Radix-Floats
-            //     (DropdownMenu, Select, Popover, Tooltip), solange der Wrapper
-            //     noch im DOM ist
-            //   • ARIA-Rollen, die typischerweise NUR in Popover-Surfaces
-            //     vorkommen (menuitem/option/menu/listbox/menuitemcheckbox/
-            //     menuitemradio). Fängt den Fall, dass das Popover sich beim
-            //     Click selbst unmountet (Race: Radix-Dismissible schließt das
-            //     Menu, bevor unser onInteractOutside den DOM inspizieren kann
-            //     — Wrapper ist dann weg, aber `originalTarget` mit `role=
-            //     "menuitem"` ist persistent über das Event).
-            // `composedPath()` ist persistent zum Event-Zeitpunkt — auch wenn
-            // Radix das Popover beim Click selbst unmountet (was es bei
-            // DropdownMenuItem-Klicks tut), enthält der Pfad noch das menuitem
-            // und seinen Popper-Wrapper. `event.target.closest(...)` allein
-            // wäre race-anfällig: zum Zeitpunkt unseres Handlers könnte das
-            // menuitem schon detached sein.
-            // Radix DismissableLayer ruft `onInteractOutside` aus zwei
-            // Quellen:
-            //   1. `onPointerDownOutside` — User klickt außerhalb. Hier ist
-            //      `originalEvent.type === 'pointerdown'/'mousedown'`.
-            //   2. `onFocusOutside` — Focus springt aus dem Layer. Hier ist
-            //      `originalEvent.type === 'focusin'`. Tritt z. B. auf, wenn
-            //      ein DropdownMenu sich nach Item-Click selbst schließt und
-            //      Focus kurzzeitig outside-springt. Das ist KEINE User-
-            //      Intention den Dialog zu schließen — wir ignorieren `focusin`.
+            // Matched conventions:
+            //   • `[data-portal-popover]` — own marker for custom portals
+            //   • `[data-radix-popper-content-wrapper]` — all Radix floats
+            //   • ARIA roles that only occur in popover surfaces (menu,
+            //     menuitem*, listbox, option) — covers popovers that unmount
+            //     themselves on click before this handler runs.
+            //
+            // Radix calls `onInteractOutside` from pointer-down-outside and
+            // from focus-outside. `focusin` happens e.g. when a dropdown
+            // closes after an item click and focus briefly leaves the layer —
+            // not a user intent to close the dialog, so it is ignored.
             const originalEvent = event.detail.originalEvent as Event
             if (originalEvent.type === 'focusin') {
               event.preventDefault()
               return
             }
-            // `composedPath()` ist persistent zum Event-Zeitpunkt — auch wenn
-            // Radix das Popover beim Click selbst unmountet, enthält der Pfad
-            // noch das menuitem und seinen Popper-Wrapper.
+            // `composedPath()` is fixed at event time — it still contains the
+            // menu item and its popper wrapper even if the popover has
+            // unmounted by now, unlike `event.target.closest(...)`.
             const path = (originalEvent.composedPath?.() as Element[]) ?? []
             const looksLikePopoverInteraction = path.some(el => {
               if (!(el instanceof Element)) return false
@@ -223,11 +210,10 @@ export function FormDialog({
           }}
           aria-describedby={undefined}
         >
-          {/* Hero-Header — Radial-Gradient (optional) + Caption/Title + Close-X
-             + optionaler Hero-Slot. `shrink-0`: Bei kleinen Viewports stösst
-             die Shell gegen `max-height` — ohne shrink würden alle drei
-             Flex-Kinder proportional schrumpfen und der Hero (overflow-hidden)
-             seinen Inhalt abschneiden (PUL-408). */}
+          {/* Hero header — optional radial gradient + caption/title + close X
+             + optional hero slot. `shrink-0`: on small viewports the shell
+             hits `max-height`; without it all three flex children would
+             shrink and the hero (overflow-hidden) would clip its content. */}
           <div
             className="px-6 pt-6 pb-5 relative overflow-hidden border-b border-border shrink-0"
             style={heroStyle}
@@ -243,11 +229,10 @@ export function FormDialog({
                 <button
                   type="button"
                   className="text-muted-foreground hover:text-foreground rounded p-1 cursor-pointer shrink-0"
-                  // Bewusst NICHT „Schließen" — vermeidet aria-label-Konflikt
-                  // mit dem Footer-Cancel-Button (`Schließen` im View-Only-
-                  // Mode), der per `getByRole({name: /Schließen/})` adressiert
-                  // wird.
-                  aria-label="Dialog-Hero schließen"
+                  // Deliberately distinct from `labels.close` so it doesn't
+                  // clash with the footer button's accessible name in
+                  // view-only mode.
+                  aria-label={l.closeHero}
                 >
                   <X width={18} height={18} />
                 </button>
@@ -256,11 +241,11 @@ export function FormDialog({
             {hero}
           </div>
 
-          {/* Body — scrollbar, konstanter gap-6 zwischen Sections. */}
+          {/* Body — scrollable, constant gap between sections. */}
           <div className="form-dialog-body px-6 py-6 flex flex-col gap-6">{children}</div>
 
-          {/* Sticky Footer — Info-Stempel links, Cancel + Submit rechts.
-             `shrink-0`: siehe Hero-Header (PUL-408). */}
+          {/* Sticky footer — info note left, Cancel + Submit right.
+             `shrink-0`: see hero header. */}
           <div className="px-6 py-4 border-t border-border bg-surface-1 flex items-center justify-between gap-2 shrink-0">
             <div className="caption text-muted-foreground inline-flex items-center gap-1.5 min-w-0">
               {footerInfo && (
@@ -320,7 +305,7 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(function S
   {variant, disabled, pending, icon, onClick, children, testId},
   ref,
 ) {
-  // Default-Icon: Checkmark für success, sonst keins.
+  // Default icon: checkmark for success, none otherwise.
   const showIcon = icon ?? (variant === 'success' ? <CheckIcon /> : null)
   return (
     <button

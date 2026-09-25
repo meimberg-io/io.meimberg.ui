@@ -46,9 +46,19 @@ describe('MarkdownRenderer', () => {
     expect(checkboxes[1]).toBeChecked()
   })
 
-  it('keeps internal /api/attachments/ URLs', () => {
-    render(<MarkdownRenderer value='![alt](/api/attachments/123)' />)
-    const img = screen.getByRole('img')
-    expect(img).toHaveAttribute('src', '/api/attachments/123')
+  it('keeps relative URLs', () => {
+    render(<MarkdownRenderer value='![alt](/files/123) [doc](docs/intro)' />)
+    expect(screen.getByRole('img')).toHaveAttribute('src', '/files/123')
+    expect(screen.getByText('doc').closest('a')).toHaveAttribute('href', 'docs/intro')
+  })
+
+  it('drops unsafe schemes', () => {
+    render(<MarkdownRenderer value='[x](javascript:alert(1))' />)
+    expect(screen.getByText('x').closest('a')?.getAttribute('href') ?? '').toBe('')
+  })
+
+  it('keeps in-page anchors', () => {
+    render(<MarkdownRenderer value='[top](#top)' />)
+    expect(screen.getByRole('link', {name: 'top'}).getAttribute('href')).toContain('#')
   })
 })

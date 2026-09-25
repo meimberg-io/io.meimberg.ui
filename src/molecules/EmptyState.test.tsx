@@ -26,6 +26,7 @@ describe('EmptyState — smoke', () => {
     )
     await user.click(screen.getByRole('button', {name: /Add new/}))
     expect(onAction).toHaveBeenCalledOnce()
+    expect(screen.getByTestId('empty-state-action')).toBeInTheDocument()
   })
 
   it('hides the action button when onAction is missing', () => {

@@ -17,9 +17,9 @@ function TextDemo() {
       value={value}
       onChange={setValue}
       options={[
-        {value: 'count', label: 'Häufigkeit'},
-        {value: 'alpha', label: 'Alphabet'},
-        {value: 'recent', label: 'Zuletzt'},
+        {value: 'count', label: 'Frequency'},
+        {value: 'alpha', label: 'Alphabetical'},
+        {value: 'recent', label: 'Recent'},
       ]}
     />
   )
@@ -32,19 +32,19 @@ function IconDemo() {
       value={value}
       onChange={setValue}
       options={[
-        {value: 'list', label: 'Liste', icon: <LayoutList className="size-3" />, ariaLabel: 'Liste'},
-        {value: 'cloud', label: 'Wolke', icon: <Cloud className="size-3" />, ariaLabel: 'Wolke'},
+        {value: 'list', label: 'List', icon: <LayoutList className="size-3" />, ariaLabel: 'List'},
+        {value: 'cloud', label: 'Cloud', icon: <Cloud className="size-3" />, ariaLabel: 'Cloud'},
       ]}
     />
   )
 }
 
 export const TextOptions: Story = {
-  name: 'Text-Optionen (Sort-Toggle)',
+  name: 'Text options (sort toggle)',
   render: () => <TextDemo />,
 }
 
 export const IconOptions: Story = {
-  name: 'Icon + Label (Display-Toggle)',
+  name: 'Icon + label (display toggle)',
   render: () => <IconDemo />,
 }

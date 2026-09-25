@@ -5,12 +5,12 @@ import {DetailField} from './DetailField'
 describe('DetailField', () => {
   it('renders label + value slot', () => {
     render(
-      <DetailField label="Provider">
-        <span>Microsoft 365</span>
+      <DetailField label="Service">
+        <span>Cloud Storage</span>
       </DetailField>,
     )
-    expect(screen.getByText('Provider')).toBeInTheDocument()
-    expect(screen.getByText('Microsoft 365')).toBeInTheDocument()
+    expect(screen.getByText('Service')).toBeInTheDocument()
+    expect(screen.getByText('Cloud Storage')).toBeInTheDocument()
   })
 
   it('uses items-start by default (multiline-safe)', () => {

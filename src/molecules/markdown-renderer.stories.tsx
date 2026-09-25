@@ -15,7 +15,7 @@ export const Empty: Story = {args: {value: ''}}
 export const SimpleText: Story = {
   args: {
     value:
-      'Pulse ist ein **Cockpit** für alle Tickets, Tasks und Inbox-Items aus den verschiedenen Tools, mit denen ich täglich arbeite.',
+      'A **dashboard** that brings together tickets, tasks and messages from all the tools you use every day.',
   },
 }
 
@@ -25,21 +25,21 @@ export const HeadingsAndLists: Story = {
 
 ## Heading 2
 
-- erstens
-- zweitens
-- drittens mit *italic* und **bold**
+- first
+- second
+- third with *italic* and **bold**
 
-1. Eins
-2. Zwei
-3. Drei`,
+1. One
+2. Two
+3. Three`,
   },
 }
 
 export const CodeAndLinks: Story = {
   args: {
-    value: `Verlinkung: [Linear-Issue PUL-398](https://linear.app/meimbergio/issue/PUL-398)
+    value: `Link: [Example issue](https://example.com/issues/42)
 
-Inline-\`code\` und Blockcode:
+Inline \`code\` and a code block:
 
 \`\`\`ts
 function hello(name: string) {
@@ -53,26 +53,20 @@ export const TableAndTaskList: Story = {
   args: {
     value: `| Stage | Status |
 | --- | --- |
-| Signal | new |
-| Seed | refined |
-| Sprout | ready |
+| Draft | new |
+| Review | in progress |
+| Release | ready |
 
-- [x] Mock-Daten gesammelt
-- [x] Story-File angelegt
-- [ ] Review durch User`,
+- [x] Collect sample data
+- [x] Write the story
+- [ ] Get a review`,
   },
 }
 
 export const BlockquoteAndStrikethrough: Story = {
   args: {
-    value: `> Pulse hält den Workflow zusammen — nicht den Wochenplan.
+    value: `> Keep the workflow together, not the weekly plan.
 
-~~Veraltete Annahme~~ wurde gestrichen.`,
-  },
-}
-
-export const RelativeAttachmentUrl: Story = {
-  args: {
-    value: 'Foto: ![Inbox-Screenshot](/api/attachments/00000000-0000-0000-0000-000000000000)',
+~~Outdated assumption~~ was removed.`,
   },
 }

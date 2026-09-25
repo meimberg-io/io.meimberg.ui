@@ -3,3 +3,19 @@
  * damit Consumer ohne Markdown das Plugin nicht installieren müssen. */
 @import "../src/styles.css";
 @plugin "@tailwindcss/typography";
+
+/* Demo-Marke für den Theme-Switch: zeigt, dass Komponenten einem Marken-
+ * Override folgen (Primary, Ring, Sidebar, Radius). */
+.theme-demo {
+  --primary: 262 70% 50%;
+  --ring: 262 70% 50%;
+  --sidebar-primary: 262 70% 50%;
+  --sidebar-ring: 262 70% 50%;
+  --radius: 0.25rem;
+}
+.theme-demo.dark {
+  --primary: 262 80% 68%;
+  --ring: 262 80% 68%;
+  --sidebar-primary: 262 80% 68%;
+  --sidebar-ring: 262 80% 68%;
+}

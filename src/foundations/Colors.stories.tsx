@@ -1,13 +1,6 @@
-// PUL-412 (G0) / PUL-462: Foundations/Colors — die NEUTRALEN Design-Tokens des
-// @meimberg/ui/tokens-Presets (Surfaces, Status, shadcn-Vendor). Quelle der
-// Wahrheit: packages/tokens/theme.css. HSL-Werte hier duplizieren wir bewusst
-// neben den CSS-Vars, damit die Foundations-Page den Wert offline les- und
-// überprüfbar macht — Token-Änderungen im selben Changeset nachziehen.
-//
-// PUL-462 Schritt 11: die Pulse-DOMÄNEN-Tokens (Prio/Vocab/Stage/Top-Mission)
-// sind KEINE geteilten Foundations mehr — sie kodieren Pulse-Fachlichkeit,
-// leben in der App (app/src/app/globals.css) und werden im App-Storybook unter
-// „Foundations/Colors (Pulse-Domain)" dokumentiert.
+// Foundations/Colors — the colour tokens of @meimberg/ui/tokens
+// (src/tokens/theme.css). Values are read live from the CSS variables, so the
+// page follows the active theme (light/dark) and any brand override.
 
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {PageHeader, Section, Swatch} from './_Swatch'
@@ -26,43 +19,55 @@ export const All: Story = {
     <div style={{maxWidth: 1100}}>
       <PageHeader
         title="Colors"
-        lead="Neutrale Design-Tokens des @meimberg/ui/tokens-Presets — produktunabhängig, von jeder konsumierenden App teilbar. Pulse-fachliche Farb-Tokens (Prio, Vokabular, Stage-Lifecycle, Top-Mission) sind bewusst NICHT hier, sondern in der App (siehe App-Storybook)."
+        lead="Neutral default palette: slate greys with a blue primary. Tokens are HSL channels without hsl() and are defined for :root (light) and .dark. To apply a brand, override the tokens after importing @meimberg/ui/tokens — the primary colour lives in --primary, --ring, --sidebar-primary and --sidebar-ring."
       />
 
       <Section
-        title="Surfaces"
-        hint="Surface-0..3 stapeln sich von der Page-Background (0) bis zu erhöhten Cards/Popovers (3). Tailwind: bg-surface-0/-1/-2/-3."
+        title="Core"
+        hint="shadcn-compatible base tokens. Tailwind: bg-background, text-foreground, bg-card, bg-primary, …"
       >
-        <Swatch token="--surface-0" hsl="200 20% 98%" purpose="Page-Background" bg="--surface-0" />
-        <Swatch token="--surface-1" hsl="0 0% 100%" purpose="Card-Background (Default)" bg="--surface-1" />
-        <Swatch token="--surface-2" hsl="200 15% 95%" purpose="Subtle-Inset (z. B. Segmented-Switch-Track)" bg="--surface-2" />
-        <Swatch token="--surface-3" hsl="200 15% 90%" purpose="Stronger-Inset / Skeleton-Highlight" bg="--surface-3" />
+        <Swatch token="--background" purpose="Page background" />
+        <Swatch token="--foreground" purpose="Body text" />
+        <Swatch token="--card" purpose="Card / surface background" fgToken="--card-foreground" />
+        <Swatch token="--popover" purpose="Popovers and floating surfaces" fgToken="--popover-foreground" />
+        <Swatch token="--primary" purpose="Primary actions, links, active states" fgToken="--primary-foreground" />
+        <Swatch token="--secondary" purpose="Secondary (muted) actions" fgToken="--secondary-foreground" />
+        <Swatch token="--muted" purpose="Muted areas, skeleton base" fgToken="--muted-foreground" />
+        <Swatch token="--accent" purpose="Hover tint" fgToken="--accent-foreground" />
+        <Swatch token="--destructive" purpose="Destructive actions (delete, data loss)" fgToken="--destructive-foreground" />
+        <Swatch token="--border" purpose="Default border" />
+        <Swatch token="--input" purpose="Input border" />
+        <Swatch token="--ring" purpose="Focus ring (keyboard focus)" />
       </Section>
 
       <Section
         title="Status"
-        hint="Neutrale Status-Semantik für Success / Warning / Info. Produktunabhängig verwendbar (Tailwind: bg-success/-warning/-info)."
+        hint="Status semantics, each with a foreground token for text on the filled colour. Tailwind: bg-success / text-success-foreground, bg-warning / …, bg-info / …"
       >
-        <Swatch token="--success" hsl="160 55% 38%" purpose="Success-Aktion (Speichern, OK-Confirm)" bg="--success" fgToken="--success-foreground" />
-        <Swatch token="--warning" hsl="45 75% 50%" purpose="Warnung (nicht-blockierende Hinweise)" bg="--warning" />
-        <Swatch token="--info" hsl="195 60% 42%" purpose="Info / neutrale Hervorhebung" bg="--info" />
+        <Swatch token="--success" purpose="Success, confirmations" fgToken="--success-foreground" />
+        <Swatch token="--warning" purpose="Non-blocking warnings" fgToken="--warning-foreground" />
+        <Swatch token="--info" purpose="Informational highlights" fgToken="--info-foreground" />
       </Section>
 
       <Section
-        title="Vendor (shadcn) — frei verwendbar"
-        hint="shadcn-Defaults, leicht gestimmt. Diese Tokens sind NICHT Atoms-exklusiv — Layer-/Page-Code darf bg-primary/bg-card/bg-muted/bg-destructive frei verwenden."
+        title="Surfaces"
+        hint="surface-0..3 stack from the page background (0) to raised or inset areas (3). Tailwind: bg-surface-0/-1/-2/-3."
       >
-        <Swatch token="--background" hsl="200 20% 98%" purpose="Page-Body-Background" bg="--background" />
-        <Swatch token="--foreground" hsl="200 15% 12%" purpose="Body-Text" bg="--foreground" />
-        <Swatch token="--card" hsl="0 0% 100%" purpose="Card-/Surface-Background" bg="--card" fgToken="--card-foreground" />
-        <Swatch token="--popover" hsl="0 0% 100%" purpose="Popover/Floating-Background" bg="--popover" />
-        <Swatch token="--primary" hsl="195 60% 42%" purpose="Primary (Cyan)" bg="--primary" fgToken="--primary-foreground" />
-        <Swatch token="--secondary" hsl="200 15% 94%" purpose="Secondary-Aktion (gedämpft)" bg="--secondary" />
-        <Swatch token="--muted" hsl="200 15% 94%" purpose="Muted-Fläche (Skeleton-Base)" bg="--muted" fgToken="--muted-foreground" />
-        <Swatch token="--accent" hsl="200 15% 94%" purpose="Accent-Hover-Tint" bg="--accent" />
-        <Swatch token="--destructive" hsl="345 65% 50%" purpose="Destructive (Löschen, Cancel mit Datenverlust)" bg="--destructive" fgToken="--destructive-foreground" />
-        <Swatch token="--border" hsl="200 15% 88%" purpose="Default-Border" bg="--border" />
-        <Swatch token="--ring" hsl="195 60% 42%" purpose="Focus-Ring (Tastatur-Fokus)" bg="--ring" />
+        <Swatch token="--surface-0" purpose="Page background" />
+        <Swatch token="--surface-1" purpose="Default card background" />
+        <Swatch token="--surface-2" purpose="Subtle inset (e.g. segmented switch track)" />
+        <Swatch token="--surface-3" purpose="Stronger inset, skeleton highlight" />
+      </Section>
+
+      <Section
+        title="Sidebar"
+        hint="Separate tokens for the app sidebar so it can be tinted independently. Tailwind: bg-sidebar, text-sidebar-foreground, …"
+      >
+        <Swatch token="--sidebar-background" purpose="Sidebar background" fgToken="--sidebar-foreground" />
+        <Swatch token="--sidebar-primary" purpose="Active item text" fgToken="--sidebar-primary-foreground" />
+        <Swatch token="--sidebar-accent" purpose="Hovered / active item background" fgToken="--sidebar-accent-foreground" />
+        <Swatch token="--sidebar-border" purpose="Sidebar borders" />
+        <Swatch token="--sidebar-ring" purpose="Focus ring inside the sidebar" />
       </Section>
     </div>
   ),

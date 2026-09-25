@@ -1,12 +1,11 @@
-// PUL-462 (Schritt 7): IconByKey — generischer Key→Icon-Registry-Lookup.
+// IconByKey — generischer Key→Icon-Registry-Lookup.
 //
 // Schlägt in einer `Record<string, IconComponent>`-Registry per `id` die
 // zu rendernde Icon-Komponente nach (optionaler `fallback`) und reicht alle
 // übrigen Props an sie weiter. Die konkrete Registry (Provider-Marken,
-// Channel-Icons, …) ist Pulse-Domain und bleibt im jeweiligen Wrapper.
-//
-// Konsumenten: ProviderGlyph (Brand-SVGs, Props {size,variant,label,className})
-// und ChannelIcon (Lucide-Map, Prop {className}).
+// Channel-Icons, …) ist Domain des Konsumenten und bleibt im jeweiligen
+// Wrapper — z. B. ein Brand-Glyph (Props {size,variant,label,className}) oder
+// eine Lucide-Map (Prop {className}).
 
 import type {ComponentType} from 'react'
 

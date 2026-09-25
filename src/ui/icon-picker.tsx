@@ -9,15 +9,37 @@ import {
 } from './popover'
 import { Button } from './button'
 import { IconButton } from './icon-button'
+import { useLabels } from '../i18n/context'
 
-// MIPUL-195 (Refinement) · Lucide-Icon-Picker — adaptiert aus io.meimberg.volve.
-// Speichert kebab-case Icon-Namen (z.B. 'lightbulb', 'flask-conical').
+// Lucide icon picker. Stores kebab-case icon names (e.g. 'lightbulb',
+// 'flask-conical').
+
+export interface IconPickerLabels {
+  /** Trigger text while no icon is selected. */
+  trigger: string
+  searchPlaceholder: string
+  /** Title of the clear button. */
+  clear: string
+  noResults: string
+  /** Hint below the grid while not searching. */
+  searchHint: (total: number) => string
+}
+
+const defaultLabels: IconPickerLabels = {
+  trigger: 'Choose icon…',
+  searchPlaceholder: 'Search icons…',
+  clear: 'Remove icon',
+  noResults: 'No icons found',
+  searchHint: total => `Search to browse all ${total} icons`,
+}
 
 interface IconPickerProps {
   value: string | null
   onChange: (icon: string | null) => void
   className?: string
+  /** Trigger text while no icon is selected. Takes precedence over `labels.trigger`. */
   triggerLabel?: string
+  labels?: Partial<IconPickerLabels>
 }
 
 function toKebab(name: string): string {
@@ -38,7 +60,8 @@ const allIcons = Object.keys(icons).map(pascal => ({
 
 const MAX_DISPLAY = 200
 
-export function IconPicker({ value, onChange, className, triggerLabel }: IconPickerProps) {
+export function IconPicker({ value, onChange, className, triggerLabel, labels }: IconPickerProps) {
+  const l = useLabels('iconPicker', defaultLabels, labels)
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
 
@@ -82,7 +105,7 @@ export function IconPicker({ value, onChange, className, triggerLabel }: IconPic
               <span className='truncate'>{value}</span>
             </>
           ) : (
-            <span>{triggerLabel ?? 'Icon auswählen…'}</span>
+            <span>{triggerLabel ?? l.trigger}</span>
           )}
         </Button>
       </PopoverTrigger>
@@ -92,12 +115,12 @@ export function IconPicker({ value, onChange, className, triggerLabel }: IconPic
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder='Icon suchen…'
+            placeholder={l.searchPlaceholder}
             className='flex-1 bg-transparent caption outline-none placeholder:text-muted-foreground'
             autoFocus
           />
           {value && (
-            <IconButton size='sm' onClick={handleClear} title='Icon entfernen'>
+            <IconButton size='sm' onClick={handleClear} title={l.clear} aria-label={l.clear}>
               <CancelIcon />
             </IconButton>
           )}
@@ -122,13 +145,13 @@ export function IconPicker({ value, onChange, className, triggerLabel }: IconPic
           })}
           {filtered.length === 0 && (
             <p className='col-span-8 py-6 text-center caption text-muted-foreground italic'>
-              Keine Icons gefunden
+              {l.noResults}
             </p>
           )}
         </div>
         {!search.trim() && (
           <p className='border-t border-border px-3 py-1.5 caption text-muted-foreground text-center'>
-            Suche nutzen für alle {allIcons.length} Icons
+            {l.searchHint(allIcons.length)}
           </p>
         )}
       </PopoverContent>
@@ -136,7 +159,5 @@ export function IconPicker({ value, onChange, className, triggerLabel }: IconPic
   )
 }
 
-// PUL-390: `LucideIcon` ist nach `./lucide-icon` gewandert
-// (per-Icon Code-Split via `dynamicIconImports`). Diese Datei behält
-// `IconPicker` als einzigen Volltext-Registry-Konsumenten — und wird in den
-// Call-Sites per `next/dynamic` lazy geladen.
+// This file imports the full Lucide registry — load `IconPicker` lazily
+// (e.g. `next/dynamic`). For rendering a single icon use `./lucide-icon`.

@@ -35,7 +35,7 @@ export const Default: Story = {
 }
 
 export const CompactSize: Story = {
-  name: 'size="sm" (kompakter Trigger)',
+  name: 'size="sm" (compact trigger)',
   render: () => (
     <ItemActionsMenu testId="story-sm-actions" size="sm">
       <DropdownMenuItem>
@@ -47,12 +47,12 @@ export const CompactSize: Story = {
 }
 
 export const WithSeparator: Story = {
-  name: 'Mit Separator (destructive unten)',
+  name: 'With separator (destructive last)',
   render: () => (
     <ItemActionsMenu testId="story-separator-actions">
       <DropdownMenuItem>
         <ArrowRight className="mr-2 size-4" />
-        Evolve to Seed
+        Duplicate
       </DropdownMenuItem>
       <DropdownMenuItem>
         <EditIcon className="mr-2 size-4" />
@@ -68,22 +68,22 @@ export const WithSeparator: Story = {
 }
 
 export const WithSubMenu: Story = {
-  name: 'Mit Submenü (Move to Mission)',
+  name: 'With submenu (Move to project)',
   render: () => (
     <ItemActionsMenu testId="story-submenu-actions">
       <DropdownMenuItem>
         <ArrowRight className="mr-2 size-4" />
-        Evolve to Seed
+        Duplicate
       </DropdownMenuItem>
       <DropdownMenuSub>
         <DropdownMenuSubTrigger>
           <FolderKanban className="mr-2 size-4" />
-          Move to Mission
+          Move to project
         </DropdownMenuSubTrigger>
         <DropdownMenuSubContent className="max-h-64 overflow-y-auto">
-          <DropdownMenuItem>Pulse Q1</DropdownMenuItem>
-          <DropdownMenuItem>Side Mission</DropdownMenuItem>
-          <DropdownMenuItem>Garden</DropdownMenuItem>
+          <DropdownMenuItem>Website relaunch</DropdownMenuItem>
+          <DropdownMenuItem>Q3 planning</DropdownMenuItem>
+          <DropdownMenuItem>Archive</DropdownMenuItem>
         </DropdownMenuSubContent>
       </DropdownMenuSub>
     </ItemActionsMenu>

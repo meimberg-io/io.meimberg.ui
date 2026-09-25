@@ -9,7 +9,7 @@ const Popover = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
-// PUL-429: PopoverAnchor exportieren, damit Konsumenten die Popover-Position
+// PopoverAnchor exportieren, damit Konsumenten die Popover-Position
 // an ein bestehendes Element verankern können, ohne den Trigger zu sein.
 // Genutzt z. B. von `OptionsDropdown`, dessen Trigger der `FilterPillButton`-
 // Atom ist (eigenes onClick zum Toggeln) — der Anchor liefert die Position

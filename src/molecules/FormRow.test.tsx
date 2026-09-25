@@ -24,7 +24,7 @@ describe('FormRow', () => {
       </FormRow>,
     )
     const wrapper = container.firstChild as HTMLElement
-    // PUL-456: mehrspaltig → form-row-grid (1 Spalte < md, Template ab md aus --form-row-cols).
+    // Multi-column → form-row-grid (1 column < md, template from --form-row-cols from md).
     expect(wrapper).toHaveClass('form-row-grid')
     expect(wrapper.style.getPropertyValue('--form-row-cols')).toBe('repeat(2, minmax(0, 1fr))')
   })

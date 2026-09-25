@@ -37,6 +37,7 @@ Volle Atomic-Design-Dreiteilung (nach **Komposition**, nicht nach Feature-Topf):
 | `@meimberg/ui/ui/*` | Einzelne shadcn-Primitives (`button`, `dialog`, …). |
 | `@meimberg/ui/organisms/markdown-editor` \| `@meimberg/ui/molecules/markdown-renderer` | Schwere Bundles (TipTap / react-markdown) — bewusst nur per Subpath, nicht im Root-Barrel. |
 | `@meimberg/ui/providers` | Provider-Contract (`UiProviders`). |
+| `@meimberg/ui/i18n/de` | Deutsches Sprachpaket (`de` für `<UiProviders {...de}>`). |
 | `@meimberg/ui/tokens` | Foundations/Preset (Tailwind-v4-Tokens, Custom-Variants, Base-Resets) — als CSS `@import`. |
 | `@meimberg/ui/styles.css` | DS-Stylesheet (Tailwind v4 + `@meimberg/ui/tokens` + Radix-Animationen). |
 
@@ -95,13 +96,24 @@ export default { plugins: { '@tailwindcss/postcss': {} } }
 
 ### 4. Eigene Marke und Produkt-Tokens
 
-Die Tokens sind HSL-Kanäle ohne `hsl()` (`--primary: 262 70% 50%`). Eine App überschreibt sie nach dem Tokens-Import. Die Markenfarbe steckt in `--primary`, `--ring`, `--sidebar-primary` und `--sidebar-ring`, jeweils in `:root` und `.dark`:
+Die mitgelieferte Palette ist neutral: Slate-Grautöne und ein blaues Primary. Eine App setzt ihre Marke, indem sie Tokens nach dem Tokens-Import überschreibt. Farb-Tokens sind HSL-Kanäle ohne `hsl()` (`--primary: 262 70% 50%`), jeweils in `:root` (hell) und `.dark`.
+
+| Was | Tokens |
+| --- | --- |
+| Markenfarbe | `--primary`, `--primary-foreground`, `--ring`, `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-ring` |
+| Grautöne und Flächen | `--background`, `--foreground`, `--card`, `--popover`, `--secondary`, `--muted`, `--accent`, `--border`, `--input`, `--surface-0` … `--surface-3`, `--sidebar-*` (jeweils mit `-foreground`) |
+| Status | `--success`, `--warning`, `--info`, `--destructive` (jeweils mit `-foreground`) |
+| Radius | `--radius` (Basis; `rounded-sm/md/lg/xl/2xl`, Form-Felder und Dialoge leiten sich davon ab) |
+| Typografie | `--type-<rolle>-size` / `--type-<rolle>-leading` für `heading-1`, `heading-2`, `heading-3`, `body`, `body-sm`, `caption` |
+| Schrift | `--font-inter` (per `next/font`, siehe Schritt 5) oder direkt `--font-sans` in einem eigenen `@theme` |
 
 ```css
 /* app/brand.css */
-:root { --primary: 262 70% 50%; --ring: 262 70% 50%; --sidebar-primary: 262 70% 50%; --sidebar-ring: 262 70% 50%; }
+:root { --primary: 262 70% 50%; --ring: 262 70% 50%; --sidebar-primary: 262 70% 50%; --sidebar-ring: 262 70% 50%; --radius: 0.375rem; }
 .dark { --primary: 262 80% 68%; --ring: 262 80% 68%; --sidebar-primary: 262 80% 68%; --sidebar-ring: 262 80% 68%; }
 ```
+
+Dark Mode hängt an der Klasse `.dark` auf `<html>`; `UiProviders` konfiguriert next-themes entsprechend. Im DS-Storybook zeigt der Theme-Switch neben hell/dunkel eine Demo-Marke.
 
 Eigene semantische Tokens (bei Pulse z. B. Prioritäts- und Stage-Farben) gehören nicht ins Package. Die App legt sie in einer eigenen Datei an: Werte in `:root`/`.dark`, dazu ein `@theme inline`-Block, der sie als Tailwind-Farben verfügbar macht (`--color-p1: hsl(var(--p1));`). Diese Datei per `@import` einbinden: Ein zweiter `@theme inline`-Block direkt in der Einstiegsdatei wird von Tailwind v4 nicht zuverlässig gemergt.
 
@@ -137,7 +149,7 @@ import { Toaster, UiProviders } from '@meimberg/ui'
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <UiProviders theme={{ defaultTheme: 'system', enableSystem: true }}>
+    <UiProviders>
       {children}
       <Toaster />
     </UiProviders>
@@ -145,7 +157,7 @@ export function Providers({ children }: { children: ReactNode }) {
 }
 ```
 
-`UiProviders` bündelt die Contexts, die das DS voraussetzt: next-themes `ThemeProvider` (Dark Mode über die Klasse `.dark`) und Radix `TooltipProvider`. Der `Toaster` muss innerhalb sitzen, sonst folgt er dem Theme nicht. `ThemeToggle` bietet Hell/Dunkel/System an und braucht dafür `enableSystem: true`.
+`UiProviders` bündelt die Contexts, die das DS voraussetzt: next-themes `ThemeProvider` (Dark Mode über die Klasse `.dark`, Default `system`), Radix `TooltipProvider` und den Sprach-Context (siehe Schritt 8). Der `Toaster` muss innerhalb sitzen, sonst folgt er dem Theme nicht. `ThemeToggle` bietet Hell/Dunkel/System an.
 
 ### 6. App-Gerüst (Navigation)
 
@@ -202,16 +214,29 @@ import { toast } from '@meimberg/ui'
 toast.success('Gespeichert')
 ```
 
+### 8. Sprache
+
+Alle Komponenten-Texte (Beschriftungen, Platzhalter, `aria-label`) sind englisch. Deutsch kommt als mitgeliefertes Paket:
+
+```tsx
+import { de } from '@meimberg/ui/i18n/de'
+
+<UiProviders {...de}>…</UiProviders>   // Labels, Zahlen-/Datumsformat (de-DE) und Kalender-Locale
+```
+
+Einzelne Texte lassen sich an zwei Stellen überschreiben, die spätere gewinnt:
+
+1. App-weit: `<UiProviders {...de} messages={{ ...de.messages, kpiTile: { comparison: 'vs. letzte Woche' } }}>`.
+2. Pro Instanz: jede Komponente mit Text hat eine `labels`-Prop, z. B. `<DatePicker labels={{ placeholder: 'Fälligkeit wählen' }} />`.
+
+Die Label-Typen heißen `<Komponente>Labels` (z. B. `DatePickerLabels`), der Gesamt-Typ ist `UiMessages`. Eigene Komponenten einer App können denselben Mechanismus über `useLabels`, `useUiLocale` und `useDateLocale` nutzen.
+
 ## API-Konventionen
 
 Verbindlich für **neue** Komponenten (Bestehendes migriert nur bei Bedarf):
 
-- **Größen:** `sm` / `md` / `lg`. Dokumentierte Ausnahmen: `Avatar` (`xs`–`xl` —
-  eigenständige Avatar-Skala), `Dropdown` (`sm`/`md`/`chip` — `chip` ist der
-  Filter-Pill-Kontext), sowie die shadcn-Erblasten `Button`/`IconButton`
-  (`default` statt `md`). ⚠ **Watch:** eine vollständige Size-Token-
-  Vereinheitlichung über alle Controls ist ein bewusst separater, API-breaking
-  Refactor (App-weiter Call-Site-Churn) — nicht Teil von PUL-464.
+- **Größen:** `sm` / `md` / `lg`. Dokumentierte Ausnahmen: `Avatar` (`xs`–`xl` — eigenständige Avatar-Skala), `Dropdown` (`sm`/`md`/`chip` — `chip` ist der Filter-Pill-Kontext), sowie die shadcn-Erblasten `Button`/`IconButton` (`default` statt `md`). Die Vereinheitlichung über alle Controls folgt in Phase 3 der Konsolidierung (`docs/konsolidierung.md`).
+- **Texte:** nie hart kodiert — englische Defaults als `<Komponente>Labels`, aufgelöst über `useLabels`, überschreibbar per `labels`-Prop; deutsche Fassung in `src/i18n/de/`.
 - **Farbe/Zustand:** semantische `variant`/`tone`-Props, **nicht** per-Call-Site-
   `className`. `className` bleibt reiner Escape-Hatch (Layout-Klassen), kein
   Styling-Mechanismus.
@@ -228,13 +253,8 @@ Source of Truth pro Komponente ist **Storybook** (`make storybook`, http://local
 
 ## Vendor-Kuration (`ui/`)
 
-`ui/` enthält nur die **real genutzten** shadcn-Primitives. Ungenutzte wurden
-entfernt (PUL-464 S4). Wird ein weiteres shadcn-Primitive gebraucht, per
-`shadcn`-CLI (bzw. Copy aus Upstream) nach `src/ui/` hinzufügen — die
-`./ui/*`-Export-Map nimmt es automatisch auf.
+`ui/` enthält nur die **real genutzten** shadcn-Primitives; ungenutzte wurden entfernt. Wird ein weiteres gebraucht, aus Upstream nach `src/ui/` kopieren und an die Tokens anpassen — die `./ui/*`-Export-Map nimmt es automatisch auf.
 
 ## Provider-Contract
 
-Details siehe `src/providers.tsx`. Kurz: `UiProviders` = next-themes
-`ThemeProvider` + Radix `TooltipProvider`; alles andere (QueryClient, Toaster,
-Auth) mountet die App selbst.
+Details siehe `src/providers.tsx`. Kurz: `UiProviders` = next-themes `ThemeProvider` + Radix `TooltipProvider` + Sprach-Context (`UiI18nProvider`); den `Toaster` setzt die App hinein, alles andere (QueryClient, Auth) mountet sie selbst.

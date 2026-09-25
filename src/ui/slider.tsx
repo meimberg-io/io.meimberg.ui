@@ -5,8 +5,8 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 
 import { cn } from "../lib/cn";
 
-// MIPUL-285: optionaler `tone` für Range/Thumb-Farbe — z. B. "success" für
-// abgeschlossene Missions (grüner Balken).
+// Optionaler `tone` für Range/Thumb-Farbe — z. B. "success" für einen
+// abgeschlossenen Fortschritt (grüner Balken).
 type SliderTone = 'primary' | 'success'
 
 interface SliderProps extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
@@ -17,8 +17,6 @@ const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   SliderProps
 >(({ className, tone = 'primary', ...props }, ref) => {
-  // PUL-462 Schritt 11: neutrales `success`-Token statt Pulse-`sprout`
-  // (identischer Farbwert; das DS-Package bleibt domain-frei).
   const rangeColor = tone === 'success' ? 'bg-success' : 'bg-primary'
   const thumbBorder = tone === 'success' ? 'border-success' : 'border-primary'
   return (

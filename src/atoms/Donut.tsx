@@ -16,10 +16,10 @@ export interface DonutProps extends Omit<SVGProps<SVGSVGElement>, 'children'> {
 }
 
 /**
- * Pulse-Donut-Atom — minimaler SVG-Donut für kleine Verteilungs-Visualisierungen
+ * Donut-Atom — minimaler SVG-Donut für kleine Verteilungs-Visualisierungen
  * (Prio-Verteilung, Status-Anteile).
  *
- * Pure Geometrie — Legend, Label, Hover-Tooltip kommen in F-04 dazu.
+ * Pure Geometrie — Legend, Label und Hover-Tooltip liefert der Call-Site.
  *
  * @example
  *   <Donut segments={[

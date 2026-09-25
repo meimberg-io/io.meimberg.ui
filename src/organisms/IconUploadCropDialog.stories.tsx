@@ -20,7 +20,7 @@ function Trigger({label, title}: {label: string; title?: string}) {
       <Button onClick={() => setOpen(true)}>{label}</Button>
       {submittedSize !== null && (
         <p className="caption text-muted-foreground">
-          Letzter Submit: {submittedSize} bytes
+          Last submit: {submittedSize} bytes
         </p>
       )}
       <IconUploadCropDialog
@@ -35,10 +35,10 @@ function Trigger({label, title}: {label: string; title?: string}) {
   )
 }
 
-export const Default: Story = {render: () => <Trigger label="Icon hochladen" />}
+export const Default: Story = {render: () => <Trigger label="Upload icon" />}
 
 export const CustomTitle: Story = {
-  render: () => <Trigger label="Org-Icon ändern" title="Org-Icon hochladen" />,
+  render: () => <Trigger label="Change team icon" title="Upload team icon" />,
 }
 
 function ClosedDemo() {
@@ -46,7 +46,7 @@ function ClosedDemo() {
   return (
     <div className="p-6">
       <p className="body-sm text-muted-foreground mb-3">
-        Dialog steuert den File-Picker selbst — Story rendert nur den Open-Trigger.
+        The dialog drives the file picker itself — this story only renders the open trigger.
       </p>
       <Button variant="outline" onClick={() => setOpen(true)}>
         Open dialog

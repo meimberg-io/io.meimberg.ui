@@ -4,27 +4,27 @@ import userEvent from '@testing-library/user-event'
 import {SegmentedSwitch} from './SegmentedSwitch'
 
 const options = [
-  {value: 'inbox' as const, label: 'Inbox'},
+  {value: 'document' as const, label: 'Document'},
   {value: 'task' as const, label: 'Task'},
 ]
 
 describe('SegmentedSwitch', () => {
   it('renders all options as radio buttons', () => {
-    render(<SegmentedSwitch value="inbox" options={options} onChange={() => {}} />)
-    expect(screen.getByRole('radio', {name: /inbox/i})).toBeInTheDocument()
+    render(<SegmentedSwitch value="document" options={options} onChange={() => {}} />)
+    expect(screen.getByRole('radio', {name: /document/i})).toBeInTheDocument()
     expect(screen.getByRole('radio', {name: /task/i})).toBeInTheDocument()
   })
 
   it('marks the active option with aria-checked', () => {
     render(<SegmentedSwitch value="task" options={options} onChange={() => {}} />)
     expect(screen.getByRole('radio', {name: /task/i})).toHaveAttribute('aria-checked', 'true')
-    expect(screen.getByRole('radio', {name: /inbox/i})).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByRole('radio', {name: /document/i})).toHaveAttribute('aria-checked', 'false')
   })
 
   it('fires onChange when a different option is clicked', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
-    render(<SegmentedSwitch value="inbox" options={options} onChange={onChange} />)
+    render(<SegmentedSwitch value="document" options={options} onChange={onChange} />)
     await user.click(screen.getByRole('radio', {name: /task/i}))
     expect(onChange).toHaveBeenCalledWith('task')
   })

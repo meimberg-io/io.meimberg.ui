@@ -59,9 +59,8 @@ export const WithMinMax: Story = {
   render: () => <Demo initial="2026-05-19" min="2026-05-01" max="2026-05-31" />,
 }
 
-// PUL-403-followup: kompakte Property-Bar-Variante. 32 px hoch, w-auto,
-// text-sm — aligned zu Chip 'md' / OptionsDropdown 'chip'. Für
-// ActionItem-Detail-Dialog & andere Editor-Property-Bars.
+// Kompakte Property-Bar-Variante: 32 px hoch, w-auto, text-sm — aligned zu
+// Chip 'md' / OptionsDropdown 'chip'.
 function SmDemo({initial, placeholder}: {initial: string | null; placeholder?: string}) {
   const [value, setValue] = useState<string | null>(initial)
   return (
@@ -84,5 +83,24 @@ export const SmCompact: Story = {
 
 export const SmCompactEmpty: Story = {
   name: "size='sm' empty",
-  render: () => <SmDemo initial={null} placeholder='Kein Datum' />,
+  render: () => <SmDemo initial={null} placeholder='No due date' />,
+}
+
+function CustomLabelsDemo() {
+  const [value, setValue] = useState<string | null>(null)
+  return (
+    <div style={{width: 260}}>
+      <DatePicker
+        value={value}
+        onChange={setValue}
+        allowClear
+        labels={{placeholder: 'Set a deadline…', today: 'Right now'}}
+      />
+    </div>
+  )
+}
+
+export const CustomLabels: Story = {
+  name: 'Custom labels',
+  render: () => <CustomLabelsDemo />,
 }

@@ -19,18 +19,17 @@ export interface MetaPillProps
 }
 
 /**
- * Pulse-MetaPill — kompakter Meta-Tag für Dialog-Header (Status-/Typ-Indikator,
+ * MetaPill — kompakter Meta-Tag für Dialog-Header (Status-/Typ-Indikator,
  * Derived-Count). `rounded-md` Chip-Geometrie mit `bg-surface-2` + `caption` +
  * `text-muted-foreground`, optional ein führender Icon-Slot.
  *
- * Bündelt das in PUL-414 (G2a-B1) identifizierte Inline-Meta-Span-Pattern aus
- * InboxItemDetailDialog. Abgrenzung: `<Pill>` ist `rounded-full` (Pill-
+ * Abgrenzung: `<Pill>` ist `rounded-full` (Pill-
  * Geometrie) und farbneutral; `<Chip>` ist ein interaktiver Toggle. MetaPill
  * ist `rounded-md` mit fixem Meta-Look, passiv.
  *
  * @example
- *   <MetaPill icon={<TaskIcon size={12} />}>Aufgabe</MetaPill>
- *   <MetaPill title="Aus diesem Item erzeugt">→ 3</MetaPill>
+ *   <MetaPill icon={<TaskIcon size={12} />}>Task</MetaPill>
+ *   <MetaPill title="Created from this item">→ 3</MetaPill>
  */
 export function MetaPill({tone = 'muted', icon, className, children, ...rest}: MetaPillProps) {
   return (

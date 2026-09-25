@@ -1,11 +1,11 @@
 'use client'
 
-// PUL-464 (S2): Breadcrumbs — rendert eine bereits AUFGELÖSTE Krümel-Liste.
+// Renders an already RESOLVED list of crumbs.
 //
-// Bewusst dumm: die Segment→Label-Auflösung (Vokabular, UUID-Handling,
-// Resource-Titel) ist Consumer-Domäne und passiert VOR dieser Komponente.
-// Hier nur die Darstellung (Root + Trenner + Links + aktuelle Seite) über die
-// shadcn-Breadcrumb-Primitives. Link-Renderer als Slot (Default `<a>`).
+// Deliberately dumb: resolving path segments to labels (vocabulary, IDs,
+// resource titles) belongs to the consumer and happens BEFORE this component.
+// Only presentation here (root + separators + links + current page) via the
+// shadcn breadcrumb primitives. Link renderer as slot (default `<a>`).
 
 import type {ComponentType, ReactNode} from 'react'
 import {
@@ -16,10 +16,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '../ui/breadcrumb'
+import {useLabels} from '../i18n/context'
 
 export interface BreadcrumbEntry {
   label: ReactNode
-  /** Ohne href → nicht-verlinkt (i. d. R. die aktuelle Seite). */
+  /** Without href → not linked (usually the current page). */
   href?: string
 }
 
@@ -29,14 +30,24 @@ export type BreadcrumbLinkComponent = ComponentType<{
   children: ReactNode
 }>
 
+export interface BreadcrumbsLabels {
+  /** aria-label of the nav landmark. */
+  navigation: string
+}
+
+const defaultLabels: BreadcrumbsLabels = {
+  navigation: 'Breadcrumb',
+}
+
 export interface BreadcrumbsProps {
-  /** Aufgelöste Krümel; der letzte Eintrag wird als aktuelle Seite gerendert. */
+  /** Resolved crumbs; the last entry is rendered as the current page. */
   items: BreadcrumbEntry[]
-  /** Optionaler Wurzel-Eintrag ganz links (z. B. Produktname → `/`). */
+  /** Optional root entry on the far left (e.g. product name → `/`). */
   rootLabel?: ReactNode
   rootHref?: string
   linkComponent?: BreadcrumbLinkComponent
   className?: string
+  labels?: Partial<BreadcrumbsLabels>
 }
 
 const DefaultLink: BreadcrumbLinkComponent = ({href, children, ...rest}) => (
@@ -53,9 +64,11 @@ export function Breadcrumbs({
   rootHref = '/',
   linkComponent: Link = DefaultLink,
   className,
+  labels,
 }: BreadcrumbsProps) {
+  const l = useLabels('breadcrumbs', defaultLabels, labels)
   return (
-    <Breadcrumb className={className}>
+    <Breadcrumb className={className} aria-label={l.navigation}>
       <BreadcrumbList>
         {rootLabel != null ? (
           <BreadcrumbItem>

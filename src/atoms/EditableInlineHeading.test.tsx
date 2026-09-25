@@ -4,64 +4,69 @@ import userEvent from '@testing-library/user-event'
 import {EditableInlineHeading} from './EditableInlineHeading'
 
 async function startEditing() {
-  await userEvent.click(screen.getByRole('button', {name: 'Titel bearbeiten'}))
+  await userEvent.click(screen.getByRole('button', {name: 'Edit title'}))
   return screen.getByRole('textbox')
 }
 
 describe('EditableInlineHeading', () => {
-  it('speichert bei Enter', async () => {
+  it('saves on Enter', async () => {
     const onSave = vi.fn()
-    render(<EditableInlineHeading value="Alt" onSave={onSave} />)
+    render(<EditableInlineHeading value="Old" onSave={onSave} />)
     const field = await startEditing()
     await userEvent.clear(field)
-    await userEvent.type(field, 'Neu{Enter}')
-    expect(onSave).toHaveBeenCalledWith('Neu')
+    await userEvent.type(field, 'New{Enter}')
+    expect(onSave).toHaveBeenCalledWith('New')
   })
 
-  it('startet den Edit-Mode auch beim Klick auf den Titel selbst', async () => {
+  it('enters edit mode when the title itself is clicked', async () => {
     const onSave = vi.fn()
-    render(<EditableInlineHeading value="Alt" onSave={onSave} />)
-    await userEvent.click(screen.getByRole('button', {name: 'Alt'}))
+    render(<EditableInlineHeading value="Old" onSave={onSave} />)
+    await userEvent.click(screen.getByRole('button', {name: 'Old'}))
     const field = screen.getByRole('textbox')
     await userEvent.clear(field)
-    await userEvent.type(field, 'Neu{Enter}')
-    expect(onSave).toHaveBeenCalledWith('Neu')
+    await userEvent.type(field, 'New{Enter}')
+    expect(onSave).toHaveBeenCalledWith('New')
   })
 
-  it('verwirft bei Escape', async () => {
+  it('discards on Escape', async () => {
     const onSave = vi.fn()
-    render(<EditableInlineHeading value="Alt" onSave={onSave} />)
+    render(<EditableInlineHeading value="Old" onSave={onSave} />)
     const field = await startEditing()
     await userEvent.clear(field)
-    await userEvent.type(field, 'Neu{Escape}')
+    await userEvent.type(field, 'New{Escape}')
     expect(onSave).not.toHaveBeenCalled()
-    expect(screen.getByText('Alt')).toBeInTheDocument()
+    expect(screen.getByText('Old')).toBeInTheDocument()
   })
 
-  it('speichert, wenn der Fokus die Edit-Zeile verlässt', async () => {
+  it('saves when focus leaves the edit row', async () => {
     const onSave = vi.fn()
     render(
       <>
-        <EditableInlineHeading value="Alt" onSave={onSave} />
-        <button type="button">Signal</button>
+        <EditableInlineHeading value="Old" onSave={onSave} />
+        <button type="button">Elsewhere</button>
       </>,
     )
     const field = await startEditing()
     await userEvent.clear(field)
-    await userEvent.type(field, 'Neu')
-    await userEvent.click(screen.getByRole('button', {name: 'Signal'}))
-    expect(onSave).toHaveBeenCalledWith('Neu')
+    await userEvent.type(field, 'New')
+    await userEvent.click(screen.getByRole('button', {name: 'Elsewhere'}))
+    expect(onSave).toHaveBeenCalledWith('New')
   })
 
-  it('speichert nicht, wenn der Fokus auf den Abbrechen-Button wandert', async () => {
+  it('does not save when focus moves to the cancel button', async () => {
     const onSave = vi.fn()
     const onCancel = vi.fn()
-    render(<EditableInlineHeading value="Alt" onSave={onSave} onCancel={onCancel} />)
+    render(<EditableInlineHeading value="Old" onSave={onSave} onCancel={onCancel} />)
     const field = await startEditing()
     await userEvent.clear(field)
-    await userEvent.type(field, 'Neu')
-    await userEvent.click(screen.getByRole('button', {name: 'Abbrechen'}))
+    await userEvent.type(field, 'New')
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
     expect(onSave).not.toHaveBeenCalled()
     expect(onCancel).toHaveBeenCalledOnce()
+  })
+
+  it('overrides labels via the labels prop', () => {
+    render(<EditableInlineHeading value="Old" onSave={vi.fn()} labels={{edit: 'Rename'}} />)
+    expect(screen.getByRole('button', {name: 'Rename'})).toBeInTheDocument()
   })
 })

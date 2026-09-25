@@ -1,50 +1,57 @@
-import type {HTMLAttributes} from 'react'
+import type {HTMLAttributes, ReactNode} from 'react'
 import {Icon} from './Icon'
 import {Sparkles} from './icons'
 import {cn} from '../lib/cn'
+import {useLabels} from '../i18n/context'
 
-export interface ComingSoonProps extends HTMLAttributes<HTMLDivElement> {
-  /** Sprechender Name des Dashlets („KPI-Strip", „Posteingang", „Throughput"). */
-  label: string
+export interface ComingSoonLabels {
+  description: string
+}
+
+const defaultLabels: ComingSoonLabels = {
+  description: 'Coming soon',
+}
+
+export interface ComingSoonProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  /** Optionaler Name des vorgesehenen Inhalts („Revenue chart", „Activity"). */
+  title?: ReactNode
+  /** Beschreibungstext. Überschreibt `labels.description`. */
+  description?: ReactNode
   /**
-   * Logischer Dashlet-Identifier. Wird als `data-dashlet`-Attribut gerendert.
-   * Pilot-Tickets nutzen das später, um Platzhalter gezielt zu ersetzen
-   * (und ggf. Lint-Regeln gegen unaufgelöste Platzhalter).
-   */
-  dashlet?: string
-  /**
-   * Aspect-Ratio für Höhen-Reservierung (`'16 / 9'`, `'video'`, etc.). Pilot-
-   * Layouts bleiben damit auch ohne echte Daten korrekt. Default: keine
-   * Reservierung — die Card nimmt nur ihren Inhalt ein.
+   * Aspect-Ratio für Höhen-Reservierung (`'16 / 9'`, `'video'`, etc.). Layouts
+   * bleiben damit auch ohne echte Daten korrekt. Default: keine Reservierung —
+   * die Card nimmt nur ihren Inhalt ein.
    */
   aspectRatio?: string
+  labels?: Partial<ComingSoonLabels>
 }
 
 /**
- * Pulse-ComingSoon-Atom — Platzhalter-Card im Look des echten Dashlets.
- * Wird in Pilot-Tickets (R-03 … R-06) eingesetzt, wenn der Dashlet
- * konzeptionell vorgesehen ist, aber das zugehörige Feature-Ticket
- * (F-01 … F-20) noch nicht grün ist.
- *
- * Sichtbar dezent (gestrichelter Rand + muted-foreground), aber im Layout
- * raumfüllend.
+ * ComingSoon — Platzhalter-Card für konzeptionell vorgesehene, aber noch
+ * nicht gebaute Inhalte. Sichtbar dezent (gestrichelter Rand +
+ * muted-foreground), aber im Layout raumfüllend.
  *
  * @example
- *   <ComingSoon label="KPI-Strip" dashlet="context-kpi-strip" aspectRatio="16 / 5" />
+ *   <ComingSoon title="Revenue chart" aspectRatio="16 / 5" />
  */
 export function ComingSoon({
-  label,
-  dashlet,
+  title,
+  description,
   aspectRatio,
+  labels,
   className,
   style,
   ...rest
 }: ComingSoonProps) {
+  const l = useLabels('comingSoon', defaultLabels, labels)
+  const text = description ?? l.description
+  const ariaLabel = typeof text === 'string'
+    ? (typeof title === 'string' ? `${text}: ${title}` : text)
+    : undefined
   return (
     <div
-      data-dashlet={dashlet}
       role="status"
-      aria-label={`Kommt bald: ${label}`}
+      aria-label={ariaLabel}
       className={cn(
         'flex flex-col items-center justify-center gap-2',
         'rounded-lg border border-dashed border-border bg-card/40',
@@ -55,7 +62,8 @@ export function ComingSoon({
       {...rest}
     >
       <Icon icon={Sparkles} size="md" />
-      <div className="caption">Kommt bald: {label}</div>
+      {title != null && <div className="body-sm font-medium">{title}</div>}
+      <div className="caption">{text}</div>
     </div>
   )
 }

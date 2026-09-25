@@ -17,7 +17,7 @@ function Demo({initial = false}: {initial?: boolean}) {
   return (
     <div style={{width: 180}}>
       <SelectableTile
-        label="Jira"
+        label="Cloud"
         glyph={<Cloud className="size-5" aria-hidden />}
         glyphBackground="hsl(220 100% 96%)"
         glyphColor="hsl(220 100% 40%)"
@@ -40,12 +40,12 @@ export const Disabled: Story = {
   render: () => (
     <div style={{width: 180}}>
       <SelectableTile
-        label="In Vorbereitung"
+        label="Coming soon"
         glyph={<Star className="size-5" aria-hidden />}
         active={false}
         onClick={() => {}}
         disabled
-        title="Provider noch nicht verfügbar"
+        title="Not available yet"
       />
     </div>
   ),
@@ -55,7 +55,7 @@ export const WithoutBrandColor: Story = {
   render: () => (
     <div style={{width: 180}}>
       <SelectableTile
-        label="Linear"
+        label="Automation"
         glyph={<Zap className="size-5" aria-hidden />}
         active={false}
         onClick={() => {}}

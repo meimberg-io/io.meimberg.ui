@@ -20,43 +20,48 @@ beforeEach(() => {
 })
 
 describe('ThemeToggle', () => {
-  it('rendert nach Mount drei Segmente Light / Dark / System', async () => {
+  it('renders three segments Light / Dark / System after mount', async () => {
     renderWithProviders(<ThemeToggle />)
-    const light = await screen.findByRole('radio', {name: /Light Mode/})
+    const light = await screen.findByRole('radio', {name: /Light mode/})
     expect(light).toBeTruthy()
-    expect(screen.getByRole('radio', {name: /Dark Mode/})).toBeTruthy()
+    expect(screen.getByRole('radio', {name: /Dark mode/})).toBeTruthy()
     expect(screen.getByRole('radio', {name: /System/})).toBeTruthy()
   })
 
-  it('markiert das aktive Segment gemäß `theme`', async () => {
+  it('marks the active segment according to `theme`', async () => {
     mockedTheme = 'dark'
     renderWithProviders(<ThemeToggle />)
-    const dark = await screen.findByRole('radio', {name: /Dark Mode/})
+    const dark = await screen.findByRole('radio', {name: /Dark mode/})
     expect(dark.getAttribute('aria-checked')).toBe('true')
-    expect(screen.getByRole('radio', {name: /Light Mode/}).getAttribute('aria-checked')).toBe('false')
+    expect(screen.getByRole('radio', {name: /Light mode/}).getAttribute('aria-checked')).toBe('false')
   })
 
-  it('behandelt undefined `theme` als "system"', async () => {
+  it('treats undefined `theme` as "system"', async () => {
     mockedTheme = undefined
     renderWithProviders(<ThemeToggle />)
     const system = await screen.findByRole('radio', {name: /System/})
     expect(system.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('Klick auf ein Segment ruft setTheme mit dem Wert auf', async () => {
+  it('clicking a segment calls setTheme with its value', async () => {
     mockedTheme = 'system'
     const {user} = renderWithProviders(<ThemeToggle />)
-    await user.click(await screen.findByRole('radio', {name: /Light Mode/}))
+    await user.click(await screen.findByRole('radio', {name: /Light mode/}))
     expect(setTheme).toHaveBeenCalledWith('light')
-    await user.click(screen.getByRole('radio', {name: /Dark Mode/}))
+    await user.click(screen.getByRole('radio', {name: /Dark mode/}))
     expect(setTheme).toHaveBeenCalledWith('dark')
     await user.click(screen.getByRole('radio', {name: /System/}))
     expect(setTheme).toHaveBeenCalledWith('system')
   })
 
-  it('Segmente sind klickbar (cursor-pointer)', async () => {
+  it('segments are clickable (cursor-pointer)', async () => {
     renderWithProviders(<ThemeToggle />)
-    const light = await screen.findByRole('radio', {name: /Light Mode/})
+    const light = await screen.findByRole('radio', {name: /Light mode/})
     expect(light.className).toContain('cursor-pointer')
+  })
+
+  it('overrides labels via the labels prop', async () => {
+    renderWithProviders(<ThemeToggle labels={{dark: 'Night'}} />)
+    expect(await screen.findByRole('radio', {name: 'Night'})).toBeTruthy()
   })
 })

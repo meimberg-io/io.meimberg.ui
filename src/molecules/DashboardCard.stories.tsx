@@ -11,10 +11,9 @@ export default meta
 
 type Story = StoryObj<typeof DashboardCard>
 
-// Neutraler Platzhalter-Body: der gefüllte Block macht das Card-Padding
-// sichtbar (Abstand Block ↔ Card-Rand). Bewusst KEIN Header-Markup — die
-// Karte liefert nur Rahmen + Padding, nicht den Titel. Den liefert
-// <SectionCardHeader>; Zusammenspiel zeigt die Story „In context".
+// Neutral placeholder body: the filled block makes the card padding visible.
+// No header markup on purpose — the card only provides frame + padding; the
+// title comes from <SectionCardHeader> (see story "In context").
 const Filler = ({label}: {label: string}) => (
   <div className="bg-muted/40 rounded-md py-10 text-center body-sm text-muted-foreground">
     {label}
@@ -24,7 +23,7 @@ const Filler = ({label}: {label: string}) => (
 export const Dashboard: Story = {
   name: 'padding="dashboard" (Default, p-5)',
   args: {
-    children: <Filler label="Card-Body · p-5" />,
+    children: <Filler label="Card body · p-5" />,
     style: {width: 360},
   },
 }
@@ -34,13 +33,13 @@ export const Compact: Story = {
   args: {
     padding: 'compact',
     className: 'group relative hover-card cursor-pointer overflow-hidden',
-    children: <Filler label="Card-Body · p-4" />,
+    children: <Filler label="Card body · p-4" />,
     style: {width: 320},
   },
 }
 
 export const NoneItemContainer: Story = {
-  name: 'padding="none" (Item-Listen-Container)',
+  name: 'padding="none" (item list container)',
   render: () => (
     <DashboardCard padding="none" className="overflow-hidden" style={{width: 360}}>
       <div className="px-4 py-3 border-b border-border">
@@ -57,7 +56,7 @@ export const NoneItemContainer: Story = {
 }
 
 export const AllSideBySide: Story = {
-  name: 'Padding-Variants nebeneinander',
+  name: 'Padding variants side by side',
   render: () => (
     <div style={{display: 'flex', gap: 16, flexWrap: 'wrap'}}>
       <DashboardCard style={{width: 240}}>
@@ -68,31 +67,30 @@ export const AllSideBySide: Story = {
       </DashboardCard>
       <DashboardCard padding="none" style={{width: 240}} className="overflow-hidden">
         <div className="px-4 py-3 bg-muted/40 body-sm text-muted-foreground">
-          none · Padding intern
+          none · padding inside
         </div>
       </DashboardCard>
     </div>
   ),
 }
 
-// Realistische Komposition: DashboardCard als Rahmen, die ECHTE
-// SectionCardHeader als Kopfzeile darin (kein Inline-<h2>, damit die Story
-// nicht von der Library driftet). Dies ist die einzige Story hier, die
-// bewusst eine zweite Library-Komponente zeigt.
+// Realistic composition: DashboardCard as frame with the real
+// SectionCardHeader inside (no inline <h2>, so the story cannot drift from
+// the library).
 export const InContext: Story = {
-  name: 'In context (mit SectionCardHeader)',
+  name: 'In context (with SectionCardHeader)',
   render: () => (
     <DashboardCard style={{width: 360}}>
       <SectionCardHeader
-        title="Aktuelle Tasks"
-        subtitle="5 offene · 2 überfällig"
+        title="Current tasks"
+        subtitle="5 open · 2 overdue"
         action={
           <a href="#" className="caption text-primary hover:underline">
-            Alle anzeigen →
+            View all →
           </a>
         }
       />
-      <Filler label="Section-Body" />
+      <Filler label="Section body" />
     </DashboardCard>
   ),
 }

@@ -70,10 +70,10 @@ export function DetailDialogWrapper({
             )}
             <div className='min-w-0 flex-1'>
               <DialogTitle className='truncate'>{title}</DialogTitle>
-              {/* asChild + <div>: `description` darf beliebigen Block-Inhalt
-                * (Meta-Pill-Reihen o. Ä.) tragen. Ohne asChild rendert Radix
-                * hier ein <p>, in dem ein <div> ungültiges HTML wäre und einen
-                * Hydration-Error auslöst. Der <div> erbt id/aria + Styling. */}
+              {/* asChild + <div>: `description` may carry block content
+                * (rows of pills etc.). Without asChild Radix renders a <p>,
+                * where a <div> would be invalid HTML and cause a hydration
+                * error. The <div> inherits id/aria + styling. */}
               {description && (
                 <DialogDescription asChild>
                   <div>{description}</div>

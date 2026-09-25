@@ -16,7 +16,7 @@ export const Initials: Story = {
   render: () => (
     <div className='flex items-end gap-3'>
       {SIZES.map(size => (
-        <Avatar key={size} initials='MB' colorSeed='meimberg' label='meimberg' size={size} />
+        <Avatar key={size} initials='AC' colorSeed='acme' label='Acme Inc.' size={size} />
       ))}
     </div>
   ),

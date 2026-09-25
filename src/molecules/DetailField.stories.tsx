@@ -13,8 +13,8 @@ type Story = StoryObj<typeof DetailField>
 
 export const Default: Story = {
   args: {
-    label: 'Provider',
-    children: <span className="body">Microsoft 365</span>,
+    label: 'Service',
+    children: <span className="body">Cloud Storage</span>,
   },
 }
 
@@ -24,7 +24,7 @@ export const WithBadge: Story = {
     align: 'center',
     children: (
       <Badge variant="outline" className="caption border-success/30 text-success">
-        Verbunden
+        Connected
       </Badge>
     ),
   },
@@ -35,7 +35,7 @@ export const LongValue: Story = {
     label: 'Identifier',
     children: (
       <span className="body font-mono break-all">
-        oliver.meimberg@form4.de
+        jane.doe@example.com
       </span>
     ),
   },
@@ -46,7 +46,7 @@ export const MultilineValue: Story = {
     label: 'Last error',
     children: (
       <pre className="caption text-destructive whitespace-pre-wrap break-all bg-destructive/5 p-2 rounded">
-        {'microsoft_graph move-to-archive 403\nErrorAccessDenied: Access is denied.'}
+        {'storage upload 403\nAccessDenied: Access is denied.'}
       </pre>
     ),
   },
@@ -55,15 +55,15 @@ export const MultilineValue: Story = {
 export const Stack: Story = {
   render: () => (
     <div className="space-y-3 max-w-md">
-      <DetailField label="Provider">
-        <span className="body">Microsoft 365</span>
+      <DetailField label="Service">
+        <span className="body">Cloud Storage</span>
       </DetailField>
       <DetailField label="Identifier">
-        <span className="body font-mono break-all">oliver.meimberg@form4.de</span>
+        <span className="body font-mono break-all">jane.doe@example.com</span>
       </DetailField>
       <DetailField label="Status" align="center">
         <Badge variant="outline" className="caption border-success/30 text-success">
-          Verbunden
+          Connected
         </Badge>
       </DetailField>
     </div>

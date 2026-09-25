@@ -17,16 +17,16 @@ describe('FormField', () => {
 
   it('connects label and input via useFormFieldId context so getByLabelText finds the input', () => {
     render(
-      <FormField label="Titel">
+      <FormField label="Title">
         <TextField defaultValue="x" />
       </FormField>,
     )
-    expect(screen.getByLabelText('Titel')).toHaveValue('x')
+    expect(screen.getByLabelText('Title')).toHaveValue('x')
   })
 
   it('marks the label as required via .form-field-required (CSS `::after` Asterisk)', () => {
     const {container} = render(
-      <FormField label="Pflichtfeld" required>
+      <FormField label="Required field" required>
         <TextField />
       </FormField>,
     )
@@ -34,14 +34,13 @@ describe('FormField', () => {
   })
 
   it('keeps the accessible name = label even with required asterisk', () => {
-    // Spec: das aria-hidden Asterisk darf den accessible Name nicht
-    // verschmutzen — getByLabelText('Titel') matched weiterhin exakt.
+    // The asterisk must not pollute the accessible name.
     render(
-      <FormField label="Titel" required>
+      <FormField label="Title" required>
         <TextField />
       </FormField>,
     )
-    expect(screen.getByLabelText('Titel')).toBeInTheDocument()
+    expect(screen.getByLabelText('Title')).toBeInTheDocument()
   })
 
   it('renders a hint next to the label', () => {
@@ -55,10 +54,10 @@ describe('FormField', () => {
 
   it('renders an error message under the field', () => {
     render(
-      <FormField label="X" error="Pflichtfeld">
+      <FormField label="X" error="Required">
         <TextField />
       </FormField>,
     )
-    expect(screen.getByText('Pflichtfeld')).toBeInTheDocument()
+    expect(screen.getByText('Required')).toBeInTheDocument()
   })
 })

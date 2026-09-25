@@ -3,8 +3,8 @@ import * as React from 'react'
 const MOBILE_BREAKPOINT = 768
 
 /**
- * `true` unterhalb 768 px (Tailwind `md`). Laufzeit-Umschaltung Mobil/Desktop —
- * deckt sich mit der `md:`-Breakpoint-Grenze des DS. SSR-safe (initial `false`).
+ * `true` below 768 px (Tailwind `md`). Runtime mobile/desktop switch matching
+ * the design system's `md:` breakpoint. SSR-safe (initially `false`).
  */
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)

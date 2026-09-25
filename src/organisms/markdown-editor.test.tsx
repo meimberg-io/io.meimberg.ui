@@ -1,20 +1,22 @@
 import {describe, expect, it, vi} from 'vitest'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '../test/render'
 import {MarkdownEditor} from './markdown-editor'
 
 // Tiptap/ProseMirror's contentEditable handling depends on selection APIs that
-// jsdom doesn't fully implement. We assert mounting + toolbar render only;
-// detailed content tests are E2E territory.
+// jsdom doesn't fully implement. We assert toolbar behaviour only; detailed
+// content tests are E2E territory.
 
 describe('MarkdownEditor', () => {
-  it('mounts and renders the toolbar buttons', () => {
+  it('mounts and renders the toolbar with English titles', async () => {
     renderWithProviders(<MarkdownEditor value='Hello' onChange={vi.fn()} />)
-    // The toolbar exposes button-style controls (Bold, Italic, etc.) — not
-    // every variant is present in every environment, but at least one button
-    // must render.
-    const buttons = screen.getAllByRole('button')
-    expect(buttons.length).toBeGreaterThan(0)
+    expect(await screen.findByRole('button', {name: 'Bold (⌘B)'})).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: 'Insert image'})).toBeInTheDocument()
+  })
+
+  it('overrides toolbar titles via the labels prop', async () => {
+    renderWithProviders(<MarkdownEditor value='' onChange={vi.fn()} labels={{bold: 'Strong'}} />)
+    expect(await screen.findByRole('button', {name: 'Strong'})).toBeInTheDocument()
   })
 
   it('reflects the disabled prop on the wrapper', () => {
@@ -26,5 +28,27 @@ describe('MarkdownEditor', () => {
     if (editable) {
       expect(editable.getAttribute('contenteditable')).not.toBe('true')
     }
+  })
+
+  it('inserts an image via the inline URL popover (Enter submits)', async () => {
+    const onChange = vi.fn()
+    const {user} = renderWithProviders(<MarkdownEditor value='Hello' onChange={onChange} />)
+    await user.click(await screen.findByRole('button', {name: 'Insert image'}))
+    const input = await screen.findByLabelText('Image URL')
+    await user.clear(input)
+    await user.type(input, 'https://example.com/a.png{Enter}')
+    await waitFor(() => expect(screen.queryByLabelText('Image URL')).not.toBeInTheDocument())
+    expect(onChange).toHaveBeenLastCalledWith(expect.stringContaining('![](https://example.com/a.png)'))
+  })
+
+  it('closes the URL popover on Escape without changing content', async () => {
+    const onChange = vi.fn()
+    const {user} = renderWithProviders(<MarkdownEditor value='Hello' onChange={onChange} />)
+    await user.click(await screen.findByRole('button', {name: 'Link'}))
+    const input = await screen.findByLabelText('Link URL')
+    expect(input).toHaveValue('https://')
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByLabelText('Link URL')).not.toBeInTheDocument())
+    expect(onChange).not.toHaveBeenCalled()
   })
 })

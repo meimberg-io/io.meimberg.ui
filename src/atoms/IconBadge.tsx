@@ -1,15 +1,14 @@
 'use client'
 
-// PUL-462 (Schritt 7): IconBadge — generischer Badge-Kern der Pulse-Badge-
-// Familie (AccountBadge, OrgBadge, RelationBadge, StageBadge, StatusBadge,
-// BucketLinkBadge). Der Kern ordnet drei Slots in einer wählbaren Hülle an:
+// IconBadge — generischer Badge-Kern für domänenspezifische Badge-Wrapper
+// (Status, Account, Relation, …). Der Kern ordnet drei Slots in einer wählbaren Hülle an:
 // `leading` (Icon ODER gefärbter Dot), Label (`children`), `trailing`
 // (z. B. External-Link-Icon).
 //
-// Bewusst TONE-NEUTRAL: die semantische Farbe (Stage-/Status-/Provider-Tint)
-// ist Pulse-Domain und wird vom jeweiligen Wrapper via `className` gereicht —
-// der gefärbte Dot erbt die Textfarbe über `bg-current`. Kein `tone`-Enum im
-// Package (D1/D2: domain-frei).
+// Bewusst TONE-NEUTRAL: die semantische Farbe (Status-/Provider-Tint) ist
+// Domain des Konsumenten und wird vom jeweiligen Wrapper via `className`
+// gereicht — der gefärbte Dot erbt die Textfarbe über `bg-current`. Kein
+// `tone`-Enum im Package (domain-frei).
 
 import type {ReactNode} from 'react'
 import {cn} from '../lib/cn'

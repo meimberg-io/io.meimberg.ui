@@ -10,9 +10,8 @@ const meta: Meta<typeof EditableInlineHeading> = {
     docs: {
       description: {
         component:
-          'Inline-Title-Editor. In den Edit-Mode führt ein Klick auf den Titel selbst ' +
-          'ebenso wie das Stift-Icon daneben. Enter speichert, Escape verwirft, ' +
-          'Fokus-Verlust speichert.',
+          'Inline title editor. Clicking the title itself or the pencil icon next to it ' +
+          'enters edit mode. Enter saves, Escape discards, losing focus saves.',
       },
     },
   },
@@ -22,23 +21,23 @@ export default meta
 type Story = StoryObj<typeof EditableInlineHeading>
 
 function BasicDemo() {
-  const [value, setValue] = useState('Bezahlung Rechnung März')
+  const [value, setValue] = useState('Quarterly planning review')
   return <EditableInlineHeading value={value} onSave={setValue} />
 }
 
 function MultilineDemo() {
-  const [value, setValue] = useState('Ein längerer Titel, der über mehrere Zeilen umbrechen kann')
+  const [value, setValue] = useState('A longer title that can wrap across multiple lines when space runs out')
   return <EditableInlineHeading value={value} onSave={setValue} size="heading-3" multiline />
 }
 
 function WithDisplayActionsDemo() {
-  const [value, setValue] = useState('Override-Titel')
+  const [value, setValue] = useState('Custom title')
   return (
     <EditableInlineHeading
       value={value}
       onSave={setValue}
       displayActions={
-        <IconButton variant="destructive" size="sm" aria-label="Override entfernen" title="Override entfernen">
+        <IconButton variant="destructive" size="sm" aria-label="Reset title" title="Reset title">
           <DeleteIcon aria-hidden="true" />
         </IconButton>
       }
@@ -49,6 +48,6 @@ function WithDisplayActionsDemo() {
 export const Basic: Story = {render: () => <BasicDemo />}
 export const Multiline: Story = {name: 'Multiline (heading-3)', render: () => <MultilineDemo />}
 export const WithDisplayActions: Story = {
-  name: 'Mit displayActions (Reset-Button)',
+  name: 'With displayActions (reset button)',
   render: () => <WithDisplayActionsDemo />,
 }

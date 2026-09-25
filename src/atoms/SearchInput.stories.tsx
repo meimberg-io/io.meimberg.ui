@@ -26,13 +26,13 @@ export const Empty: Story = {
 }
 
 export const Filled: Story = {
-  render: () => <Controlled initial="Pulse" placeholder="Search…" />,
+  render: () => <Controlled initial="Quarterly report" placeholder="Search…" />,
 }
 
-export const GermanPlaceholder: Story = {
-  render: () => <Controlled placeholder="Items durchsuchen…" />,
+export const CustomPlaceholder: Story = {
+  render: () => <Controlled placeholder="Search documents…" />,
 }
 
 export const Debounced: Story = {
-  render: () => <Controlled placeholder="Suchen (300ms debounce)…" debounceMs={300} />,
+  render: () => <Controlled placeholder="Search (300ms debounce)…" debounceMs={300} />,
 }

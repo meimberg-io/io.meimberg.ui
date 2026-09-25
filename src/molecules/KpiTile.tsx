@@ -1,55 +1,64 @@
-// PUL-361 · Konsolidierte KpiTile — eine Atom-Variante fuer alle KPI-Surfaces
-// (Context-Dashboard, Missions-Liste, Mission-Detail). Loest die Page-lokale
-// Missions-Variante (`app/(app)/missions/components/KpiTile.tsx`) ab.
+'use client'
+
+// KpiTile — a single KPI with optional sparkline, delta and icon chip.
 //
-// API-Design:
-//   • `value: string | number` — Strings fuer Surfaces, die formatierte Werte
-//     reichen (z. B. `'12h'`, `'87 %'`).
-//   • `sparklineValues` und `delta` sind optional — Missions-Surfaces zeigen
-//     keine Deltas; ContextKpiStrip nutzt beide; Mission-Detail nur Sparkline.
-//   • `icon` rendert in einem 20px Tone-Chip oben links (Missions-Pattern).
-//   • `accent` ist ein freier ReactNode-Slot in einem Tone-Chip oben links;
-//     ueberschreibt `icon` wenn beide gesetzt sind.
-//   • `tone` steuert Sparkline-, Delta- und Chip-Farbe semantisch.
-//   • `variant: 'default' | 'emphasis' | 'muted'` ersetzt die alten
-//     emphasis/muted-Booleans (kann nicht beides gleichzeitig sein).
-//
-// Drift-Schutz: die App-ESLint-Config (`no-restricted-imports`) blockt jeden
-// KpiTile-Import-Pfad ausserhalb `@meimberg/ui` — siehe app/eslint.config.mjs.
+// API notes:
+//   • `value: string | number` — strings for pre-formatted values
+//     (e.g. `'12h'`, `'87 %'`).
+//   • `sparklineValues` and `delta` are optional and independent.
+//   • `icon` renders in a 20px tone chip top-left; `accent` is a free ReactNode
+//     slot in the same chip and wins over `icon`.
+//   • `tone` drives sparkline, delta and chip colour semantically.
+//   • `variant` replaces separate emphasis/muted booleans (mutually exclusive).
+//   • The delta's comparison text (`labels.comparison`) names the reference
+//     period; the component itself has no notion of which period that is.
 
 import type {HTMLAttributes, ReactNode} from 'react'
 import {Sparkline} from '../atoms/Sparkline'
 import {ArrowDown, ArrowRight, ArrowUp} from '../atoms/icons'
 import {cn} from '../lib/cn'
+import {useLabels} from '../i18n/context'
 
 export type KpiTone = 'neutral' | 'success' | 'warn' | 'danger'
 export type KpiVariant = 'default' | 'emphasis' | 'muted'
 
 export interface KpiDelta {
-  /** Signed delta (positiv/negativ/0). */
+  /** Signed delta (positive/negative/0). */
   value: number
   direction: 'up' | 'down' | 'flat'
   /**
-   * True wenn der Wert eine Verbesserung darstellt — steuert Farbe.
-   * Default: `direction === 'up'`. Explizit setzen wenn „weniger Ueberfaellige"
-   * gut ist (`isPositive: true` bei `direction: 'down'`).
+   * True if the change is an improvement — drives the colour.
+   * Default: `direction === 'up'`. Set explicitly when "less" is good
+   * (`isPositive: true` with `direction: 'down'`).
    */
   isPositive?: boolean
+}
+
+export interface KpiTileLabels {
+  /** Reference text after the delta, e.g. "vs. previous period". */
+  comparison: string
+}
+
+const defaultLabels: KpiTileLabels = {
+  comparison: 'vs. previous period',
 }
 
 export interface KpiTileProps extends HTMLAttributes<HTMLDivElement> {
   label: string
   value: string | number
   sublabel?: string
-  /** Sparkline-Werte, idealerweise ≤14. Bei <2 Werten oder `undefined` → kein Sparkline. */
+  /** Sparkline values, ideally ≤14. Fewer than 2 values or `undefined` → no sparkline. */
   sparklineValues?: number[]
   delta?: KpiDelta
   tone?: KpiTone
-  /** Icon-Slot — rendert in einem 20px Tone-Chip oben links. */
+  /** Icon slot — rendered in a 20px tone chip top-left. */
   icon?: ReactNode
-  /** Free-form ReactNode-Slot im Tone-Chip oben links — ueberschreibt `icon`. */
+  /** Free-form ReactNode slot in the tone chip top-left — overrides `icon`. */
   accent?: ReactNode
   variant?: KpiVariant
+  /** Test id of the tile root. Default `kpi-tile`. */
+  'data-testid'?: string
+  labels?: Partial<KpiTileLabels>
 }
 
 const TONE_TEXT: Record<KpiTone, string> = {
@@ -84,8 +93,11 @@ export function KpiTile({
   accent,
   variant = 'default',
   className,
+  'data-testid': testId = 'kpi-tile',
+  labels,
   ...rest
 }: KpiTileProps) {
+  const l = useLabels('kpiTile', defaultLabels, labels)
   const chip = accent ?? icon
   const isMuted = variant === 'muted'
   const isEmphasis = variant === 'emphasis'
@@ -93,7 +105,7 @@ export function KpiTile({
     !isMuted && sparklineValues !== undefined && sparklineValues.length >= 2
   return (
     <div
-      data-testid="kpi-tile"
+      data-testid={testId}
       data-tone={tone}
       data-variant={variant}
       className={cn(
@@ -145,19 +157,27 @@ export function KpiTile({
           <span className="text-sm text-muted-foreground truncate">{sublabel}</span>
         )}
       </div>
-      {delta && <DeltaRow delta={delta} tone={tone} />}
+      {delta && <DeltaRow delta={delta} tone={tone} comparison={l.comparison} />}
     </div>
   )
 }
 
-function DeltaRow({delta, tone}: {delta: KpiDelta; tone: KpiTone}) {
+function DeltaRow({
+  delta,
+  tone,
+  comparison,
+}: {
+  delta: KpiDelta
+  tone: KpiTone
+  comparison: string
+}) {
   if (delta.direction === 'flat' && delta.value === 0) {
     return (
       <div
         className="text-xs text-muted-foreground/60 tabular-nums"
         data-testid="kpi-tile-delta"
       >
-        — vs. letzte Woche
+        — {comparison}
       </div>
     )
   }
@@ -169,8 +189,8 @@ function DeltaRow({delta, tone}: {delta: KpiDelta; tone: KpiTone}) {
     : delta.direction === 'flat'
     ? 'text-muted-foreground/60'
     : 'text-destructive'
-  // Tone-Override: getintete Tiles (success/warn/danger) tragen ihren Tile-Tone
-  // statt der Delta-Heuristik — Pfeil-Richtung kommuniziert weiterhin Up/Down.
+  // Tinted tiles (success/warn/danger) keep their tile tone instead of the
+  // delta heuristic — the arrow still communicates up/down.
   const visualClass = tone === 'neutral' ? colorClass : TONE_TEXT[tone]
   const sign = delta.value > 0 ? '+' : ''
   return (
@@ -183,7 +203,7 @@ function DeltaRow({delta, tone}: {delta: KpiDelta; tone: KpiTone}) {
         {sign}
         {delta.value}
       </span>
-      <span className="text-muted-foreground">vs. letzte Woche</span>
+      <span className="text-muted-foreground">{comparison}</span>
     </div>
   )
 }

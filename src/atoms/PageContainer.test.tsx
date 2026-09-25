@@ -3,7 +3,7 @@ import {describe, expect, it} from 'vitest'
 import {PageContainer} from './PageContainer'
 
 describe('<PageContainer>', () => {
-  it('rendert Default-Geometrie und responsive Padding', () => {
+  it('renders default geometry and responsive padding', () => {
     const {container} = render(
       <PageContainer>
         <div data-testid="child" />
@@ -20,7 +20,7 @@ describe('<PageContainer>', () => {
     expect(wrapper.className).toContain('md:py-7')
   })
 
-  it('lässt Padding weg bei padded={false}', () => {
+  it('omits padding with padded={false}', () => {
     const {container} = render(
       <PageContainer padded={false}>
         <div />
@@ -34,7 +34,7 @@ describe('<PageContainer>', () => {
     expect(wrapper.className).not.toContain('md:py-7')
   })
 
-  it('merged eingehende className', () => {
+  it('merges an incoming className', () => {
     const {container} = render(
       <PageContainer className="custom-class">
         <div />

@@ -6,6 +6,16 @@ import { CloseIcon } from "./action-icons";
 import * as React from "react";
 
 import { cn } from "../lib/cn";
+import { useLabels } from "../i18n/context";
+
+export interface SheetLabels {
+  /** Screen-reader text of the close button. */
+  close: string;
+}
+
+const defaultLabels: SheetLabels = {
+  close: "Close",
+};
 
 const Sheet = SheetPrimitive.Root;
 
@@ -51,21 +61,26 @@ const sheetVariants = cva(
 
 interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
+    VariantProps<typeof sheetVariants> {
+  labels?: Partial<SheetLabels>;
+}
 
 const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, SheetContentProps>(
-  ({ side = "right", className, children, ...props }, ref) => (
+  ({ side = "right", className, children, labels, ...props }, ref) => {
+    const l = useLabels("sheet", defaultLabels, labels);
+    return (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
         {children}
         <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity cursor-pointer hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed data-[state=open]:bg-secondary">
           <CloseIcon className="size-4" />
-          <span className="sr-only">Close</span>
+          <span className="sr-only">{l.close}</span>
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>
     </SheetPortal>
-  ),
+    );
+  },
 );
 SheetContent.displayName = SheetPrimitive.Content.displayName;
 

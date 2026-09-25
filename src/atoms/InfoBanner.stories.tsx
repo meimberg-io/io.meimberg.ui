@@ -11,7 +11,7 @@ type Story = StoryObj<typeof InfoBanner>
 
 export const Muted: Story = {
   args: {
-    children: 'Kein Inhalt.',
+    children: 'No content.',
   },
 }
 
@@ -19,6 +19,6 @@ export const Subtle: Story = {
   args: {
     tone: 'subtle',
     italic: false,
-    children: 'Keine weiteren Tags zum Eingrenzen verfügbar.',
+    children: 'No more tags available to narrow down.',
   },
 }

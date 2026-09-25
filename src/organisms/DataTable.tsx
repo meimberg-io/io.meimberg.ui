@@ -1,13 +1,11 @@
 'use client'
 
-// PUL-456 · DataTable — responsives Daten-Grid-Primitive. Auf `≥ md` eine
-// klassische Tabelle (ui/table), auf `< md` pro Zeile eine Card mit Label:Wert-
-// Liste. Generisch über Column-Definitionen, keine Domain-Kopplung — Konsumenten
-// liefern `columns` + `rows` + `getRowKey`.
+// Responsive data grid. On `≥ md` a classic table (ui/table), on `< md` one
+// card per row with a label:value list. Generic via column definitions —
+// consumers pass `columns` + `rows` + `getRowKey`.
 //
-// Verbindliches Mobile-Muster „Tabellen → Stacked Cards" (guidelines.md §
-// Responsive / Mobile). Das alte `ui/table` direkt für Daten-Grids zu nutzen ist
-// damit Drift (PUL-461 flaggt es) — neue Daten-Tabellen laufen über dieses Primitive.
+// This is the mobile pattern "tables → stacked cards": use it for data grids
+// instead of `ui/table` directly.
 
 import type {ReactNode} from 'react'
 import {useIsMobile} from '../hooks/use-mobile'
@@ -23,19 +21,19 @@ import {
 import {cn} from '../lib/cn'
 
 export interface DataTableColumn<Row> {
-  /** Stabiler Key der Spalte (React-key + Mobile-Card-Zeilen-key). */
+  /** Stable column key (React key + mobile card row key). */
   key: string
-  /** Spaltenkopf (Desktop) + Default-Label in der Mobile-Card. */
+  /** Column header (desktop) + default label in the mobile card. */
   header: ReactNode
-  /** Zellen-Renderer für eine Zeile. */
+  /** Cell renderer for a row. */
   cell: (row: Row) => ReactNode
-  /** Abweichendes Label in der Mobile-Card (default: `header`). */
+  /** Different label in the mobile card (default: `header`). */
   cardLabel?: ReactNode
-  /** Kein Label in der Mobile-Card, nur der Wert (z. B. Aktionen-Spalte). */
+  /** No label in the mobile card, value only (e.g. an actions column). */
   hideOnCard?: boolean
-  /** Optionale Klassen für `<TableHead>` (Desktop). */
+  /** Optional classes for `<TableHead>` (desktop). */
   headerClassName?: string
-  /** Optionale Klassen für `<TableCell>` (Desktop). */
+  /** Optional classes for `<TableCell>` (desktop). */
   cellClassName?: string
 }
 

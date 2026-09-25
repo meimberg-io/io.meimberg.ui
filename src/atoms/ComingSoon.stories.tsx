@@ -5,8 +5,7 @@ const meta: Meta<typeof ComingSoon> = {
   title: 'Atoms/ComingSoon',
   component: ComingSoon,
   args: {
-    label: 'KPI-Strip',
-    dashlet: 'context-kpi-strip',
+    title: 'Activity feed',
   },
 }
 
@@ -15,8 +14,16 @@ type Story = StoryObj<typeof ComingSoon>
 
 export const Default: Story = {}
 
+export const WithoutTitle: Story = {
+  args: {title: undefined},
+}
+
+export const CustomDescription: Story = {
+  args: {title: 'Reports', description: 'Available in the next release'},
+}
+
 export const Wide: Story = {
-  args: {label: 'Throughput', aspectRatio: '16 / 5'},
+  args: {title: 'Throughput', aspectRatio: '16 / 5'},
   render: args => (
     <div className="w-[480px]">
       <ComingSoon {...args} />
@@ -25,7 +32,7 @@ export const Wide: Story = {
 }
 
 export const Square: Story = {
-  args: {label: 'Donut', aspectRatio: '1 / 1'},
+  args: {title: 'Donut', aspectRatio: '1 / 1'},
   render: args => (
     <div className="w-[200px]">
       <ComingSoon {...args} />

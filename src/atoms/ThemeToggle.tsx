@@ -1,12 +1,13 @@
 'use client'
 
-import {useEffect, useState} from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import {useTheme} from 'next-themes'
 import {Sun, Moon, Monitor} from '../atoms/icons'
 import {SegmentedSwitch, type SegmentedOption} from './SegmentedSwitch'
+import {useLabels} from '../i18n/context'
 
 /**
- * Theme-Switcher (PUL-319, System-Mode ergänzt). Sitzt in der App-Topbar.
+ * Theme-Switcher. Sitzt typischerweise in der App-Topbar.
  *
  * Verhalten: Segmented Control mit drei Zuständen Light / Dark / System.
  * "System" folgt der OS-Preference (`prefers-color-scheme`) — dafür muss der
@@ -27,13 +28,29 @@ import {SegmentedSwitch, type SegmentedOption} from './SegmentedSwitch'
 
 type ThemeChoice = 'light' | 'dark' | 'system'
 
-const THEME_OPTIONS: ReadonlyArray<SegmentedOption<ThemeChoice>> = [
-  {value: 'light', icon: <Sun width={15} height={15} />, ariaLabel: 'Light Mode'},
-  {value: 'dark', icon: <Moon width={15} height={15} />, ariaLabel: 'Dark Mode'},
-  {value: 'system', icon: <Monitor width={15} height={15} />, ariaLabel: 'System — folgt dem Betriebssystem'},
-]
+export interface ThemeToggleLabels {
+  light: string
+  dark: string
+  system: string
+}
 
-export function ThemeToggle() {
+const defaultLabels: ThemeToggleLabels = {
+  light: 'Light mode',
+  dark: 'Dark mode',
+  system: 'System — follows the operating system',
+}
+
+interface Props {
+  labels?: Partial<ThemeToggleLabels>
+}
+
+export function ThemeToggle({labels}: Props = {}) {
+  const l = useLabels('themeToggle', defaultLabels, labels)
+  const options = useMemo<ReadonlyArray<SegmentedOption<ThemeChoice>>>(() => [
+    {value: 'light', icon: <Sun width={15} height={15} />, ariaLabel: l.light},
+    {value: 'dark', icon: <Moon width={15} height={15} />, ariaLabel: l.dark},
+    {value: 'system', icon: <Monitor width={15} height={15} />, ariaLabel: l.system},
+  ], [l])
   const {theme, setTheme} = useTheme()
   const [mounted, setMounted] = useState(false)
   // Established mounted-Idiom — setMounted im Effect triggert einen Re-Render
@@ -42,13 +59,13 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), [])
 
   if (!mounted) {
-    return <SegmentedSwitch value="system" options={THEME_OPTIONS} onChange={() => {}} disabled />
+    return <SegmentedSwitch value="system" options={options} onChange={() => {}} disabled />
   }
 
   return (
     <SegmentedSwitch<ThemeChoice>
       value={(theme as ThemeChoice | undefined) ?? 'system'}
-      options={THEME_OPTIONS}
+      options={options}
       onChange={setTheme}
     />
   )

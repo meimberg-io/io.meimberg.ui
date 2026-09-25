@@ -1,15 +1,14 @@
 'use client'
 
-// PUL-464 (S2): AppSidebar — generische, config-getriebene App-Navigation.
+// Generic, config-driven app navigation.
 //
-// Framework-agnostisch: der aktuelle Pfad kommt als `currentPath`-Prop (der
-// Consumer reicht z. B. Next `usePathname()` rein), Links rendern über ein
-// `linkComponent`-Slot (Default: `<a>`; Next-Apps geben `next/link` rein →
-// Prefetch/Client-Nav). Keine Domain-Kenntnis: Nav-Struktur, Icons, Badges
-// und Header/Footer liefert der Consumer als Daten/Slots.
+// Framework-agnostic: the current path comes in as `currentPath` (e.g. Next
+// `usePathname()`), links render through the `linkComponent` slot (default
+// `<a>`; Next apps pass `next/link` for prefetch/client navigation). Nav
+// structure, icons, badges and header/footer are supplied as data/slots.
 //
-// Muss innerhalb von <AppShell> (bzw. einem SidebarProvider) gerendert werden —
-// nutzt `useSidebar()` für Collapsed-State + Mobile-Off-Canvas-Close.
+// Must be rendered inside <AppShell> (or a SidebarProvider) — uses
+// `useSidebar()` for the collapsed state and closing the mobile off-canvas.
 
 import type {ComponentType, ReactNode} from 'react'
 import {
@@ -29,14 +28,14 @@ import {cn} from '../lib/cn'
 export interface SidebarNavItem {
   label: string
   href: string
-  /** Vorgerendertes Leading-Icon (Consumer kontrolliert Icon-System). */
+  /** Pre-rendered leading icon (the consumer owns the icon system). */
   icon?: ReactNode
-  /** Trailing-Badge (z. B. Counter-Pill). Wird bei collapsed ausgeblendet. */
+  /** Trailing badge (e.g. a counter pill). Hidden when collapsed. */
   badge?: ReactNode
 }
 
 export interface SidebarNavGroup {
-  /** Optionaler Caps-Header über der Gruppe. */
+  /** Optional caps header above the group. */
   label?: string
   items: SidebarNavItem[]
 }
@@ -51,17 +50,17 @@ export type SidebarLinkComponent = ComponentType<{
 
 export interface AppSidebarProps {
   groups: SidebarNavGroup[]
-  /** Aktueller Pfad (z. B. Next `usePathname()`). */
+  /** Current path (e.g. Next `usePathname()`). */
   currentPath: string
-  /** Aktiv-Heuristik. Default: exakt für `/`, sonst Prefix-Match. */
+  /** Active heuristic. Default: exact for `/`, prefix match otherwise. */
   isActive?: (href: string, currentPath: string) => boolean
-  /** Link-Renderer. Default `<a>`. Next-Apps: `next/link`. */
+  /** Link renderer. Default `<a>`. Next apps: `next/link`. */
   linkComponent?: SidebarLinkComponent
-  /** Zusätzlicher Callback bei Navigation (Mobile-Close macht die Komponente selbst). */
+  /** Extra callback on navigation (the component closes the mobile sidebar itself). */
   onNavigate?: () => void
-  /** Header-Slot (Logo/Brand). Bekommt den Collapsed-State. */
+  /** Header slot (logo/brand). Receives the collapsed state. */
   header?: (collapsed: boolean) => ReactNode
-  /** Footer-Slot (z. B. User-Menü). Bekommt den Collapsed-State. */
+  /** Footer slot (e.g. user menu). Receives the collapsed state. */
   footer?: (collapsed: boolean) => ReactNode
   className?: string
 }
@@ -122,8 +121,8 @@ export function AppSidebar({
                             active && 'bg-sidebar-accent text-sidebar-primary font-medium',
                           )}
                         >
-                          {/* Icon-Größe kontrolliert der Consumer (Lucide h-4 w-4,
-                              Avatar/OrgIcon size-5 …) — hier nur shrink-0. */}
+                          {/* The consumer controls icon size (Lucide h-4 w-4,
+                              avatar size-5 …) — only shrink-0 here. */}
                           {item.icon ? <span className="shrink-0">{item.icon}</span> : null}
                           {!collapsed && (
                             <>

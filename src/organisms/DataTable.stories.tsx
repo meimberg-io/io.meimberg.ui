@@ -1,6 +1,6 @@
-// PUL-456: DataTable — responsives Daten-Grid. Desktop = Tabelle, < md = Cards.
-// Die Mobile-Card-Variante wird über die Storybook-Viewport-Toolbar (Breite < 768px)
-// sichtbar; `useIsMobile()` schaltet zur Laufzeit anhand der Fensterbreite um.
+// Responsive data grid. Desktop = table, < md = cards. The mobile card variant
+// shows up via the Storybook viewport toolbar (width < 768px); `useIsMobile()`
+// switches at runtime based on the window width.
 
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {DataTable, type DataTableColumn} from './DataTable'
@@ -26,9 +26,9 @@ interface Job {
 }
 
 const ROWS: Job[] = [
-  {id: '1', target: 'Notion-Inbox', status: 'done', http: 200, attempts: 1, created: '17.06.2026 14:02'},
-  {id: '2', target: 'Jira-Sync', status: 'failed', http: 502, attempts: 3, created: '17.06.2026 13:40'},
-  {id: '3', target: 'Raindrop-Export', status: 'queued', http: null, attempts: 0, created: '17.06.2026 13:31'},
+  {id: '1', target: 'Webhook: Billing', status: 'done', http: 200, attempts: 1, created: '2026-06-17 14:02'},
+  {id: '2', target: 'CRM export', status: 'failed', http: 502, attempts: 3, created: '2026-06-17 13:40'},
+  {id: '3', target: 'Nightly backup', status: 'queued', http: null, attempts: 0, created: '2026-06-17 13:31'},
 ]
 
 const COLUMNS: DataTableColumn<Job>[] = [
@@ -43,13 +43,13 @@ const COLUMNS: DataTableColumn<Job>[] = [
   },
   {
     key: 'actions',
-    header: <span className="sr-only">Aktionen</span>,
+    header: <span className="sr-only">Actions</span>,
     headerClassName: 'w-12 text-right',
     cellClassName: 'text-right',
     hideOnCard: true,
     cell: () => (
       <Button variant="ghost" size="sm">
-        Re-Queue
+        Retry
       </Button>
     ),
   },

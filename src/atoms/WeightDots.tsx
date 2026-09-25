@@ -1,54 +1,70 @@
 'use client'
 
-// PUL-368: Mission-Weight als 5-Dots-Skala (1..5, Default 3). Ersetzt den
-// alten −/+-Stepper (1..10). Domain-frei — Konsumenten geben Wert + onChange.
+// Gewichts-Skala als Dots (1..max, Default-Max 5). Domain-frei — Konsumenten
+// geben Wert + onChange.
 //
-// Pulse-Tokens (bg-primary, bg-muted-foreground …) bleiben hier im Atom,
-// damit die ESLint-Regel auf Pulse-Tokens ausserhalb von atoms/ greifen kann
-// (R-07).
+// Die Farb-Tokens (bg-primary, bg-muted-foreground …) bleiben hier im Atom,
+// damit die ESLint-Regel gegen Tokens ausserhalb von atoms/ greifen kann.
 
 import {cn} from '../lib/cn'
+import {useLabels} from '../i18n/context'
 
-export type WeightValue = 1 | 2 | 3 | 4 | 5
+const DEFAULT_MAX = 5
 
-const VALUES: ReadonlyArray<WeightValue> = [1, 2, 3, 4, 5]
+export interface WeightDotsLabels {
+  /** Basis für die a11y-Labels: Gruppe „<label> 3 / 5", Dot „<label> 3". */
+  label: string
+}
+
+const defaultLabels: WeightDotsLabels = {
+  label: 'Weight',
+}
 
 export interface WeightDotsProps {
-  /** Aktueller Wert (1..5). */
-  value: WeightValue
+  /** Aktueller Wert (1..max). */
+  value: number
+  /** Anzahl der Dots. Default 5. */
+  max?: number
   /** Klick auf einen Dot → neuer Wert. Nicht aufgerufen wenn `readOnly`. */
-  onChange?: (value: WeightValue) => void
+  onChange?: (value: number) => void
   /** Read-only-Modus: keine Klick-Handler, kein Cursor-Pointer. */
   readOnly?: boolean
   /** Optionale Tailwind-Klassen für den äußeren Container. */
   className?: string
-  /** A11y-Label für die gesamte Gruppe (z. B. „Gewicht für Mission X"). */
+  /** A11y-Label für die gesamte Gruppe (z. B. „Weight for project X"). */
   'aria-label'?: string
+  labels?: Partial<WeightDotsLabels>
+  'data-testid'?: string
 }
 
 /**
- * 5 Dots als Gewichts-Skala. Gefüllte Dots = aktueller Wert, ungefüllte =
+ * Dots als Gewichts-Skala. Gefüllte Dots = aktueller Wert, ungefüllte =
  * Rest. Klick auf Dot `n` setzt den Wert auf `n`.
  *
- * - Filled-Tone: `bg-primary` (Pulse-Token).
+ * - Filled-Tone: `bg-primary`.
  * - Empty-Tone: dezenter Border + transparenter Fill.
  * - Read-Only: deaktiviert Interaktion + Hover-Affordance.
  */
 export function WeightDots({
   value,
+  max = DEFAULT_MAX,
   onChange,
   readOnly,
   className,
   'aria-label': ariaLabel,
+  labels,
+  'data-testid': testId,
 }: WeightDotsProps) {
+  const l = useLabels('weightDots', defaultLabels, labels)
+  const values = Array.from({length: max}, (_, i) => i + 1)
   return (
     <div
       role="group"
-      aria-label={ariaLabel ?? `Gewicht ${value} von 5`}
+      aria-label={ariaLabel ?? `${l.label} ${value} / ${max}`}
       className={cn('inline-flex items-center gap-1', className)}
-      data-testid="weight-dots"
+      data-testid={testId}
     >
-      {VALUES.map(n => {
+      {values.map(n => {
         const filled = n <= value
         const interactive = !readOnly && !!onChange
         return (
@@ -57,7 +73,7 @@ export function WeightDots({
             type="button"
             role="radio"
             aria-checked={n === value}
-            aria-label={`Gewicht ${n}`}
+            aria-label={`${l.label} ${n}`}
             disabled={!interactive}
             onClick={e => {
               e.stopPropagation()

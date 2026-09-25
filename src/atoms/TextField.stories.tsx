@@ -12,11 +12,11 @@ export default meta
 type Story = StoryObj<typeof TextField>
 
 export const Default: Story = {
-  args: {placeholder: 'Pulse'},
+  args: {placeholder: 'Project name'},
 }
 
 export const Filled: Story = {
-  args: {defaultValue: 'Pulse-Backlog'},
+  args: {defaultValue: 'Product roadmap'},
 }
 
 export const Disabled: Story = {
@@ -25,21 +25,21 @@ export const Disabled: Story = {
 
 export const WithLeadingIcon: Story = {
   args: {
-    placeholder: 'Suchen…',
+    placeholder: 'Search…',
     leadingIcon: <Search width={14} height={14} />,
   },
 }
 
 export const WithTrailingIcon: Story = {
   args: {
-    defaultValue: 'wird geprüft',
+    defaultValue: 'Checking',
     trailingIcon: <Loader2 width={14} height={14} className="animate-spin" />,
   },
 }
 
 export const WithBothIcons: Story = {
   args: {
-    placeholder: 'wird geprüft…',
+    placeholder: 'Checking…',
     leadingIcon: <Search width={14} height={14} />,
     trailingIcon: <Loader2 width={14} height={14} className="animate-spin" />,
   },
@@ -49,7 +49,7 @@ export const Textarea: Story = {
   args: {
     as: 'textarea',
     rows: 3,
-    placeholder: 'Beschreibung…',
+    placeholder: 'Description…',
   },
 }
 
@@ -58,6 +58,6 @@ export const TextareaFilled: Story = {
     as: 'textarea',
     rows: 4,
     defaultValue:
-      'Pulse ist ein Cockpit für alle Tickets, Tasks, Inbox-Items und Ideen aus den verschiedenen Tools, mit denen ich täglich arbeite.',
+      'A shared workspace for the team to collect tasks, documents and ideas from all the tools we use every day.',
   },
 }

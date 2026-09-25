@@ -1,13 +1,18 @@
 /* ============================================================================
- * @meimberg/ui/tokens — Pulse Design-System Foundations (Tailwind-v4-Preset)
+ * @meimberg/ui/tokens — Design-System-Foundations (Tailwind-v4-Preset)
  *
  * Teilbare "Optik": Design-Tokens (:root/.dark), Theme-Bridge (@theme inline),
  * foundationale Custom-Variants, DS-Animationen, Reduced-Motion und Base-Resets.
- * KEIN Component-CSS und keine Pulse-Fachlichkeit — die bleiben in der App
- * (PUL-462, D1/D2). Konsum: `@import "@meimberg/ui/tokens";` NACH
- * `@import "tailwindcss";` in der globals.css der jeweiligen App.
+ * Kein Component-CSS und keine Produkt-Fachlichkeit — die bleiben in der App.
+ * Konsum: `@import "@meimberg/ui/tokens";` NACH `@import "tailwindcss";` in der
+ * globals.css der jeweiligen App.
  *
- * Token-Änderung = Foundations-Story-Update im selben Changeset (PUL-412).
+ * Die Palette ist bewusst neutral (Slate-Grautöne, blaues Primary). Eine App
+ * setzt ihre Marke, indem sie die Farb-Tokens nach diesem Import in `:root`
+ * und `.dark` überschreibt (Format: HSL-Kanäle ohne `hsl()`). Typografie und
+ * Radius hängen an `--type-*` bzw. `--radius`.
+ *
+ * Token-Änderung = Foundations-Story-Update im selben Changeset.
  * ==========================================================================*/
 
 /* Tailwind v4 scannt `node_modules` nicht. Ohne diese Zeile fehlen in der
@@ -18,59 +23,72 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* MIPUL-289: Pointer-Fine-Geräte (Maus/Trackpad). Wird verwendet, um
+/* Pointer-Fine-Geräte (Maus/Trackpad). Wird verwendet, um
  * Hover-only-Affordances (z. B. ausgeblendete Action-Icons in ActionCards)
  * NICHT auf Touch-Geräten wie iPad permanent unsichtbar zu lassen — dort
  * gibt es kein Hover, also müssen sie ohne Pointer-Fine sichtbar sein. */
 @custom-variant pointer-fine (@media (pointer: fine));
 
-/* PUL-455 (Mobile-Standard, Welle 0): Gegenstück zu pointer-fine — greift auf
+/* Gegenstück zu pointer-fine — greift auf
  * Touch-Geräten (grober Zeiger, kein Hover). Heimat des 44-px-Tap-Target-Standards:
  * interaktive Atoms heben ihre Trefferfläche NUR hier an (z. B.
  * `pointer-coarse:min-h-tap pointer-coarse:min-w-tap`), damit die Desktop-Dichte
  * (Maus/Trackpad) unverändert bleibt. */
 @custom-variant pointer-coarse (@media (pointer: coarse));
 
+/* Typografie-Rollen (Größe + Zeilenhöhe) und Radius — theme-unabhängig. */
 :root {
-  --background: 200 20% 98%;
-  --foreground: 200 15% 12%;
-
-  --card: 0 0% 100%;
-  --card-foreground: 200 15% 12%;
-
-  --popover: 0 0% 100%;
-  --popover-foreground: 200 15% 12%;
-
-  --primary: 195 60% 42%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 200 15% 94%;
-  --secondary-foreground: 200 15% 20%;
-
-  --muted: 200 15% 94%;
-  --muted-foreground: 200 10% 42%;
-
-  --accent: 200 15% 94%;
-  --accent-foreground: 200 15% 20%;
-
-  --destructive: 345 65% 50%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 200 15% 88%;
-  --input: 200 15% 88%;
-  --ring: 195 60% 42%;
-
   --radius: 0.5rem;
 
-  /* PUL-462 Schritt 11: Die Pulse-Domänen-Tokens (Prio-Skala, Tag-Vokabular,
-   * Stage-Lifecycle signal/seed/sprout/cluster/mission, Top-Mission-Akzent)
-   * sind zurück in die App gezogen (app/src/app/globals.css) — sie kodieren
-   * Pulse-Fachlichkeit und gehören nicht ins produktneutrale Preset (D1/D2).
-   * Hier bleibt nur die neutrale Status-Semantik. */
-  --success: 160 55% 38%;
-  --success-foreground: 160 50% 98%;
-  --warning: 45 75% 50%;
-  --info: 195 60% 42%;
+  --type-heading-1-size: 24px;
+  --type-heading-1-leading: 32px;
+  --type-heading-2-size: 20px;
+  --type-heading-2-leading: 28px;
+  --type-heading-3-size: 17px;
+  --type-heading-3-leading: 24px;
+  --type-body-size: 15px;
+  --type-body-leading: 22px;
+  --type-body-sm-size: 13px;
+  --type-body-sm-leading: 20px;
+  --type-caption-size: 12px;
+  --type-caption-leading: 16px;
+}
+
+:root {
+  --background: 220 14% 98%;
+  --foreground: 222 20% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 20% 12%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 20% 12%;
+
+  --primary: 221 83% 53%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 220 14% 95%;
+  --secondary-foreground: 222 20% 20%;
+
+  --muted: 220 14% 95%;
+  --muted-foreground: 220 9% 44%;
+
+  --accent: 220 14% 95%;
+  --accent-foreground: 222 20% 20%;
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 220 13% 89%;
+  --input: 220 13% 89%;
+  --ring: 221 83% 53%;
+
+  --success: 142 64% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 26 83% 14%;
+  --info: 199 89% 48%;
+  --info-foreground: 0 0% 100%;
 
   --elev-card: 0 1px 2px hsl(var(--foreground) / 0.05),
                0 1px 1px hsl(var(--foreground) / 0.04);
@@ -79,55 +97,56 @@
   --elev-modal: 0 16px 48px hsl(var(--foreground) / 0.20),
                 0 4px 12px hsl(var(--foreground) / 0.10);
 
-  --surface-0: 200 20% 98%;
+  --surface-0: 220 14% 98%;
   --surface-1: 0 0% 100%;
-  --surface-2: 200 15% 95%;
-  --surface-3: 200 15% 90%;
+  --surface-2: 220 14% 96%;
+  --surface-3: 220 13% 91%;
 
-  --sidebar-background: 200 20% 96%;
-  --sidebar-foreground: 200 15% 35%;
-  --sidebar-primary: 195 60% 42%;
+  --sidebar-background: 220 14% 96%;
+  --sidebar-foreground: 220 9% 35%;
+  --sidebar-primary: 221 83% 53%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 200 15% 92%;
-  --sidebar-accent-foreground: 200 15% 15%;
-  --sidebar-border: 200 15% 88%;
-  --sidebar-ring: 195 60% 42%;
+  --sidebar-accent: 220 14% 92%;
+  --sidebar-accent-foreground: 222 20% 15%;
+  --sidebar-border: 220 13% 89%;
+  --sidebar-ring: 221 83% 53%;
 }
 
 .dark {
-  --background: 200 10% 4%;
-  --foreground: 195 10% 90%;
+  --background: 222 14% 5%;
+  --foreground: 220 13% 91%;
 
-  --card: 200 8% 8%;
-  --card-foreground: 195 10% 90%;
+  --card: 222 12% 9%;
+  --card-foreground: 220 13% 91%;
 
-  --popover: 200 8% 10%;
-  --popover-foreground: 195 10% 90%;
+  --popover: 222 12% 11%;
+  --popover-foreground: 220 13% 91%;
 
-  --primary: 195 50% 50%;
-  --primary-foreground: 195 50% 98%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 222 47% 11%;
 
-  --secondary: 200 8% 16%;
-  --secondary-foreground: 195 10% 90%;
+  --secondary: 222 10% 17%;
+  --secondary-foreground: 220 13% 91%;
 
-  --muted: 200 8% 16%;
-  --muted-foreground: 195 10% 50%;
+  --muted: 222 10% 17%;
+  --muted-foreground: 220 9% 55%;
 
-  --accent: 200 8% 16%;
-  --accent-foreground: 195 10% 90%;
+  --accent: 222 10% 17%;
+  --accent-foreground: 220 13% 91%;
 
-  --destructive: 345 55% 50%;
-  --destructive-foreground: 345 55% 98%;
+  --destructive: 0 63% 55%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 200 8% 18%;
-  --input: 200 8% 18%;
-  --ring: 195 50% 50%;
+  --border: 222 10% 19%;
+  --input: 222 10% 19%;
+  --ring: 217 91% 60%;
 
-  /* PUL-462 Schritt 11: Pulse-Domänen-Tokens (Dark-Mode) → app/globals.css. */
-  --success: 160 50% 45%;
-  --success-foreground: 160 50% 10%;
-  --warning: 45 65% 55%;
-  --info: 195 50% 50%;
+  --success: 142 55% 45%;
+  --success-foreground: 142 60% 8%;
+  --warning: 38 90% 55%;
+  --warning-foreground: 26 83% 10%;
+  --info: 199 89% 58%;
+  --info-foreground: 199 80% 10%;
 
   /* Dark-Mode: Schatten sind schwarz-basiert, NICHT foreground-basiert.
    * `--foreground` ist im Dark-Mode nahezu weiß — als Schatten ergäbe das
@@ -141,19 +160,19 @@
   --elev-modal: 0 16px 48px hsl(0 0% 0% / 0.60),
                 0 4px 12px hsl(0 0% 0% / 0.40);
 
-  --surface-0: 200 10% 4%;
-  --surface-1: 200 8% 8%;
-  --surface-2: 200 8% 12%;
-  --surface-3: 200 8% 16%;
+  --surface-0: 222 14% 5%;
+  --surface-1: 222 12% 9%;
+  --surface-2: 222 10% 13%;
+  --surface-3: 222 10% 17%;
 
-  --sidebar-background: 200 10% 6%;
-  --sidebar-foreground: 195 10% 70%;
-  --sidebar-primary: 195 50% 50%;
-  --sidebar-primary-foreground: 195 50% 98%;
-  --sidebar-accent: 200 8% 12%;
-  --sidebar-accent-foreground: 195 10% 90%;
-  --sidebar-border: 200 8% 14%;
-  --sidebar-ring: 195 50% 50%;
+  --sidebar-background: 222 14% 7%;
+  --sidebar-foreground: 220 9% 70%;
+  --sidebar-primary: 217 91% 60%;
+  --sidebar-primary-foreground: 222 47% 11%;
+  --sidebar-accent: 222 10% 13%;
+  --sidebar-accent-foreground: 220 13% 91%;
+  --sidebar-border: 222 10% 15%;
+  --sidebar-ring: 217 91% 60%;
 }
 
 @theme inline {
@@ -179,14 +198,14 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
-  /* PUL-462 Schritt 11: Die Domänen-Farb-Mappings (signal/seed/sprout/cluster/
-   * mission, accent-top, vocab-*, p1..p4) leben mit ihren Tokens in
-   * app/src/app/globals.css — dort erzeugt ein eigenes `@theme inline` die
-   * `bg-p1`/`text-signal`/`bg-vocab-*`-Utilities. */
+  /* Produkt-eigene Farb-Tokens definiert die App in einer eigenen Datei mit
+   * eigenem `@theme inline` (siehe README § Eigene Marke und Produkt-Tokens). */
   --color-success: hsl(var(--success));
   --color-success-foreground: hsl(var(--success-foreground));
   --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
   --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
 
   --shadow-card: var(--elev-card);
   --shadow-floating: var(--elev-floating);
@@ -209,8 +228,10 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
 
-  /* PUL-455 (Mobile-Standard, Welle 0): Tap-Target-Token = 44 px (WCAG-Mindest-
+  /* Tap-Target-Token = 44 px (WCAG-Mindest-
    * Trefferfläche für Touch). Named-Spacing in der Tailwind-v4-`--spacing-*`-
    * Bridge → erzeugt `min-h-tap` / `min-w-tap` / `size-tap` / `h-tap` / `w-tap`.
    * Verwendung NUR über die `pointer-coarse:`-Variant (s. oben), damit die
@@ -245,7 +266,7 @@
   100% { background-position: -200% 0; }
 }
 
-/* MIPUL-135: A11y — Animationen und Transitions effektiv abschalten,
+/* A11y — Animationen und Transitions effektiv abschalten,
  * wenn das OS „Reduce Motion" gesetzt hat. */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -288,14 +309,10 @@
 }
 
 /* ============================================================================
- * Geteilte Primitive-Utilities (PUL-462 Schritt 9).
+ * Geteilte Primitive-Utilities.
  *
- * Aus der App-`globals.css` hierher gezogen, weil `@meimberg/ui`-Komponenten
- * (Badge/Pill/Chip, Form-Shells, Typografie) sie brauchen — und das DS-Preset
- * ist die einzige Quelle, die App **und** Package (DS-Storybook, App 2)
- * gemeinsam importieren. Ohne das rendern die Primitives im DS-Storybook
- * unstyled. App-spezifische Utilities (prio-filter-chip, stagger-fade-in,
- * col-chev, sync-icon-spinning) bleiben in der App-`globals.css`.
+ * Utilities, die `@meimberg/ui`-Komponenten brauchen (Pills, Form-Shells,
+ * Typografie, Hover-Affordances) und die Apps ebenfalls nutzen dürfen.
  * ==========================================================================*/
 
 /* Hover-Reveal — Aktionen, die erst beim Hover auf der Karte/Zeile erscheinen.
@@ -329,9 +346,9 @@
   }
 }
 
-/* PUL-397-followup: Vereinheitlichter Active-State-Cue auf Form-Triggern.
+/* Vereinheitlichter Active-State-Cue auf Form-Triggern.
  *   `:focus-visible` — Tastatur-Fokus · `[data-state="open"]` — Radix-Trigger
- *   · `[data-open="true"]` — Pulse-eigene Trigger. */
+ *   · `[data-open="true"]` — eigene Trigger (z. B. RichSelect). */
 @utility focus-ring {
   &:focus-visible,
   &[data-state="open"],
@@ -342,7 +359,7 @@
   }
 }
 
-/* PUL-420 (G5): Form-Field-Shell — geteilte 40-px-Geometrie für Inputs,
+/* Form-Field-Shell — geteilte 40-px-Geometrie für Inputs,
  * Rich-Select-Trigger und Tag-Trigger. */
 @utility field-shell {
   width: 100%;
@@ -355,11 +372,11 @@
   padding-block: 0;
   padding-left: 12px;
   padding-right: 12px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   border: 1.5px solid hsl(var(--border));
   background: hsl(var(--card));
   color: hsl(var(--foreground));
-  font-size: 13px;
+  font-size: var(--type-body-sm-size);
   line-height: 1.4;
   transition: border-color .25s, box-shadow .25s, background-color .25s;
   text-align: left;
@@ -375,7 +392,7 @@
   }
 }
 
-/* PUL-420 (G5): Form-Dialog-Shell + Section-Header + Required-Asterisk. */
+/* Form-Dialog-Shell + Section-Header + Required-Asterisk. */
 @utility form-field-required {
   /* Required-Asterisk via ::after — bewusst NICHT als JSX-Span, sonst matched
    * `getByLabelText('Title')` (textContent) gegen "Title*". */
@@ -417,7 +434,7 @@
 }
 @utility form-dialog-shell {
   background: hsl(var(--card));
-  border-radius: 14px;
+  border-radius: calc(var(--radius) + 6px);
   box-shadow:
     0 24px 48px hsl(var(--foreground) / 0.25),
     0 4px 12px hsl(var(--foreground) / 0.10);
@@ -433,7 +450,7 @@
   overflow-y: auto;
 }
 
-/* PUL-456 (Mobile-Standard): FormRow-Grid — kollabiert auf `< md` auf eine
+/* FormRow-Grid — kollabiert auf `< md` auf eine
  * Spalte, nimmt ab `md` das Template aus `--form-row-cols` (inline gesetzt). */
 @utility form-row-grid {
   display: grid;
@@ -443,65 +460,62 @@
   }
 }
 
-@layer utilities {
-  /* MIPUL-244: Typografische Rollen. Verbindlich; Tailwind text-xs/sm/base/lg/xl
-   * dürfen nicht direkt verwendet werden. Bewusst ohne `text-`-Präfix, um
-   * Naming-Kollisionen mit Tailwind `text-{color}`-Klassen zu vermeiden — die
-   * würden sonst von tailwind-merge als gleiche Klassen-Gruppe (font-size)
-   * deduped werden, und die Rolle ginge im finalen className verloren. */
-  .heading-1 { font-size: 24px; line-height: 32px; font-weight: 600; }
-  .heading-2 { font-size: 20px; line-height: 28px; font-weight: 600; }
-  .heading-3 { font-size: 17px; line-height: 24px; font-weight: 600; }
-  .body      { font-size: 15px; line-height: 22px; font-weight: 400; }
-  .body-sm   { font-size: 13px; line-height: 20px; font-weight: 400; }
-  .caption   { font-size: 12px; line-height: 16px; font-weight: 400; }
+/* Typografische Rollen. Verbindlich; Tailwind text-xs/sm/base/lg/xl dürfen
+ * nicht direkt verwendet werden. Bewusst ohne `text-`-Präfix, um Kollisionen
+ * mit Tailwind `text-{color}` zu vermeiden (tailwind-merge würde sonst die Rolle
+ * deduplizieren). Als `@utility`, damit Varianten greifen (`max-sm:body-sm`). */
+@utility heading-1 { font-size: var(--type-heading-1-size); line-height: var(--type-heading-1-leading); font-weight: 600; }
+@utility heading-2 { font-size: var(--type-heading-2-size); line-height: var(--type-heading-2-leading); font-weight: 600; }
+@utility heading-3 { font-size: var(--type-heading-3-size); line-height: var(--type-heading-3-leading); font-weight: 600; }
+@utility body { font-size: var(--type-body-size); line-height: var(--type-body-leading); font-weight: 400; }
+@utility body-sm { font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-leading); font-weight: 400; }
+@utility caption { font-size: var(--type-caption-size); line-height: var(--type-caption-leading); font-weight: 400; }
 
-  /* MIPUL-284: Pill-Shell. Zentrale Definition der Pill-Geometrie für alle
-   * Badge-Varianten. Größenänderungen für ALLE Pills — hier. */
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;          /* gap-1 */
-    border-radius: 9999px; /* rounded-full */
-    border-width: 1px;
-    border-style: solid;
-    padding: 0.125rem 0.5rem; /* py-0.5 px-2 */
-    font-size: 12px;
-    line-height: 16px;
-    font-weight: 400;
-    transition-property: color, background-color, border-color;
-    transition-duration: 150ms;
-  }
+/* Pill-Shell: zentrale Geometrie für alle Badge-Varianten. */
+@utility pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.125rem 0.5rem;
+  font-size: var(--type-caption-size);
+  line-height: var(--type-caption-leading);
+  font-weight: 400;
+  transition-property: color, background-color, border-color;
+  transition-duration: 150ms;
+}
 
-  /* Brightness-Hover für Pills mit dynamischen Inline-Farben (z. B. DueChip). */
-  .pill-hover { transition: filter .15s, background-color .15s, border-color .15s; }
-  .pill-hover:hover { filter: brightness(.96); }
-  .dark .pill-hover:hover { filter: brightness(1.12); }
+/* Brightness-Hover für Pills mit dynamischen Inline-Farben. */
+@utility pill-hover {
+  transition: filter .15s, background-color .15s, border-color .15s;
+  &:hover { filter: brightness(.96); }
+  :where(.dark) &:hover { filter: brightness(1.12); }
+}
 
-  /* PUL-352: Hover-Card-Akzent — Border-Shift + Shadow, KEINE Translation. */
-  .hover-card {
-    transition: border-color 150ms ease-out, box-shadow 200ms ease-out;
-  }
-  .hover-card:hover {
+/* Hover-Card-Akzent — Border-Shift + Shadow, keine Translation. */
+@utility hover-card {
+  transition: border-color 150ms ease-out, box-shadow 200ms ease-out;
+  &:hover {
     border-color: hsl(var(--foreground) / 0.2);
     box-shadow: var(--elev-floating);
   }
-
-  /* Loading-Shimmer-Sweep für Skeletons. */
-  .skeleton-shimmer {
-    background-image: linear-gradient(
-      90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--surface-3)) 50%,
-      hsl(var(--muted)) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.6s ease-in-out infinite;
-  }
 }
 
-/* v3-Form-Keyframes (von form-dialog-overlay/-shell referenziert) — außerhalb
- * @layer utilities, damit sie nicht in den Utilities-Layer scoped werden. */
+/* Loading-Shimmer-Sweep für Skeletons. */
+@utility skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--surface-3)) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Keyframes für form-dialog-overlay/-shell. */
 @keyframes dlg-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }

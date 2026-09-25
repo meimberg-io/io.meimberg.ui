@@ -1,6 +1,6 @@
 'use client'
 
-// PUL-352 · Form-Section — Mikro-Caps-Header mit Hairline-Trenner + Body.
+// Form-Section — Mikro-Caps-Header mit Hairline-Trenner + Body.
 // Standard-vertikaler-Abstand zwischen Sections steuert die FormDialog (via
 // `gap-6`). Innerhalb der Section bleibt der Spacing-Default kompakt.
 

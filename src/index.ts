@@ -1,6 +1,6 @@
 // @meimberg/ui — Root-Barrel.
 //
-// Layer (PUL-464): ui/ (Vendor-Primitives, Subpath @meimberg/ui/ui/*) ·
+// Layer: ui/ (Vendor-Primitives, Subpath @meimberg/ui/ui/*) ·
 // atoms/ (ein Element: Controls + Anzeige + Layout-Primitives) · molecules/
 // (Kompositionen aus 2+ Elementen) · organisms/ (App-Gerüst + große
 // Kompositionen/Modals/Heavy).
@@ -16,6 +16,11 @@ export { usePopoverPosition } from './hooks/use-popover-position'
 // Provider-Contract (Contexts, die @meimberg/ui voraussetzt).
 export { UiProviders } from './providers'
 export type { UiProvidersProps } from './providers'
+
+// Sprache: Labels, Locale. Deutsches Paket: `@meimberg/ui/i18n/de`.
+export { UiI18nProvider, useUiLocale, useDateLocale, useLabels } from './i18n/context'
+export type { UiI18nProviderProps, UiMessagesOverride } from './i18n/context'
+export type { UiMessages } from './i18n/messages'
 
 // Toast: <Toaster> und toast() (sonner) kuratiert aus dem Root-Barrel. sonner
 // ist Peer-Dependency, damit App und DS denselben Toast-Store teilen.

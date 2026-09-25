@@ -17,15 +17,14 @@ function Stateful({initialEditing = false}: {initialEditing?: boolean}) {
     <div className="w-[640px] rounded-lg border border-border bg-card p-4">
       <EditableSection
         title="Objectives"
-        subtitle="Strukturieren die Mission in gewichtete Ziele"
+        subtitle="Break the project down into weighted goals"
         onAdd={() => alert('add')}
         addLabel="Add objective"
         editing={editing}
         onToggleEdit={() => setEditing(v => !v)}
-        editLabel="Bearbeiten"
       />
       <p className="caption text-muted-foreground">
-        Edit-Mode: {editing ? 'an' : 'aus'}
+        Edit mode: {editing ? 'on' : 'off'}
       </p>
     </div>
   )
@@ -38,10 +37,10 @@ export const NoEditToggle: Story = {
   render: () => (
     <div className="w-[640px] rounded-lg border border-border bg-card p-4">
       <EditableSection
-        title="Buckets"
-        subtitle="2 verknüpft"
+        title="Team members"
+        subtitle="2 assigned"
         onAdd={() => alert('add')}
-        addLabel="Bucket hinzufügen"
+        addLabel="Add member"
       />
     </div>
   ),

@@ -1,8 +1,8 @@
 'use client'
 
-// MIPUL-186 · Tiptap-basierter Richtext-Editor mit Markdown-I/O.
-// Voller Markdown-Funktionsumfang (Bold/Italic/Code, Headings, Listen,
-// Tasklisten, Links, Blockquote, Tabellen, Bilder via URL, HR, Undo/Redo).
+// Tiptap-based rich-text editor with Markdown I/O. Full Markdown feature set
+// (bold/italic/code, headings, lists, task lists, links, blockquote, tables,
+// images via URL, HR, undo/redo).
 
 import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
@@ -17,8 +17,11 @@ import { TaskItem } from '@tiptap/extension-task-item'
 import { Markdown, type MarkdownStorage } from 'tiptap-markdown'
 import type { Node as PMNode } from '@tiptap/pm/model'
 import type { MarkdownSerializerState } from 'prosemirror-markdown'
-import { useEffect } from 'react'
+import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react'
 import { Button } from '../ui/button'
+import { Popover, PopoverAnchor, PopoverContent } from '../ui/popover'
+import { TextField } from '../atoms/TextField'
+import { useLabels } from '../i18n/context'
 import { cn } from '../lib/cn'
 import {
   Bold, Italic, Code, Code2, Heading1, Heading2, Heading3,
@@ -26,12 +29,65 @@ import {
   Minus, Table as TableIcon, Undo, Redo,
 } from '../atoms/icons'
 
+export interface MarkdownEditorLabels {
+  bold: string
+  italic: string
+  inlineCode: string
+  heading1: string
+  heading2: string
+  heading3: string
+  bulletList: string
+  orderedList: string
+  taskList: string
+  blockquote: string
+  codeBlock: string
+  link: string
+  image: string
+  table: string
+  horizontalRule: string
+  undo: string
+  redo: string
+  /** Label of the URL input when adding/editing a link. */
+  linkUrl: string
+  /** Label of the URL input when inserting an image. */
+  imageUrl: string
+  apply: string
+  cancel: string
+  removeLink: string
+}
+
+const defaultLabels: MarkdownEditorLabels = {
+  bold: 'Bold (⌘B)',
+  italic: 'Italic (⌘I)',
+  inlineCode: 'Inline code',
+  heading1: 'Heading 1',
+  heading2: 'Heading 2',
+  heading3: 'Heading 3',
+  bulletList: 'Bullet list',
+  orderedList: 'Numbered list',
+  taskList: 'Task list',
+  blockquote: 'Blockquote',
+  codeBlock: 'Code block',
+  link: 'Link',
+  image: 'Insert image',
+  table: 'Table (3×3)',
+  horizontalRule: 'Horizontal rule',
+  undo: 'Undo',
+  redo: 'Redo',
+  linkUrl: 'Link URL',
+  imageUrl: 'Image URL',
+  apply: 'Apply',
+  cancel: 'Cancel',
+  removeLink: 'Remove link',
+}
+
 interface Props {
   value: string
   onChange: (markdown: string) => void
   placeholder?: string
   disabled?: boolean
   className?: string
+  labels?: Partial<MarkdownEditorLabels>
 }
 
 function getMarkdown(editor: Editor): string {
@@ -39,9 +95,9 @@ function getMarkdown(editor: Editor): string {
   return storage.markdown?.getMarkdown() ?? ''
 }
 
-// tiptap-markdown 0.9 ships keine Tabellen-Serialisierung — unbekannte Nodes
-// landen sonst als `[table]` im Markdown. GFM-Pipe-Tabellen lassen sich aus
-// dem Tiptap-Tree direkt aufbauen.
+// tiptap-markdown 0.9 ships no table serialisation — unknown nodes would end
+// up as `[table]` in the Markdown. GFM pipe tables are built straight from
+// the Tiptap tree.
 function cellText(cell: PMNode): string {
   let out = ''
   cell.descendants(node => {
@@ -73,8 +129,8 @@ function serializeTable(state: MarkdownSerializerState, node: PMNode) {
     state.write('| ' + Array(cols).fill('---').join(' | ') + ' |\n')
     for (let i = 1; i < rows.length; i++) writeRow(rows[i])
   } else {
-    // Headerless GFM-Tabellen sind nicht standardkonform — leere Header-Zeile
-    // einsetzen, damit der Renderer die Tabelle erkennt.
+    // Headerless GFM tables are not valid — insert an empty header row so
+    // renderers recognise the table.
     state.write('| ' + Array(cols).fill(' ').join(' | ') + ' |\n')
     state.write('| ' + Array(cols).fill('---').join(' | ') + ' |\n')
     for (const r of rows) writeRow(r)
@@ -92,7 +148,8 @@ const TableRowMd = TableRow.extend({ addStorage() { return { ...this.parent?.(),
 const TableHeaderMd = TableHeader.extend({ addStorage() { return { ...this.parent?.(), markdown: noopSerializer } } })
 const TableCellMd = TableCell.extend({ addStorage() { return { ...this.parent?.(), markdown: noopSerializer } } })
 
-export function MarkdownEditor({ value, onChange, placeholder, disabled, className }: Props) {
+export function MarkdownEditor({ value, onChange, placeholder, disabled, className, labels }: Props) {
+  const l = useLabels('markdownEditor', defaultLabels, labels)
   const editor = useEditor({
     immediatelyRender: false,
     editable: !disabled,
@@ -145,7 +202,7 @@ export function MarkdownEditor({ value, onChange, placeholder, disabled, classNa
 
   return (
     <div className={cn('rounded-md border border-input bg-background', className)}>
-      <Toolbar editor={editor} disabled={disabled} />
+      <Toolbar editor={editor} disabled={disabled} labels={l} />
       <div className='border-t border-border/40'>
         <EditorContent editor={editor} placeholder={placeholder} />
       </div>
@@ -153,29 +210,43 @@ export function MarkdownEditor({ value, onChange, placeholder, disabled, classNa
   )
 }
 
-function Toolbar({ editor, disabled }: { editor: Editor | null; disabled?: boolean }) {
+type UrlPromptKind = 'link' | 'image'
+
+interface UrlPrompt {
+  kind: UrlPromptKind
+  initial: string
+  /** Editing an existing link — offers "remove link". */
+  hasExisting: boolean
+}
+
+function Toolbar({ editor, disabled, labels: l }: { editor: Editor | null; disabled?: boolean; labels: MarkdownEditorLabels }) {
+  const [prompt, setPrompt] = useState<UrlPrompt | null>(null)
   if (!editor) {
     return <div className='h-10 border-b border-border/40' />
   }
   const can = !disabled
 
-  function setLink() {
+  function openLinkPrompt() {
     if (!editor) return
     const previous = editor.getAttributes('link').href as string | undefined
-    const url = window.prompt('Link-URL', previous ?? 'https://')
-    if (url === null) return
-    if (url === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run()
-      return
-    }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+    setPrompt({ kind: 'link', initial: previous ?? 'https://', hasExisting: previous !== undefined })
   }
 
-  function insertImage() {
-    if (!editor) return
-    const url = window.prompt('Bild-URL', 'https://')
-    if (!url) return
-    editor.chain().focus().setImage({ src: url }).run()
+  function unsetLink() {
+    editor?.chain().focus().extendMarkRange('link').unsetLink().run()
+    setPrompt(null)
+  }
+
+  function applyUrl(url: string) {
+    if (!editor || !prompt) return
+    const trimmed = url.trim()
+    if (prompt.kind === 'link') {
+      if (trimmed === '') editor.chain().focus().extendMarkRange('link').unsetLink().run()
+      else editor.chain().focus().extendMarkRange('link').setLink({ href: trimmed }).run()
+    } else if (trimmed !== '') {
+      editor.chain().focus().setImage({ src: trimmed }).run()
+    }
+    setPrompt(null)
   }
 
   function insertTable() {
@@ -184,29 +255,79 @@ function Toolbar({ editor, disabled }: { editor: Editor | null; disabled?: boole
   }
 
   return (
-    <div className='flex flex-wrap items-center gap-0.5 px-1 py-1'>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()}        active={editor.isActive('bold')}        disabled={!can} title='Bold (⌘B)'><Bold className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()}      active={editor.isActive('italic')}      disabled={!can} title='Italic (⌘I)'><Italic className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()}        active={editor.isActive('code')}        disabled={!can} title='Inline Code'><Code className='size-4' /></ToolbarButton>
-      <Divider />
-      <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive('heading', { level: 1 })} disabled={!can} title='H1'><Heading1 className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} disabled={!can} title='H2'><Heading2 className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} disabled={!can} title='H3'><Heading3 className='size-4' /></ToolbarButton>
-      <Divider />
-      <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()}  active={editor.isActive('bulletList')}  disabled={!can} title='Bullet List'><List className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} disabled={!can} title='Ordered List'><ListOrdered className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()}    active={editor.isActive('taskList')}    disabled={!can} title='Task List'><ListChecks className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()}  active={editor.isActive('blockquote')}  disabled={!can} title='Blockquote'><Quote className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()}   active={editor.isActive('codeBlock')}   disabled={!can} title='Code Block'><Code2 className='size-4' /></ToolbarButton>
-      <Divider />
-      <ToolbarButton onClick={setLink}      active={editor.isActive('link')} disabled={!can} title='Link'><LinkIcon className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={insertImage}  disabled={!can} title='Bild einfügen'><ImageIcon className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={insertTable}  disabled={!can} title='Tabelle (3×3)'><TableIcon className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} disabled={!can} title='Horizontale Linie'><Minus className='size-4' /></ToolbarButton>
-      <Divider />
-      <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!can || !editor.can().undo()} title='Undo'><Undo className='size-4' /></ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!can || !editor.can().redo()} title='Redo'><Redo className='size-4' /></ToolbarButton>
-    </div>
+    <Popover open={prompt !== null} onOpenChange={open => { if (!open) setPrompt(null) }}>
+      <PopoverAnchor asChild>
+        <div className='flex flex-wrap items-center gap-0.5 px-1 py-1'>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()}        active={editor.isActive('bold')}        disabled={!can} title={l.bold}><Bold className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()}      active={editor.isActive('italic')}      disabled={!can} title={l.italic}><Italic className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()}        active={editor.isActive('code')}        disabled={!can} title={l.inlineCode}><Code className='size-4' /></ToolbarButton>
+          <Divider />
+          <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive('heading', { level: 1 })} disabled={!can} title={l.heading1}><Heading1 className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} disabled={!can} title={l.heading2}><Heading2 className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} disabled={!can} title={l.heading3}><Heading3 className='size-4' /></ToolbarButton>
+          <Divider />
+          <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()}  active={editor.isActive('bulletList')}  disabled={!can} title={l.bulletList}><List className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} disabled={!can} title={l.orderedList}><ListOrdered className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleTaskList().run()}    active={editor.isActive('taskList')}    disabled={!can} title={l.taskList}><ListChecks className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()}  active={editor.isActive('blockquote')}  disabled={!can} title={l.blockquote}><Quote className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().toggleCodeBlock().run()}   active={editor.isActive('codeBlock')}   disabled={!can} title={l.codeBlock}><Code2 className='size-4' /></ToolbarButton>
+          <Divider />
+          <ToolbarButton onClick={openLinkPrompt} active={editor.isActive('link')} disabled={!can} title={l.link}><LinkIcon className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => setPrompt({ kind: 'image', initial: 'https://', hasExisting: false })} disabled={!can} title={l.image}><ImageIcon className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={insertTable}  disabled={!can} title={l.table}><TableIcon className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} disabled={!can} title={l.horizontalRule}><Minus className='size-4' /></ToolbarButton>
+          <Divider />
+          <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!can || !editor.can().undo()} title={l.undo}><Undo className='size-4' /></ToolbarButton>
+          <ToolbarButton onClick={() => editor.chain().focus().redo().run()} disabled={!can || !editor.can().redo()} title={l.redo}><Redo className='size-4' /></ToolbarButton>
+        </div>
+      </PopoverAnchor>
+      <PopoverContent align='start' className='p-3'>
+        {prompt && (
+          <UrlForm
+            // Remount per prompt so the input starts from the new initial value.
+            key={`${prompt.kind}:${prompt.initial}`}
+            label={prompt.kind === 'link' ? l.linkUrl : l.imageUrl}
+            initial={prompt.initial}
+            labels={l}
+            onSubmit={applyUrl}
+            onCancel={() => setPrompt(null)}
+            onRemove={prompt.hasExisting ? unsetLink : undefined}
+          />
+        )}
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+interface UrlFormProps {
+  label: string
+  initial: string
+  labels: MarkdownEditorLabels
+  onSubmit: (url: string) => void
+  onCancel: () => void
+  onRemove?: () => void
+}
+
+// Enter submits (native form submit); Escape is handled by the popover.
+function UrlForm({ label, initial, labels: l, onSubmit, onCancel, onRemove }: UrlFormProps) {
+  const [url, setUrl] = useState(initial)
+  const inputId = useId()
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    onSubmit(url)
+  }
+  return (
+    <form onSubmit={handleSubmit} className='flex flex-col gap-2'>
+      <label htmlFor={inputId} className='caption text-muted-foreground'>{label}</label>
+      <TextField id={inputId} type='url' value={url} onChange={e => setUrl(e.target.value)} autoFocus />
+      <div className='flex items-center justify-end gap-2'>
+        {onRemove && (
+          <Button type='button' variant='ghost' size='sm' className='mr-auto' onClick={onRemove}>{l.removeLink}</Button>
+        )}
+        <Button type='button' variant='ghost' size='sm' onClick={onCancel}>{l.cancel}</Button>
+        <Button type='submit' size='sm'>{l.apply}</Button>
+      </div>
+    </form>
   )
 }
 
@@ -215,7 +336,7 @@ interface BtnProps {
   active?: boolean
   disabled?: boolean
   title: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 function ToolbarButton({ onClick, active, disabled, title, children }: BtnProps) {

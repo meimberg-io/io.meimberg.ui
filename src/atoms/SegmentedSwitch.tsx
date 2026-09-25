@@ -1,8 +1,6 @@
 'use client'
 
-// PUL-352 · Segmented-Switch mit gleitendem Thumb. Generische N-Optionen-
-// Variante des v3-Mockups `type-seg` (Inbox/Task). Quelle:
-// docs/frontend/redesign/source/v3/mission/Buckets.html § .type-seg.
+// Segmented-Switch mit gleitendem Thumb für N Optionen.
 //
 // Thumb-Breite und -Position werden über CSS-Custom-Properties berechnet
 // (`--seg-count`, `--seg-index`), damit dieselbe Klasse für 2, 3 oder mehr
@@ -29,8 +27,7 @@ interface Props<T extends string> {
 
 export function SegmentedSwitch<T extends string>({value, options, onChange, disabled}: Props<T>) {
   const index = Math.max(0, options.findIndex(o => o.value === value))
-  // PUL-420 (G5): Look inline in der Komponente (war `.type-seg*` in
-  // globals.css). Inline-Style trägt die zwei CSS-Properties; der Thumb liest
+  // Inline-Style trägt die zwei CSS-Properties; der Thumb liest
   // `--seg-count`/`--seg-index` via calc() für Breite + Position.
   const style = {
     '--seg-count': options.length,

@@ -13,21 +13,21 @@ export default meta
 type Story = StoryObj<typeof PageHeader>
 
 export const TitleOnly: Story = {
-  args: {title: 'Posteingang'},
+  args: {title: 'Messages'},
 }
 
 export const WithDescription: Story = {
   args: {
-    title: 'Posteingang',
-    description: 'Alle ungelesenen Inbox-Items aus deinen verknüpften Konten.',
+    title: 'Messages',
+    description: 'All unread messages from your connected accounts.',
   },
 }
 
 export const WithActionButton: Story = {
   args: {
-    title: 'Missions',
-    description: 'Übersicht deiner aktiven Missions und Cluster.',
-    actionLabel: 'Mission anlegen',
+    title: 'Projects',
+    description: 'Overview of your active projects.',
+    actionLabel: 'Create project',
     actionIcon: Plus,
     onAction: () => {},
   },
@@ -36,21 +36,21 @@ export const WithActionButton: Story = {
 export const WithActionNoIcon: Story = {
   args: {
     title: 'Tasks',
-    actionLabel: 'Synchronisieren',
+    actionLabel: 'Sync',
     onAction: () => {},
   },
 }
 
 export const WithChildren: Story = {
   render: () => (
-    <PageHeader title="Inbox" description="Filter rechts in der Topbar">
+    <PageHeader title="Messages" description="Filters on the right">
       <Button variant="outline" size="sm">
         <Inbox className="size-4" />
         Filter
       </Button>
       <Button size="sm">
         <Plus className="size-4" />
-        Neu
+        New
       </Button>
     </PageHeader>
   ),
@@ -59,9 +59,9 @@ export const WithChildren: Story = {
 export const WithChildrenAndAction: Story = {
   render: () => (
     <PageHeader
-      title="Garden"
-      description="Signals · Seeds · Sprouts · Cluster · Missions"
-      actionLabel="Promote"
+      title="Library"
+      description="Documents · Images · Videos"
+      actionLabel="Organize"
       actionIcon={FolderKanban}
       onAction={() => {}}
     >
@@ -72,27 +72,26 @@ export const WithChildrenAndAction: Story = {
   ),
 }
 
-// PUL-413 (G1c): description als ReactNode-Beispiel — Counts inline mit
-// Highlight-Spans, wie im Todo-View nach der G1c-Migration verwendet.
+// description as ReactNode: inline counts with highlight spans.
 export const WithJsxDescription: Story = {
-  name: 'description als JSX (counts + highlights)',
+  name: 'description as JSX (counts + highlights)',
   render: () => (
     <PageHeader
       title="Todo"
       description={
         <>
-          42 aktuell ·{' '}
-          <span className="text-destructive font-medium">3 überfällig</span>
+          42 current ·{' '}
+          <span className="text-destructive font-medium">3 overdue</span>
           {' · '}
-          <span className="text-warning font-medium">7 heute</span>
-          {' · alle Kontexte'}
+          <span className="text-warning font-medium">7 today</span>
+          {' · all workspaces'}
         </>
       }
     >
       <Button variant="outline" size="sm">
         Sync
       </Button>
-      <Button size="sm">Quick-Capture</Button>
+      <Button size="sm">Quick add</Button>
     </PageHeader>
   ),
 }

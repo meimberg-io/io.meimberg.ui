@@ -1,12 +1,13 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
-import {WeightDots, type WeightValue} from './WeightDots'
+import {WeightDots} from './WeightDots'
 
 const meta: Meta<typeof WeightDots> = {
   title: 'Atoms/WeightDots',
   component: WeightDots,
   args: {
     value: 3,
+    max: 5,
     readOnly: false,
   },
   argTypes: {
@@ -26,10 +27,14 @@ export const ReadOnly: Story = {
   args: {value: 4, readOnly: true},
 }
 
+export const CustomMax: Story = {
+  args: {value: 7, max: 10},
+}
+
 export const AllValues: Story = {
   render: () => (
     <div className="flex items-center gap-6">
-      {([1, 2, 3, 4, 5] as WeightValue[]).map(v => (
+      {[1, 2, 3, 4, 5].map(v => (
         <div key={v} className="flex flex-col items-center gap-1">
           <WeightDots value={v} />
           <span className="caption text-muted-foreground">value={v}</span>
@@ -42,7 +47,7 @@ export const AllValues: Story = {
 export const Interactive: Story = {
   render: () => {
     const Demo = () => {
-      const [value, setValue] = useState<WeightValue>(3)
+      const [value, setValue] = useState(3)
       return (
         <div className="flex flex-col items-start gap-2">
           <WeightDots value={value} onChange={setValue} />

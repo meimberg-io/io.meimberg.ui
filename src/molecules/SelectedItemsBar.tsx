@@ -1,44 +1,60 @@
+'use client'
+
 import type {ReactNode} from 'react'
 import {Button} from '../ui/button'
 import {CloseIcon} from '../ui/action-icons'
+import {useLabels} from '../i18n/context'
+
+export interface SelectedItemsBarLabels {
+  /** Prefix label on the left. */
+  selected: string
+  /** Text of the clear-all button. */
+  clearAll: string
+}
+
+const defaultLabels: SelectedItemsBarLabels = {
+  selected: 'Selected:',
+  clearAll: 'Clear all',
+}
 
 export interface SelectedItemsBarProps {
-  /** Prefix-Label links. Default „Ausgewählt:". */
+  /** Prefix label on the left. Takes precedence over `labels.selected`. */
   label?: string
-  /** Bulk-Clear-Handler (rendert den ClearAll-Button rechts). */
+  /** Bulk-clear handler (renders the clear-all button on the right). */
   onClearAll: () => void
-  /** Beschriftung des ClearAll-Buttons. Default „Alle entfernen". */
+  /** Text of the clear-all button. Takes precedence over `labels.clearAll`. */
   clearLabel?: string
-  /** Die ausgewählten Item-Chips/Badges (content-agnostisch). */
+  /** The selected item chips/badges (content-agnostic). */
   children: ReactNode
+  labels?: Partial<SelectedItemsBarLabels>
 }
 
 /**
- * Pulse-SelectedItemsBar — „applied items bar" für Multi-Select-Surfaces:
- * Prefix-Label + Item-Slot (children) + ClearAll-Button.
+ * SelectedItemsBar — "applied items bar" for multi-select surfaces:
+ * prefix label + item slot (children) + clear-all button.
  *
- * Content-agnostisch: die konkreten Item-Chips (z. B. `<TagBadge>`) inkl. ihrer
- * Domain-Auflösung kommen als `children` vom Call-Site — die Molecule selbst
- * importiert keine Domain-Module. Bündelt das in PUL-414 (G2b-T2) identifizierte
- * Selection-Bar-Pattern aus tags-view.
+ * Content-agnostic: the concrete item chips come as `children` from the call
+ * site, so the molecule stays free of domain modules.
  *
  * @example
  *   <SelectedItemsBar onClearAll={clearAll}>
- *     {selected.map(t => <TagBadge key={t.id} tag={t} onRemove={() => remove(t.id)} />)}
+ *     {selected.map(t => <Pill key={t.id}>{t.name}</Pill>)}
  *   </SelectedItemsBar>
  */
 export function SelectedItemsBar({
-  label = 'Ausgewählt:',
+  label,
   onClearAll,
-  clearLabel = 'Alle entfernen',
+  clearLabel,
   children,
+  labels,
 }: SelectedItemsBarProps) {
+  const l = useLabels('selectedItemsBar', defaultLabels, labels)
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
-      <span className="caption text-muted-foreground">{label}</span>
+      <span className="caption text-muted-foreground">{label ?? l.selected}</span>
       {children}
       <Button type="button" variant="ghost" size="sm" className="ml-auto" onClick={onClearAll}>
-        <CloseIcon /> {clearLabel}
+        <CloseIcon /> {clearLabel ?? l.clearAll}
       </Button>
     </div>
   )

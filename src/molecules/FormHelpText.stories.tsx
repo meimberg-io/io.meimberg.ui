@@ -11,12 +11,12 @@ export default meta
 type Story = StoryObj<typeof FormHelpText>
 
 export const Default: Story = {
-  args: {children: 'Items werden auf INBOX eingeschränkt.'},
+  args: {children: 'Only items from the selected folder are synced.'},
 }
 
 export const Long: Story = {
   args: {
     children:
-      'Der erste Sync läuft direkt nach dem Anlegen. Danach wird der Bucket alle 10 Minuten aktualisiert; existierende Items werden nicht überschrieben.',
+      'The first sync starts right after saving. After that, data refreshes every 10 minutes; existing entries are never overwritten.',
   },
 }

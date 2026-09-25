@@ -8,8 +8,8 @@ const meta: Meta<typeof EmptyState> = {
   parameters: {layout: 'fullscreen'},
   args: {
     icon: Inbox,
-    title: 'Posteingang ist leer',
-    description: 'Sobald neue Inbox-Items reinkommen, tauchen sie hier auf.',
+    title: 'No messages yet',
+    description: 'New messages will show up here as soon as they arrive.',
   },
 }
 export default meta
@@ -21,9 +21,9 @@ export const Default: Story = {}
 export const WithAction: Story = {
   args: {
     icon: FolderKanban,
-    title: 'Noch keine Missions',
-    description: 'Lege deine erste Mission an, um Tasks zu bündeln.',
-    actionLabel: 'Mission anlegen',
+    title: 'No projects yet',
+    description: 'Create your first project to group related tasks.',
+    actionLabel: 'Create project',
     onAction: () => {},
   },
 }
@@ -31,41 +31,41 @@ export const WithAction: Story = {
 export const SearchNoResults: Story = {
   args: {
     icon: Search,
-    title: 'Keine Treffer',
-    description: 'Versuche es mit einem anderen Suchbegriff oder lösche Filter.',
+    title: 'No results',
+    description: 'Try a different search term or clear your filters.',
   },
 }
 
-export const SignalsEmpty: Story = {
+export const AutomationsEmpty: Story = {
   args: {
     icon: Zap,
-    title: 'Noch keine Signale',
-    description: 'Markiere Inbox-Items als Signal, um sie für Routing vorzubereiten.',
-    actionLabel: 'Signal anlegen',
+    title: 'No automations yet',
+    description: 'Automations run actions for you whenever a trigger fires.',
+    actionLabel: 'Create automation',
     onAction: () => {},
   },
 }
 
 export const Dashed: Story = {
-  name: 'Dashed (gefilterter Listen-Empty)',
+  name: 'Dashed (filtered list empty)',
   args: {
     tone: 'dashed',
     icon: Search,
-    title: 'Keine Treffer',
-    description: 'Mit den aktiven Filtern bleibt nichts übrig. Filter zurücksetzen.',
+    title: 'No results',
+    description: 'Nothing matches the active filters. Reset filters.',
   },
 }
 
 export const DashedWithLinkAction: Story = {
-  name: 'Dashed + Link-Action',
+  name: 'Dashed + link action',
   args: {
     tone: 'dashed',
     icon: FolderKanban,
-    title: 'Keine Missions',
-    description: 'Lege die erste Mission in diesem Kontext an.',
+    title: 'No projects',
+    description: 'Create the first project in this workspace.',
     action: (
       <a href="#" className="text-sm font-medium text-primary hover:underline cursor-pointer">
-        Erste Mission anlegen
+        Create first project
       </a>
     ),
   },

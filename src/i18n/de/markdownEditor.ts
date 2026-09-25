@@ -1,0 +1,26 @@
+import type {MarkdownEditorLabels} from '../../organisms/markdown-editor'
+
+export const markdownEditor: MarkdownEditorLabels = {
+  bold: 'Fett (⌘B)',
+  italic: 'Kursiv (⌘I)',
+  inlineCode: 'Inline-Code',
+  heading1: 'Überschrift 1',
+  heading2: 'Überschrift 2',
+  heading3: 'Überschrift 3',
+  bulletList: 'Aufzählung',
+  orderedList: 'Nummerierte Liste',
+  taskList: 'Aufgabenliste',
+  blockquote: 'Zitat',
+  codeBlock: 'Codeblock',
+  link: 'Link',
+  image: 'Bild einfügen',
+  table: 'Tabelle (3×3)',
+  horizontalRule: 'Horizontale Linie',
+  undo: 'Rückgängig',
+  redo: 'Wiederholen',
+  linkUrl: 'Link-URL',
+  imageUrl: 'Bild-URL',
+  apply: 'Übernehmen',
+  cancel: 'Abbrechen',
+  removeLink: 'Link entfernen',
+}

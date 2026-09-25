@@ -1,15 +1,10 @@
 'use client'
 
-// PUL-464 (S2c / MIPUL-271): Config-getriebene FilterBar. Pages liefern eine
-// Liste von Field-Configs; die Komponente rendert Search / Select / Toggle /
-// Chips-Multi / Segmented / Custom in der gegebenen Reihenfolge. `actions`-Slot
-// rechts für Page-spezifische Aktionen.
-//
-// PUL-464: domain-frei. Der frühere `org`-Feldtyp (OrgSwitcher, Pulse-Domäne)
-// ist durch ein generisches `custom`-Feld ersetzt — der Consumer rendert dort
-// beliebige eigene Controls (z. B. Pulse rendert seinen OrgSwitcher). `toneClass`
-// bei Chips/Segmented ist ein vom Consumer geliefertes className (keine
-// Farb-Domäne im Package).
+// Config-driven filter bar. Pages pass a list of field configs; the component
+// renders search / select / toggle / chips-multi / segmented / custom in the
+// given order, with an `actions` slot on the right. Domain-specific controls
+// go into a `custom` field; `toneClass` on chips/segmented is a
+// consumer-supplied className, so no colour semantics live here.
 
 import type {ReactNode} from 'react'
 import {Button} from '../ui/button'
@@ -17,6 +12,7 @@ import {Label} from '../ui/label'
 import {Switch} from '../ui/switch'
 import {SearchInput} from '../atoms/SearchInput'
 import {Dropdown} from '../atoms/Dropdown'
+import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
 
 export type FilterBarValue = Record<string, string | string[] | boolean | null>
@@ -48,7 +44,7 @@ interface ToggleField {
   label: string
 }
 
-/** Multi-Select-Chip-Gruppe (Toggle pro Chip). Value = `string[]`. */
+/** Multi-select chip group (toggle per chip). Value = `string[]`. */
 interface ChipsMultiField {
   kind: 'chipsMulti'
   key: string
@@ -56,7 +52,7 @@ interface ChipsMultiField {
   options: readonly ChipsOption[]
 }
 
-/** Single-Select-Segmented-Control. `null` = kein Filter; Re-Klick toggelt zurück. */
+/** Single-select segmented control. `null` = no filter; clicking again toggles back. */
 interface SegmentedField {
   kind: 'segmented'
   key: string
@@ -65,9 +61,8 @@ interface SegmentedField {
 }
 
 /**
- * Beliebiges Consumer-Control (Render-Slot). Ersetzt domain-spezifische
- * Feldtypen (z. B. Pulse-OrgSwitcher). Bekommt den aktuellen Wert für `key`
- * und einen Setter.
+ * Arbitrary consumer control (render slot) for domain-specific filters.
+ * Receives the current value for `key` and a setter.
  */
 interface CustomField {
   kind: 'custom'
@@ -83,6 +78,14 @@ export type FilterField =
   | SegmentedField
   | CustomField
 
+export interface FilterBarLabels {
+  reset: string
+}
+
+const defaultLabels: FilterBarLabels = {
+  reset: 'Reset filters',
+}
+
 interface Props {
   fields: readonly FilterField[]
   value: FilterBarValue
@@ -90,9 +93,11 @@ interface Props {
   onReset?: () => void
   actions?: ReactNode
   className?: string
+  labels?: Partial<FilterBarLabels>
 }
 
-export function FilterBar({fields, value, onChange, onReset, actions, className}: Props) {
+export function FilterBar({fields, value, onChange, onReset, actions, className, labels}: Props) {
+  const l = useLabels('filterBar', defaultLabels, labels)
   const patch = (key: string, v: FilterFieldValue) => onChange({...value, [key]: v})
 
   return (
@@ -207,7 +212,7 @@ export function FilterBar({fields, value, onChange, onReset, actions, className}
       {actions && <div className="ml-auto flex items-center gap-2">{actions}</div>}
       {onReset && (
         <Button variant="ghost" size="sm" onClick={onReset}>
-          Filter zurücksetzen
+          {l.reset}
         </Button>
       )}
     </div>

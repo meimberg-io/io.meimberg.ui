@@ -1,6 +1,6 @@
 'use client'
 
-// PUL-352 · Form-Row — Grid-Wrapper für ein- oder mehrspaltige Layouts in
+// Form-Row — Grid-Wrapper für ein- oder mehrspaltige Layouts in
 // einer Form-Section. `cols=1` → Block-Layout (Gap nach unten), `cols=2` →
 // gleichbreite Spalten, beliebige Grid-Templates als String („1fr 240px",
 // „auto 1fr auto").
@@ -31,7 +31,7 @@ export function FormRow({cols = 1, gap = 3, children, className}: Props) {
   if (typeof cols === 'number' && cols === 1) {
     return <div className={cn('flex flex-col', gapClass, className)}>{children}</div>
   }
-  // PUL-456: Mehrspaltig → `form-row-grid`-Utility (1 Spalte < md, Desktop-
+  // Mehrspaltig → `form-row-grid`-Utility (1 Spalte < md, Desktop-
   // Template ab md aus `--form-row-cols`). Template numerisch oder roh ("1fr 240px").
   const template = typeof cols === 'number' ? `repeat(${cols}, minmax(0, 1fr))` : cols
   return (

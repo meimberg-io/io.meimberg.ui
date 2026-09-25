@@ -1,11 +1,10 @@
 'use client'
 
-// PUL-352 / PUL-462 · SelectableTile — horizontale Mini-Card mit Icon-Slab links und
-// Label rechts. Aktiv: Primary-Border + 3px Glow + Checkmark-Pille. Quelle:
-// docs/frontend/redesign/source/v3/mission/Buckets.html § .prov-tile.
+// SelectableTile — horizontale Mini-Card mit Icon-Slab links und Label rechts.
+// Aktiv: Primary-Border + 3px Glow + Checkmark-Pille.
 //
 // Generisch über `glyph`-Slot — Konsumenten füllen den Icon-Slab mit dem
-// passenden Glyph (z. B. Pulse: `<ProviderGlyph provider="jira" />`).
+// passenden Glyph (Icon, Logo, Initialen).
 
 import type {ReactNode} from 'react'
 
@@ -23,7 +22,7 @@ interface Props {
   onClick: () => void
   disabled?: boolean
   title?: string
-  /** Test-Hook, z. B. `bucket-provider-jira`. */
+  /** Test-Hook, z. B. `source-tile-cloud`. */
   'data-testid'?: string
 }
 
@@ -47,11 +46,9 @@ export function SelectableTile({
       disabled={disabled}
       onClick={onClick}
       title={title}
-      // PUL-420 (G5): Look inline gekapselt (war `.prov-tile` etc. in
-      // globals.css). `group` + `group-data-[on=true]:`-Varianten bilden die
-      // früheren `.prov-tile[data-on] .prov-label/.prov-check`-Parent-State-
-      // Selektoren ab.
-      className="group relative flex min-h-[52px] cursor-pointer items-stretch overflow-hidden rounded-[10px] border-[1.5px] border-border bg-card text-left transition-[border-color,box-shadow,background-color] duration-150 hover:border-muted-foreground/40 hover:shadow-[0_4px_12px_-6px_hsl(var(--foreground)/0.1)] data-[on=true]:border-primary data-[on=true]:shadow-[0_0_0_3px_hsl(var(--primary)/0.1),0_4px_12px_-6px_hsl(var(--primary)/0.2)] data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-55"
+      // `group` + `group-data-[on=true]:`-Varianten stylen Label und
+      // Checkmark aus dem Aktiv-Zustand des Buttons.
+      className="group relative flex min-h-[52px] cursor-pointer items-stretch overflow-hidden rounded-[calc(var(--radius)+2px)] border-[1.5px] border-border bg-card text-left transition-[border-color,box-shadow,background-color] duration-150 hover:border-muted-foreground/40 hover:shadow-[0_4px_12px_-6px_hsl(var(--foreground)/0.1)] data-[on=true]:border-primary data-[on=true]:shadow-[0_0_0_3px_hsl(var(--primary)/0.1),0_4px_12px_-6px_hsl(var(--primary)/0.2)] data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-55"
     >
       <span
         className="flex w-[50px] shrink-0 items-center justify-center border-r border-[hsl(var(--foreground)/0.06)]"

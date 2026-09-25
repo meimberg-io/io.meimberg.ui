@@ -21,7 +21,7 @@ export const Outline: Story = {
 export const WithDot: Story = {
   render: () => (
     <IconBadge className='text-primary bg-primary/15' leading={<IconBadgeDot />}>
-      Aktiv
+      Active
     </IconBadge>
   ),
 }
@@ -29,7 +29,7 @@ export const WithDot: Story = {
 export const Plain: Story = {
   render: () => (
     <IconBadge variant='plain' leading={<Icon icon={Sparkles} size='sm' />}>
-      Account-Name
+      Account name
     </IconBadge>
   ),
 }
@@ -37,7 +37,7 @@ export const Plain: Story = {
 export const Chip: Story = {
   render: () => (
     <IconBadge variant='chip' leading={<Icon icon={Sparkles} size='xs' />}>
-      Bucket
+      Project
     </IconBadge>
   ),
 }
@@ -50,7 +50,7 @@ export const ChipLink: Story = {
       leading={<Icon icon={Sparkles} size='xs' />}
       trailing={<Icon icon={ArrowUpRight} size='xs' className='opacity-60' />}
     >
-      Im Provider öffnen
+      Open in app
     </IconBadge>
   ),
 }
@@ -58,7 +58,7 @@ export const ChipLink: Story = {
 export const IconOnly: Story = {
   render: () => (
     <IconBadge variant='plain' iconOnly leading={<Icon icon={Sparkles} size='sm' />}>
-      Nur-Icon (Label als Tooltip)
+      Icon only (label as tooltip)
     </IconBadge>
   ),
 }

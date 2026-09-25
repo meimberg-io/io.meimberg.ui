@@ -12,21 +12,21 @@ describe('IconBadge', () => {
   it('hides label but keeps leading when iconOnly, exposing label as title', () => {
     render(
       <IconBadge iconOnly leading={<span data-testid='lead' />}>
-        Konto
+        Account
       </IconBadge>,
     )
     expect(screen.getByTestId('lead')).toBeInTheDocument()
-    expect(screen.queryByText('Konto')).not.toBeInTheDocument()
-    expect(screen.getByTitle('Konto')).toBeInTheDocument()
+    expect(screen.queryByText('Account')).not.toBeInTheDocument()
+    expect(screen.getByTitle('Account')).toBeInTheDocument()
   })
 
   it('renders as a link with target/rel when href is set', () => {
     render(
       <IconBadge variant='chip' href='https://example.com'>
-        Öffnen
+        Open
       </IconBadge>,
     )
-    const link = screen.getByRole('link', {name: 'Öffnen'})
+    const link = screen.getByRole('link', {name: 'Open'})
     expect(link).toHaveAttribute('href', 'https://example.com')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')

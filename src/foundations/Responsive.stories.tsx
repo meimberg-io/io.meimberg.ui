@@ -1,7 +1,6 @@
-// PUL-455 (Mobile-Standard, Welle 0): Foundations/Responsive — Breakpoints +
-// Tap-Target-Token als Cheatsheet. Quelle der Regeln: docs/frontend/guidelines.md
-// § Responsive / Mobile. Tailwind-Default-Breakpoints, Mobile = Basis, Desktop ab
-// `md:`, kleinste Zielbreite 360 px, kein Tablet-Tier.
+// Foundations/Responsive — breakpoints and the tap target token. Tailwind
+// default breakpoints, mobile is the base, desktop layout from `md:`,
+// smallest target width 360 px, no separate tablet tier.
 
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {PageHeader} from './_Swatch'
@@ -16,19 +15,19 @@ export default meta
 type Story = StoryObj
 
 interface Breakpoint {
-  /** Tailwind-Prefix (leer = Mobile-Basis). */
+  /** Tailwind prefix (empty = mobile base). */
   prefix: string
-  /** min-width in px (0 = Basis). */
+  /** min-width in px (0 = base). */
   px: number
   note: string
 }
 
 const BREAKPOINTS: Breakpoint[] = [
-  {prefix: '(Basis)', px: 0, note: 'Mobile-first — kein Prefix. Zielbreite ab 360 px.'},
-  {prefix: 'sm:', px: 640, note: 'Große Phones / kleine Tablets.'},
-  {prefix: 'md:', px: 768, note: 'Desktop-Layout greift ab hier (= useIsMobile-Grenze).'},
-  {prefix: 'lg:', px: 1024, note: 'Breiter Desktop.'},
-  {prefix: 'xl:', px: 1280, note: 'Sehr breite Viewports.'},
+  {prefix: '(base)', px: 0, note: 'Mobile first — no prefix. Target width from 360 px.'},
+  {prefix: 'sm:', px: 640, note: 'Large phones / small tablets.'},
+  {prefix: 'md:', px: 768, note: 'Desktop layout starts here (= useIsMobile threshold).'},
+  {prefix: 'lg:', px: 1024, note: 'Wide desktop.'},
+  {prefix: 'xl:', px: 1280, note: 'Very wide viewports.'},
 ]
 
 export const All: Story = {
@@ -36,7 +35,7 @@ export const All: Story = {
     <div style={{maxWidth: 900}}>
       <PageHeader
         title="Responsive / Mobile"
-        lead="Tailwind-Default-Breakpoints, ein Fluss von 360 px bis Desktop — kein eigenes Tablet-Tier. Mobile ist die Basis (kein Prefix), Desktop-Layout greift ab md:. Verbindliche Layout-Muster (Drawer-Nav, Tabellen→Cards, Dialog→Bottom-Sheet, Toolbar-Umbruch, Grid-Collapse) siehe guidelines.md § Responsive / Mobile."
+        lead="Tailwind default breakpoints, one flow from 360 px to desktop — no separate tablet tier. Mobile is the base (no prefix), the desktop layout starts at md:. Components follow the same patterns: drawer navigation, tables → cards (DataTable), dialogs → bottom sheets (FormDialog), wrapping toolbars, collapsing grids."
       />
 
       <h3 style={{fontSize: 13, fontWeight: 600, margin: '8px 0 12px'}}>Breakpoints</h3>
@@ -62,7 +61,7 @@ export const All: Story = {
         ))}
       </div>
 
-      <h3 style={{fontSize: 13, fontWeight: 600, margin: '32px 0 12px'}}>Tap-Target</h3>
+      <h3 style={{fontSize: 13, fontWeight: 600, margin: '32px 0 12px'}}>Tap target</h3>
       <div style={{display: 'flex', alignItems: 'center', gap: 24}}>
         <div
           style={{
@@ -83,20 +82,19 @@ export const All: Story = {
         </div>
         <div style={{fontSize: 13, color: 'hsl(var(--foreground))', lineHeight: '20px'}}>
           <code style={{fontFamily: 'monospace', fontSize: 12}}>--spacing-tap</code> = 44 px
-          (WCAG-Mindest-Trefferfläche). Erzeugt <code style={{fontFamily: 'monospace', fontSize: 12}}>min-h-tap</code> /{' '}
+          (WCAG minimum target size). Generates <code style={{fontFamily: 'monospace', fontSize: 12}}>min-h-tap</code> /{' '}
           <code style={{fontFamily: 'monospace', fontSize: 12}}>min-w-tap</code> /{' '}
-          <code style={{fontFamily: 'monospace', fontSize: 12}}>size-tap</code>. Verwendung NUR über die{' '}
-          <code style={{fontFamily: 'monospace', fontSize: 12}}>pointer-coarse:</code>-Variant — Touch hebt die
-          Trefferfläche an, Desktop-Dichte bleibt unverändert.
+          <code style={{fontFamily: 'monospace', fontSize: 12}}>size-tap</code>. Use it ONLY with the{' '}
+          <code style={{fontFamily: 'monospace', fontSize: 12}}>pointer-coarse:</code> variant — touch devices get the
+          larger target, desktop density stays unchanged.
         </div>
       </div>
 
       <div style={{marginTop: 40, padding: 16, background: 'hsl(var(--surface-2))', borderRadius: 8, fontSize: 13, lineHeight: '20px'}}>
-        <strong>Konvention:</strong> Fixe Breiten (<code style={{fontFamily: 'monospace', fontSize: 12}}>min-w-[…px]</code> /{' '}
+        <strong>Convention:</strong> fixed widths (<code style={{fontFamily: 'monospace', fontSize: 12}}>min-w-[…px]</code> /{' '}
         <code style={{fontFamily: 'monospace', fontSize: 12}}>w-[…px]</code> / inline <code style={{fontFamily: 'monospace', fontSize: 12}}>minWidth</code>)
-        an Layout-Stellen außerhalb der Atoms sind der häufigste Mobile-Bruch. Default ist flexible Breite
-        (<code style={{fontFamily: 'monospace', fontSize: 12}}>min-w-0</code> + flex/grid + truncate). Der Drift-Schutz-Lint
-        (PUL-461) flaggt Verstöße.
+        in layouts outside the atoms are the most common mobile breakage. Default to flexible widths
+        (<code style={{fontFamily: 'monospace', fontSize: 12}}>min-w-0</code> + flex/grid + truncate).
       </div>
     </div>
   ),

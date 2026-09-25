@@ -1,44 +1,61 @@
-// PUL-412 (G0): Geteilte Swatch-Komponente für Foundations/Colors. Nicht in
-// /components/atoms/, weil ausschließlich von Foundations-Stories konsumiert
-// und kein App-UI-Wert. Unterstrich-Präfix signalisiert „Internal zur
-// Foundations-Sektion".
+// Shared swatch helpers for the Foundations stories. Not a library component —
+// the underscore prefix marks it as internal to the Foundations section.
 
-import type {CSSProperties} from 'react'
+import {useSyncExternalStore, type CSSProperties, type ReactNode} from 'react'
+
+// Re-read token values when the theme class on <html> changes (dark mode).
+function subscribeToTheme(onChange: () => void): () => void {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, {attributes: true, attributeFilter: ['class', 'style']})
+  return () => observer.disconnect()
+}
+
+/** Current value of a CSS custom property on the document root. */
+function useTokenValue(token: string): string {
+  return useSyncExternalStore(
+    subscribeToTheme,
+    () => getComputedStyle(document.documentElement).getPropertyValue(token).trim(),
+    () => '',
+  )
+}
 
 export interface SwatchProps {
-  /** Tailwind-Klasse oder Inline-Style. Wird als Background gerendert. */
-  bg: string
-  /** Token-Name, z. B. `--p1`. */
+  /** Token name, e.g. `--primary`. Rendered as background and read live. */
   token: string
-  /** HSL-Komponenten, z. B. `0 78% 55%`. */
-  hsl: string
-  /** Kurze „wann nutzen?"-Beschreibung. */
+  /** Short "when to use" description. */
   purpose: string
-  /** Optional: Text-Token-Pendant (z. B. `--p1-fg`) für Kontrast-Preview. */
+  /** Optional matching text token (e.g. `--primary-foreground`) for a contrast preview. */
   fgToken?: string
-  /** Optional: Inline-Style-Override (für Token, die noch keine Tailwind-Klasse haben). */
+  /** Optional inline style override. */
   style?: CSSProperties
 }
 
-export function Swatch({bg, token, hsl, purpose, fgToken, style}: SwatchProps) {
+export function Swatch({token, purpose, fgToken, style}: SwatchProps) {
+  const value = useTokenValue(token)
   return (
     <div style={{display: 'flex', gap: 12, alignItems: 'flex-start'}}>
       <div
-        className={bg.startsWith('--') ? undefined : bg}
         style={{
           width: 64,
           height: 64,
           borderRadius: 8,
           border: '1px solid hsl(var(--border))',
           flexShrink: 0,
-          ...(bg.startsWith('--') ? {background: `hsl(var(${bg}))`} : null),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 600,
+          background: `hsl(var(${token}))`,
+          color: fgToken ? `hsl(var(${fgToken}))` : undefined,
           ...style,
         }}
-      />
+      >
+        {fgToken ? 'Aa' : null}
+      </div>
       <div style={{display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0}}>
         <div style={{fontFamily: 'monospace', fontSize: 13, fontWeight: 600}}>{token}</div>
         <div style={{fontFamily: 'monospace', fontSize: 11, color: 'hsl(var(--muted-foreground))'}}>
-          hsl({hsl})
+          {value ? `hsl(${value})` : '—'}
           {fgToken ? ` · fg: ${fgToken}` : ''}
         </div>
         <div style={{fontSize: 13, color: 'hsl(var(--foreground))'}}>{purpose}</div>
@@ -50,7 +67,7 @@ export function Swatch({bg, token, hsl, purpose, fgToken, style}: SwatchProps) {
 export interface SectionProps {
   title: string
   hint?: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function Section({title, hint, children}: SectionProps) {
@@ -69,7 +86,7 @@ export function Section({title, hint, children}: SectionProps) {
   )
 }
 
-export function PageHeader({title, lead}: {title: string; lead: string}) {
+export function PageHeader({title, lead}: {title: string; lead: ReactNode}) {
   return (
     <header style={{marginBottom: 32, maxWidth: 760}}>
       <h1 style={{fontSize: 24, fontWeight: 600, marginBottom: 8}}>{title}</h1>

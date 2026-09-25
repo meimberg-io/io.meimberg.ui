@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../lib/cn'
 
 const iconButtonVariants = cva(
-  // PUL-456: `pointer-coarse:min-h/w-tap` (44px) hebt die Trefferfläche NUR auf
+  // `pointer-coarse:min-h/w-tap` (44px) hebt die Trefferfläche NUR auf
   // Touch an (sm/default size-8 = 32px → 44px-Floor); Desktop bleibt kompakt.
   'inline-flex items-center justify-center rounded-md transition-colors cursor-pointer pointer-coarse:min-h-tap pointer-coarse:min-w-tap disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed shrink-0 outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {

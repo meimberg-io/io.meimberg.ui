@@ -1,43 +1,41 @@
 'use client'
 
-// PUL-352 · Shared Popover-Positionierung für die Form-Atoms (RichSelect,
-// TagTrigger). Berechnet absolute Viewport-Koordinaten + Auto-Flip aus den
-// Bounds des Triggers — damit funktionieren Popover auch innerhalb von
-// `overflow: hidden`-Containern (z. B. unserer FormDialog-Shell), weil sie
-// via Portal ans <body> gehen.
+// Shared popover positioning for custom form popovers (e.g. RichSelect).
+// Computes absolute viewport coordinates + auto-flip from the trigger bounds,
+// so popovers work inside `overflow: hidden` containers (e.g. the FormDialog
+// shell) because they are portalled to <body>.
 //
-// Vertrag:
-// - Konsument hängt `triggerRef` an den Trigger-Wrapper (das DIV mit data-
-//   open-Attribut).
-// - Konsument rendert das Popover via createPortal an document.body mit
-//   `position: fixed` + die hier zurückgegebenen `top`/`left`/`width` als
-//   Style. `width` wird vom Hook geliefert: entweder dynamisch =
-//   Trigger-Breite, oder fix in px.
-// - `direction` ist `'down' | 'up'` — Konsument darf optional eine Open-
-//   Animation (rs-open-down / rs-open-up) daran ankoppeln.
+// Contract:
+// - The consumer attaches `triggerRef` to the trigger wrapper (the element
+//   carrying the data-open attribute).
+// - The consumer renders the popover via createPortal into document.body
+//   with `position: fixed` and the returned `top`/`left`/`width` as style.
+//   `width` is either the trigger width or a fixed px value.
+// - `direction` is `'down' | 'up'` — consumers may hook an open animation
+//   onto it.
 
 import {useEffect, useRef, useState} from 'react'
 
 interface Options {
   open: boolean
-  /** `'trigger'` → Popover-Breite = Trigger-Breite (z. B. RichSelect).
-   *  Zahl → feste Breite in px (z. B. TagPicker = 280). */
+  /** `'trigger'` → popover width = trigger width.
+   *  Number → fixed width in px. */
   width: 'trigger' | number
-  /** Geschätzte Popover-Höhe für die Flip-Entscheidung. */
+  /** Estimated popover height for the flip decision. */
   estimatedHeight: number
-  /** Horizontale Ausrichtung wenn `width` fest ist:
-   *  - `'start'` → linke Trigger-Kante
-   *  - `'end'` → rechte Trigger-Kante (right-aligned) */
+  /** Horizontal alignment when `width` is fixed:
+   *  - `'start'` → left trigger edge
+   *  - `'end'` → right trigger edge (right-aligned) */
   align?: 'start' | 'end'
-  /** Sicherheits-Padding zum Viewport-Rand (default 24 px). */
+  /** Safety padding to the viewport edge (default 24 px). */
   safe?: number
 }
 
 export interface PopoverPosition {
-  /** Viewport-relativ (für `position: fixed`). */
+  /** Viewport-relative (for `position: fixed`). */
   top: number
   left: number
-  /** Effektive Popover-Breite. */
+  /** Effective popover width. */
   width: number
 }
 
@@ -75,11 +73,10 @@ export function usePopoverPosition({
       } else {
         left = rect.left
       }
-      // Viewport-Clamp: nicht über die linke / rechte Kante hinaus.
+      // Clamp to the viewport: never past the left / right edge.
       const clampedLeft = Math.max(safe, Math.min(window.innerWidth - w - safe, left))
-      // Identitäts-Check: setPosition mit identischen Werten würde sonst einen
-      // Re-Render auslösen → Playwright sieht das als „layout-shift" und
-      // wartet endlos auf Stabilität.
+      // Identity check: setting identical values would still re-render, which
+      // e2e tools see as a layout shift and wait forever for stability.
       setPosition(prev =>
         prev && prev.top === top && prev.left === clampedLeft && prev.width === w
           ? prev
@@ -88,13 +85,12 @@ export function usePopoverPosition({
       setDirection(prev => (prev === (flipUp ? 'up' : 'down') ? prev : flipUp ? 'up' : 'down'))
     }
     compute()
-    // Scroll capture=true → catchet auch Scroll-Events von inneren Containern
-    // (z. B. dem scrollbaren Modal-Body). Resize re-positioniert beim Layout-
-    // Wechsel (Window-Resize, Browser-Zoom, Mobile-Keyboard).
+    // Scroll with capture=true also catches scroll events of inner containers
+    // (e.g. a scrollable modal body). Resize repositions on layout changes
+    // (window resize, browser zoom, mobile keyboard).
     //
-    // Debounced via rAF damit identische Re-Renders nicht in einem Loop
-    // hängenbleiben — Playwright sieht „not stable" wenn `setPosition`
-    // synchron mit Layout-Events feuert, auch wenn Werte gleich sind.
+    // Debounced via rAF so identical re-renders don't loop — e2e tools report
+    // "not stable" when `setPosition` fires synchronously with layout events.
     let raf = 0
     const onScrollOrResize = () => {
       if (raf) cancelAnimationFrame(raf)

@@ -1,24 +1,22 @@
 'use client'
 
-// PUL-397 · Pulse-DatePicker — Single-Date-Picker via Popover + Calendar.
-// Ersetzt App-weit `<input type="date">` und Inline-Popover+Calendar-Aufbauten.
-// ESLint blockt neue `from '../ui/calendar'`-Imports außerhalb dieser
-// Datei (analog `from '../ui/select'` → Dropdown.tsx).
+// Single-Date-Picker via Popover + Calendar. Ersetzt `<input type="date">`.
+// ESLint blockt `from '../ui/calendar'`-Imports außerhalb dieser Datei
+// (analog `from '../ui/select'` → Dropdown.tsx).
 //
-// API-Entscheidungen (PUL-397 Plan):
-// - Value-Typ: `string | null` als ISO-Date (YYYY-MM-DD), kein `Date`-Objekt.
-//   Hintergrund: DB-Spalten (`due_at`, etc.) sind `date` (date-only, kein TZ),
-//   Server-Actions akzeptieren Strings. Drop-in für `<input type="date">`.
-// - Locale: `date-fns/locale/de` als Default. Override via `locale`-Prop.
+// API-Entscheidungen:
+// - Value-Typ: `string | null` als ISO-Date (YYYY-MM-DD), kein `Date`-Objekt —
+//   date-only ohne TZ-Probleme, drop-in für `<input type="date">`.
+// - Locale: Kalender aus `useDateLocale()`, Trigger-Text und Hints aus
+//   `useUiLocale()`. Override der Kalender-Locale via `locale`-Prop.
 // - Clear: optionaler X-Button im Trigger (`allowClear`).
-// - Quick-Actions: Todoist-Stil-Shortcut-Liste über dem Kalender (`showShortcuts`,
-//   Default an): Heute, Morgen, Nächstes Wochenende (Sa), Nächste Woche (Mo) und
-//   — bei `allowClear` — Kein Datum.
+// - Quick-Actions über dem Kalender (`showShortcuts`, Default an): Heute,
+//   Morgen, Nächstes Wochenende (Sa), Nächste Woche (Mo) und — bei
+//   `allowClear` — Kein Datum.
 
 import {useState} from 'react'
 import type {ReactNode} from 'react'
 import {format, parseISO, startOfToday, addDays, nextSaturday, nextMonday} from 'date-fns'
-import {de} from 'date-fns/locale'
 import type {Locale} from 'date-fns'
 import {CalendarDays, X, Sun, Armchair, CalendarClock, Ban} from '../atoms/icons'
 import type {LucideIcon} from '../atoms/icons'
@@ -27,19 +25,37 @@ import {Popover, PopoverContent, PopoverTrigger} from '../ui/popover'
 import {cn} from '../lib/cn'
 import {formatAbsoluteDate} from '../lib/datetime'
 import {useFormFieldId} from '../molecules/FormField'
+import {useDateLocale, useLabels, useUiLocale} from '../i18n/context'
 
 /**
- * Trigger-Größen-Variante (PUL-403-followup):
+ * Trigger-Größen-Variante:
  *   - `default`: 40 px (Form-Field-Standard), `w-full`, body-Font, 12 px Padding.
  *     Für klassische Form-Layouts mit Label oben + Feld drunter.
  *   - `sm`: 32 px (h-8), `w-auto`, text-sm, kompaktes Padding. Für
- *     Property-Bars in Editor-Surfaces (ActionItem-Detail-Dialog), wo der
- *     Picker neben `<Chip size='md'>` / `<OptionsDropdown size='chip'>` in
- *     einer Toolbar-Reihe sitzt. Geometrie ist auf diese Nachbar-Atoms
- *     abgestimmt (siehe Chip.tsx + FilterPillButton.tsx — beide nennen
- *     `size='sm' / h-8` als Pendant für Form-Trigger).
+ *     Property-Bars/Toolbars neben `<Chip size='md'>` / `<OptionsDropdown size='chip'>`
+ *     — Geometrie ist auf diese Nachbar-Atoms abgestimmt.
  */
 export type DatePickerSize = 'default' | 'sm'
+
+export interface DatePickerLabels {
+  placeholder: string
+  clear: string
+  today: string
+  tomorrow: string
+  nextWeekend: string
+  nextWeek: string
+  noDate: string
+}
+
+const defaultLabels: DatePickerLabels = {
+  placeholder: 'Pick a date…',
+  clear: 'Clear date',
+  today: 'Today',
+  tomorrow: 'Tomorrow',
+  nextWeekend: 'Next weekend',
+  nextWeek: 'Next week',
+  noDate: 'No date',
+}
 
 interface Props {
   /** YYYY-MM-DD oder null. Date-only — keine TZ-Probleme, drop-in für `<input type="date">`. */
@@ -53,17 +69,18 @@ interface Props {
   max?: string
   /** Default-Monat bei `value === null`. Default: heute. */
   defaultMonth?: Date
-  /** Override für die Calendar-Locale. Default: `de` aus `date-fns/locale`. */
+  /** Override für die Calendar-Locale. Default: `useDateLocale()`. */
   locale?: Locale
   /** X-Button im Trigger, der `onChange(null)` feuert. */
   allowClear?: boolean
-  /** Todoist-Stil-Quick-Actions über dem Kalender. Default `true`. */
+  /** Quick-Actions über dem Kalender. Default `true`. */
   showShortcuts?: boolean
   /** Trigger-Größe. Default `default` (40 px Form-Field). `sm` (32 px) für
    *  Property-Bars — Geometrie aligned zu Chip 'md' / OptionsDropdown 'chip'.
    *  Wer eine dritte Größe braucht: hier erweitern, **nicht** per className-
    *  Override. */
   size?: DatePickerSize
+  labels?: Partial<DatePickerLabels>
   className?: string
   'data-testid'?: string
 }
@@ -73,27 +90,32 @@ interface DateShortcut {
   icon: LucideIcon
   /** Zieldatum, oder `null` um den Wert zu leeren. */
   date: Date | null
-  /** Kurz-Hint rechts (z. B. "Sa. 6. Jun"). */
+  /** Kurz-Hint rechts (z. B. "Sat, Jun 6"). */
   hint?: string
 }
 
-/** Baut die Quick-Action-Shortcuts relativ zu heute (Todoist-Stil). */
-function buildShortcuts(today: Date, locale: Locale, allowClear: boolean): DateShortcut[] {
-  const weekday = (date: Date) => format(date, 'EEEEEE', {locale})
-  const dayMonth = (date: Date) => format(date, 'd. MMM', {locale})
+/** Baut die Quick-Action-Shortcuts relativ zu heute. */
+function buildShortcuts(
+  today: Date,
+  uiLocale: string,
+  labels: DatePickerLabels,
+  allowClear: boolean,
+): DateShortcut[] {
+  const weekday = new Intl.DateTimeFormat(uiLocale, {weekday: 'short'})
+  const weekdayDate = new Intl.DateTimeFormat(uiLocale, {weekday: 'short', day: 'numeric', month: 'short'})
 
   const tomorrow = addDays(today, 1)
   const weekend = nextSaturday(today)
   const nextWeek = nextMonday(today)
 
   const shortcuts: DateShortcut[] = [
-    {label: 'Heute', icon: CalendarDays, date: today, hint: `${weekday(today)}.`},
-    {label: 'Morgen', icon: Sun, date: tomorrow, hint: `${weekday(tomorrow)}.`},
-    {label: 'Nächstes Wochenende', icon: Armchair, date: weekend, hint: `${weekday(weekend)}. ${dayMonth(weekend)}`},
-    {label: 'Nächste Woche', icon: CalendarClock, date: nextWeek, hint: `${weekday(nextWeek)}. ${dayMonth(nextWeek)}`},
+    {label: labels.today, icon: CalendarDays, date: today, hint: weekday.format(today)},
+    {label: labels.tomorrow, icon: Sun, date: tomorrow, hint: weekday.format(tomorrow)},
+    {label: labels.nextWeekend, icon: Armchair, date: weekend, hint: weekdayDate.format(weekend)},
+    {label: labels.nextWeek, icon: CalendarClock, date: nextWeek, hint: weekdayDate.format(nextWeek)},
   ]
 
-  if (allowClear) shortcuts.push({label: 'Kein Datum', icon: Ban, date: null})
+  if (allowClear) shortcuts.push({label: labels.noDate, icon: Ban, date: null})
 
   return shortcuts
 }
@@ -110,26 +132,31 @@ function parseValue(value: string | null): Date | null {
 export function DatePicker({
   value,
   onChange,
-  placeholder = 'Datum wählen…',
+  placeholder,
   disabled,
   min,
   max,
   defaultMonth,
-  locale = de,
+  locale,
   allowClear,
   showShortcuts = true,
   size = 'default',
+  labels,
   className,
   'data-testid': testId,
 }: Props) {
   const contextId = useFormFieldId()
+  const l = useLabels('datePicker', defaultLabels, labels)
+  const uiLocale = useUiLocale()
+  const contextDateLocale = useDateLocale()
+  const calendarLocale = locale ?? contextDateLocale
   const [open, setOpen] = useState(false)
   const parsed = parseValue(value)
   const minDate = parseValue(min ?? null)
   const maxDate = parseValue(max ?? null)
   const month = parsed ?? defaultMonth ?? startOfToday()
 
-  const shortcuts = buildShortcuts(startOfToday(), locale, Boolean(allowClear))
+  const shortcuts = buildShortcuts(startOfToday(), uiLocale, l, Boolean(allowClear))
   const isShortcutDisabled = (date: Date) =>
     Boolean((minDate && date < minDate) || (maxDate && date > maxDate))
 
@@ -150,10 +177,8 @@ export function DatePicker({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      {/* PUL-397-followup: `focus-ring` ist die Tailwind-v4-Utility
-          für den vereinheitlichten Active-State-Cue (border-primary + Glow);
-          greift hier auf `[data-state="open"]` (Radix-Trigger). Der vorherige
-          `focus:ring-*` entfällt — der Glow ersetzt den Ring. */}
+      {/* `focus-ring` greift auch auf `[data-state="open"]` (Radix-Trigger)
+          und ersetzt den `focus:ring-*`. */}
       <PopoverTrigger
         id={contextId}
         type="button"
@@ -176,13 +201,13 @@ export function DatePicker({
           aria-hidden="true"
         />
         <span className={cn('flex-1 truncate', !parsed && 'text-muted-foreground')}>
-          {parsed ? formatAbsoluteDate(parsed, 'list') : placeholder}
+          {parsed ? formatAbsoluteDate(parsed, 'list', uiLocale) : (placeholder ?? l.placeholder)}
         </span>
         {allowClear && parsed && (
           <span
             role="button"
             tabIndex={-1}
-            aria-label="Datum löschen"
+            aria-label={l.clear}
             onClick={handleClear}
             className="text-muted-foreground hover:text-foreground shrink-0 inline-flex items-center justify-center"
           >
@@ -231,7 +256,7 @@ export function DatePicker({
           selected={parsed ?? undefined}
           defaultMonth={month}
           onSelect={handleSelect}
-          locale={locale}
+          locale={calendarLocale}
           disabled={(date: Date) => {
             if (minDate && date < minDate) return true
             if (maxDate && date > maxDate) return true

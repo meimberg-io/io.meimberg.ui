@@ -12,20 +12,20 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const fields: FilterField[] = [
-  {kind: 'search', key: 'q', placeholder: 'Suchen…'},
+  {kind: 'search', key: 'q', placeholder: 'Search…'},
   {
     kind: 'select',
     key: 'status',
     label: 'Status',
     options: [
-      {value: 'open', label: 'Offen'},
-      {value: 'done', label: 'Erledigt'},
+      {value: 'open', label: 'Open'},
+      {value: 'done', label: 'Done'},
     ],
   },
   {
     kind: 'chipsMulti',
     key: 'prio',
-    label: 'Prio',
+    label: 'Priority',
     options: [
       {value: 'p1', label: 'P1'},
       {value: 'p2', label: 'P2'},
@@ -36,11 +36,11 @@ const fields: FilterField[] = [
     kind: 'segmented',
     key: 'due',
     options: [
-      {value: 'overdue', label: 'Überfällig'},
-      {value: 'today', label: 'Heute'},
+      {value: 'overdue', label: 'Overdue'},
+      {value: 'today', label: 'Today'},
     ],
   },
-  {kind: 'toggle', key: 'mine', label: 'Nur meine'},
+  {kind: 'toggle', key: 'mine', label: 'Only mine'},
 ]
 
 export const Default: Story = {
@@ -58,19 +58,19 @@ export const WithCustomField: Story = {
     function Demo() {
       const [value, setValue] = useState<FilterBarValue>({})
       const withCustom: FilterField[] = [
-        {kind: 'search', key: 'q', placeholder: 'Suchen…'},
+        {kind: 'search', key: 'q', placeholder: 'Search…'},
         {
           kind: 'custom',
-          key: 'ctx',
+          key: 'team',
           render: (v, set) => (
             <select
               value={typeof v === 'string' ? v : ''}
               onChange={e => set(e.target.value || null)}
               className="h-8 rounded-md border border-border bg-card px-2 body"
             >
-              <option value="">Alle Kontexte</option>
-              <option value="a">Kontext A</option>
-              <option value="b">Kontext B</option>
+              <option value="">All teams</option>
+              <option value="a">Team A</option>
+              <option value="b">Team B</option>
             </select>
           ),
         },

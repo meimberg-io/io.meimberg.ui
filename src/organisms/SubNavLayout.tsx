@@ -1,23 +1,23 @@
 'use client'
 
-// PUL-464 (S2): SubNavLayout — Zwei-Ebenen-Sub-Navigation (z. B. Settings).
+// Two-level sub-navigation (e.g. settings).
 //
-// Desktop (`>= md`): schmale Nav-Sidebar links + Content rechts. Mobile
-// (`< md`): die Sidebar weicht einem <SelectField>, das zur Sub-Page navigiert.
-// Genau eine Nav ist je Breakpoint sichtbar. Config-getrieben + framework-
-// agnostisch: `currentPath` als Prop, Desktop-Links über `linkComponent`-Slot,
-// Mobile-Navigation über `onNavigate(href)` (Consumer reicht z. B. Next
-// `router.push` rein). Kein Page-Padding — der Consumer wrappt (z. B. in
-// <PageContainer>).
+// Desktop (`>= md`): narrow nav sidebar left + content right. Mobile
+// (`< md`): the sidebar gives way to a <SelectField> that navigates to the
+// sub-page. Exactly one nav is visible per breakpoint. Framework-agnostic:
+// `currentPath` as prop, desktop links via the `linkComponent` slot, mobile
+// navigation via `onNavigate(href)` (e.g. Next `router.push`). No page
+// padding — the consumer wraps it (e.g. in <PageContainer>).
 
 import type {ComponentType, ReactNode} from 'react'
 import {SelectField} from '../atoms/SelectField'
+import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
 
 export interface SubNavItem {
   label: string
   href: string
-  /** Vorgerendertes Icon (nur Desktop-Sidebar; das Mobile-Select ist Text-only). */
+  /** Pre-rendered icon (desktop sidebar only; the mobile select is text-only). */
   icon?: ReactNode
 }
 
@@ -28,17 +28,32 @@ export type SubNavLinkComponent = ComponentType<{
   children: ReactNode
 }>
 
+export interface SubNavLayoutLabels {
+  /** aria-label of the nav landmark. */
+  navigation: string
+  /** Placeholder of the mobile select. */
+  mobilePlaceholder: string
+}
+
+const defaultLabels: SubNavLayoutLabels = {
+  navigation: 'Section navigation',
+  mobilePlaceholder: 'Select a section',
+}
+
 export interface SubNavLayoutProps {
   items: SubNavItem[]
   currentPath: string
   children: ReactNode
   linkComponent?: SubNavLinkComponent
-  /** Mobile-Select-Navigation (z. B. `href => router.push(href)`). */
+  /** Mobile select navigation (e.g. `href => router.push(href)`). */
   onNavigate?: (href: string) => void
   isActive?: (href: string, currentPath: string) => boolean
+  /** Takes precedence over `labels.navigation`. */
   ariaLabel?: string
+  /** Takes precedence over `labels.mobilePlaceholder`. */
   mobilePlaceholder?: string
   className?: string
+  labels?: Partial<SubNavLayoutLabels>
 }
 
 const DefaultLink: SubNavLinkComponent = ({href, children, ...rest}) => (
@@ -58,10 +73,12 @@ export function SubNavLayout({
   linkComponent: Link = DefaultLink,
   onNavigate,
   isActive = defaultIsActive,
-  ariaLabel = 'Sub-Navigation',
+  ariaLabel,
   mobilePlaceholder,
   className,
+  labels,
 }: SubNavLayoutProps) {
+  const l = useLabels('subNavLayout', defaultLabels, labels)
   const active = items.find(item => isActive(item.href, currentPath))
 
   return (
@@ -70,12 +87,12 @@ export function SubNavLayout({
         <SelectField
           value={active?.href ?? null}
           onChange={href => onNavigate?.(href)}
-          placeholder={mobilePlaceholder}
+          placeholder={mobilePlaceholder ?? l.mobilePlaceholder}
           options={items.map(item => ({value: item.href, label: item.label}))}
         />
       </div>
 
-      <nav aria-label={ariaLabel} className="hidden md:block w-56 shrink-0">
+      <nav aria-label={ariaLabel ?? l.navigation} className="hidden md:block w-56 shrink-0">
         <ul className="flex flex-col gap-0.5">
           {items.map(item => {
             const isCurrent = isActive(item.href, currentPath)

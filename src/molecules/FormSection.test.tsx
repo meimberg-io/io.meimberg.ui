@@ -5,12 +5,12 @@ import {FormSection} from './FormSection'
 describe('FormSection', () => {
   it('renders title in dlg-section header and the body', () => {
     const {container} = render(
-      <FormSection title="Provider">
+      <FormSection title="General">
         <div data-testid="body">hi</div>
       </FormSection>,
     )
     const header = container.querySelector('.dlg-section')
-    expect(header?.textContent).toContain('Provider')
+    expect(header?.textContent).toContain('General')
     expect(screen.getByTestId('body')).toBeInTheDocument()
   })
 

@@ -43,4 +43,15 @@ describe('IconUploadCropDialog', () => {
     expect(input?.getAttribute('accept')).toContain('image/webp')
     expect(input?.getAttribute('accept')).toContain('image/svg+xml')
   })
+
+  it('opens the crop dialog after a raster file is picked, with overridable labels', async () => {
+    const {container, user} = renderWithProviders(
+      <IconUploadCropDialog open onOpenChange={vi.fn()} onSubmit={vi.fn()} labels={{title: 'Pick avatar'}} />,
+    )
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement
+    await user.upload(input, new File(['x'], 'a.png', {type: 'image/png'}))
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText('Pick avatar')).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument()
+  })
 })

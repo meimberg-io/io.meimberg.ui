@@ -14,6 +14,11 @@ describe('SearchInput', () => {
     expect(screen.getByPlaceholderText('Find…')).toBeInTheDocument()
   })
 
+  it('overrides labels via the labels prop', () => {
+    renderWithProviders(<SearchInput value='x' onChange={vi.fn()} labels={{clear: 'Reset'}} />)
+    expect(screen.getByRole('button', {name: 'Reset'})).toBeInTheDocument()
+  })
+
   it('calls onChange immediately when debounceMs is 0', async () => {
     const onChange = vi.fn()
     const {user} = renderWithProviders(<SearchInput value='' onChange={onChange} />)
@@ -34,15 +39,15 @@ describe('SearchInput', () => {
 
   it('shows the clear button only when there is text', () => {
     const {rerender} = renderWithProviders(<SearchInput value='' onChange={vi.fn()} />)
-    expect(screen.queryByRole('button', {name: /Suche leeren/})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: /Clear search/})).not.toBeInTheDocument()
     rerender(<SearchInput value='hello' onChange={vi.fn()} />)
-    expect(screen.getByRole('button', {name: /Suche leeren/})).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: /Clear search/})).toBeInTheDocument()
   })
 
   it('clears the input when the clear button is clicked', async () => {
     const onChange = vi.fn()
     const {user} = renderWithProviders(<SearchInput value='hello' onChange={onChange} />)
-    await user.click(screen.getByRole('button', {name: /Suche leeren/}))
+    await user.click(screen.getByRole('button', {name: /Clear search/}))
     expect(onChange).toHaveBeenCalledWith('')
   })
 })

@@ -17,9 +17,9 @@ interface AccountItem extends RichSelectItem {
 }
 
 const ACCOUNTS: ReadonlyArray<AccountItem> = [
-  {id: 'jira-mb', label: 'meimberg.atlassian.net', sub: 'Jira', icon: Cloud},
-  {id: 'linear-mb', label: 'meimbergio', sub: 'Linear', icon: Zap},
-  {id: 'notion-mb', label: 'meimberg-workspace', sub: 'Notion', icon: FileText},
+  {id: 'cloud', label: 'acme.example.com', sub: 'Cloud workspace', icon: Cloud},
+  {id: 'automation', label: 'acme-automation', sub: 'Automation', icon: Zap},
+  {id: 'docs', label: 'acme-docs', sub: 'Documents', icon: FileText},
 ]
 
 const SHORT: ReadonlyArray<RichSelectItem> = [
@@ -88,7 +88,7 @@ export const WithSubText: Story = {
 export const NoOptions: Story = {
   render: () => (
     <div style={{width: 320}}>
-      <RichSelect items={[]} selected={null} onSelect={() => {}} placeholder="Keine Accounts" />
+      <RichSelect items={[]} selected={null} onSelect={() => {}} placeholder="No accounts" />
     </div>
   ),
 }
@@ -98,7 +98,7 @@ export const DisabledItem: Story = {
     function Demo() {
       const items: ReadonlyArray<RichSelectItem> = [
         {id: 'a', label: 'Option A'},
-        {id: 'b', label: 'Option B (in Vorbereitung)', disabled: true},
+        {id: 'b', label: 'Option B (coming soon)', disabled: true},
         {id: 'c', label: 'Option C'},
       ]
       const [selected, setSelected] = useState<RichSelectItem | null>(items[0])
@@ -112,26 +112,26 @@ export const DisabledItem: Story = {
   },
 }
 
-// PUL-397: Searchable-Modus — Suchfeld am Top des Popovers. Default-Filter
+// Searchable-Modus — Suchfeld am Top des Popovers. Default-Filter
 // macht Substring-Match auf `label + sub`.
 export const Searchable: Story = {
   render: () => {
     function SearchDemo() {
       const items: ReadonlyArray<RichSelectItem> = [
+        'Amsterdam',
         'Berlin',
-        'Hamburg',
-        'München',
-        'Köln',
-        'Frankfurt am Main',
-        'Stuttgart',
-        'Düsseldorf',
-        'Leipzig',
-        'Dortmund',
-        'Essen',
-        'Bremen',
-        'Dresden',
-        'Hannover',
-        'Nürnberg',
+        'Chicago',
+        'Dublin',
+        'Lisbon',
+        'London',
+        'Madrid',
+        'New York',
+        'Paris',
+        'Rome',
+        'San Francisco',
+        'Singapore',
+        'Tokyo',
+        'Vienna',
       ].map(city => ({id: city, label: city}))
       const [selected, setSelected] = useState<RichSelectItem | null>(null)
       return (
@@ -141,8 +141,8 @@ export const Searchable: Story = {
             selected={selected}
             onSelect={setSelected}
             searchable
-            searchPlaceholder="Stadt suchen…"
-            placeholder="Stadt wählen…"
+            searchPlaceholder="Search cities…"
+            placeholder="Select a city…"
           />
         </div>
       )
@@ -171,7 +171,7 @@ export const SearchableWithSubText: Story = {
             selected={selected}
             onSelect={setSelected}
             searchable
-            searchPlaceholder="Zeitzone suchen…"
+            searchPlaceholder="Search time zones…"
             estimatedHeight={400}
           />
         </div>

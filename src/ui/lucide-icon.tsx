@@ -1,14 +1,11 @@
 'use client'
 
-// PUL-390: Per-Icon lazy-loaded Lucide-Renderer.
+// Per-Icon lazy-loaded Lucide-Renderer.
 //
-// Vorgänger: `LucideIcon` lebte in `icon-picker.tsx` und nutzte das eager-
-// importierte `icons`-Registry-Objekt aus `lucide-react`. Damit landete der
-// gesamte Iconsatz (~1351 Komponenten, ~135 kB gzip) in jedem Route-Bundle,
-// das `LucideIcon` aufrief — auch wenn die Route nie den Picker öffnete.
-//
-// Diese Version nutzt `lucide-react/dynamicIconImports` (per-Icon-Code-Split):
-// die Karte selbst ist ~11 kB gzip, das tatsächliche Icon-SVG wird erst beim
+// Das eager importierte `icons`-Registry-Objekt aus `lucide-react` würde den
+// gesamten Iconsatz (~135 kB gzip) in jedes Bundle ziehen, das ein einzelnes
+// Icon per Name rendert. Diese Version nutzt `lucide-react/dynamicIconImports`
+// (per-Icon-Code-Split): die Karte selbst ist ~11 kB gzip, das tatsächliche Icon-SVG wird erst beim
 // Render in einem eigenen Mini-Chunk nachgeladen. React 19's `use(promise)`
 // rendert in der Suspense-Phase einen Platzhalter in passender Größe; der
 // Promise-Cache stellt sicher, dass derselbe Icon-Name nicht erneut

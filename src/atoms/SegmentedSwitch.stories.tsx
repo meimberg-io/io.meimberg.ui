@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
 import {SegmentedSwitch, type SegmentedOption} from './SegmentedSwitch'
-import {Inbox, CheckSquare, Sparkles} from '../atoms/icons'
+import {FileText, CheckSquare, Sparkles} from '../atoms/icons'
 
 const meta: Meta<typeof SegmentedSwitch> = {
   title: 'Atoms/SegmentedSwitch',
@@ -12,32 +12,32 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-type BucketType = 'inbox' | 'task'
-const BUCKET_TYPE_OPTIONS: ReadonlyArray<SegmentedOption<BucketType>> = [
-  {value: 'inbox', label: 'Inbox', icon: <Inbox width={13} height={13} />},
+type ItemType = 'document' | 'task'
+const ITEM_TYPE_OPTIONS: ReadonlyArray<SegmentedOption<ItemType>> = [
+  {value: 'document', label: 'Document', icon: <FileText width={13} height={13} />},
   {value: 'task', label: 'Task', icon: <CheckSquare width={13} height={13} />},
 ]
 
 type Priority = 'low' | 'medium' | 'high'
 const PRIORITY_OPTIONS: ReadonlyArray<SegmentedOption<Priority>> = [
-  {value: 'low', label: 'Niedrig'},
-  {value: 'medium', label: 'Mittel'},
-  {value: 'high', label: 'Hoch'},
+  {value: 'low', label: 'Low'},
+  {value: 'medium', label: 'Medium'},
+  {value: 'high', label: 'High'},
 ]
 
 type Stage = 'idea' | 'plan' | 'do' | 'review'
 const STAGE_OPTIONS: ReadonlyArray<SegmentedOption<Stage>> = [
-  {value: 'idea', label: 'Idee', icon: <Sparkles width={13} height={13} />},
+  {value: 'idea', label: 'Idea', icon: <Sparkles width={13} height={13} />},
   {value: 'plan', label: 'Plan'},
   {value: 'do', label: 'Do'},
   {value: 'review', label: 'Review'},
 ]
 
 function TwoOptionsDemo() {
-  const [value, setValue] = useState<BucketType>('inbox')
+  const [value, setValue] = useState<ItemType>('document')
   return (
     <div style={{width: 220}}>
-      <SegmentedSwitch value={value} options={BUCKET_TYPE_OPTIONS} onChange={setValue} />
+      <SegmentedSwitch value={value} options={ITEM_TYPE_OPTIONS} onChange={setValue} />
     </div>
   )
 }
@@ -76,8 +76,8 @@ export const Disabled: Story = {
   render: () => (
     <div style={{width: 220}}>
       <SegmentedSwitch
-        value="inbox"
-        options={BUCKET_TYPE_OPTIONS}
+        value="document"
+        options={ITEM_TYPE_OPTIONS}
         onChange={() => {}}
         disabled
       />

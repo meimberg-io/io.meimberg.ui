@@ -1,10 +1,9 @@
 'use client'
 
 // DetailField — Definition-Zeile für Detail-Dialoge: feste Label-Spalte +
-// Wert-Slot. Ersetzt das bisher je Detail-Dialog einkopierte lokale `FieldRow`
-// (AccountDetailDialog, RoutingTargetDetailDialog). Read-Display-Pendant zu
-// `FormField` (das die editierbaren Form-Inputs mit Label/Hint/Error trägt).
-// Der Wert-Slot ist bewusst frei: Text, Badge, Select oder Fehler-Block.
+// Wert-Slot. Read-Display-Pendant zu `FormField` (das die editierbaren
+// Form-Inputs mit Label/Hint/Error trägt). Der Wert-Slot ist bewusst frei:
+// Text, Badge, Select oder Fehler-Block.
 
 import type {ReactNode} from 'react'
 import {cn} from '../lib/cn'

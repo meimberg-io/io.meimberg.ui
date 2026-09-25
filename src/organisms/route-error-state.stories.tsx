@@ -10,7 +10,7 @@ export default meta
 
 type Story = StoryObj<typeof RouteErrorState>
 
-const baseError = Object.assign(new Error('Failed to fetch /api/contexts/123/kpi'), {
+const baseError = Object.assign(new Error('Failed to fetch /api/projects/123/stats'), {
   digest: 'a1b2c3d4',
 })
 
@@ -28,12 +28,12 @@ export const WithoutDigest: Story = {
 export const LongStack: Story = {
   args: {
     error: (() => {
-      const e = new Error('Hydration mismatch in /todo')
+      const e = new Error('Hydration mismatch in /tasks')
       e.stack = [
-        'Error: Hydration mismatch in /todo',
+        'Error: Hydration mismatch in /tasks',
         '  at Suspense (react-dom/server.browser.js:1234)',
-        '  at TodoPage (app/(app)/todo/page.tsx:42)',
-        '  at AppShell (app/(app)/layout.tsx:18)',
+        '  at TasksPage (app/tasks/page.tsx:42)',
+        '  at AppShell (app/layout.tsx:18)',
       ].join('\n')
       return Object.assign(e, {digest: 'h1m2'})
     })(),

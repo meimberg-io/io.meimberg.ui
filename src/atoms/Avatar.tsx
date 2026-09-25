@@ -1,6 +1,6 @@
-// PUL-462 (Schritt 7): Avatar — generischer Bild-oder-Initialen-Avatar mit
-// deterministischer Hash-Hintergrundfarbe. Kern von OrgIcon (Domain-Wrapper
-// bleibt in app/ und leitet Initialen aus dem Org-Label ab).
+// Avatar — generischer Bild-oder-Initialen-Avatar mit deterministischer
+// Hash-Hintergrundfarbe. Domain-Wrapper leiten die Initialen z. B. aus einem
+// Org- oder User-Namen ab.
 
 import {cn} from '../lib/cn'
 

@@ -5,6 +5,25 @@ import {cn} from '../lib/cn'
 import {IconButton} from '../ui/icon-button'
 import {TextField} from './TextField'
 import {SaveIcon, CancelIcon, EditIcon} from '../ui/action-icons'
+import {useLabels} from '../i18n/context'
+
+export interface EditableInlineHeadingLabels {
+  save: string
+  /** Tooltip des Save-Buttons (mit Tastenkürzel). */
+  saveHint: string
+  cancel: string
+  /** Tooltip des Cancel-Buttons (mit Tastenkürzel). */
+  cancelHint: string
+  edit: string
+}
+
+const defaultLabels: EditableInlineHeadingLabels = {
+  save: 'Save',
+  saveHint: 'Save (Enter)',
+  cancel: 'Cancel',
+  cancelHint: 'Cancel (Esc)',
+  edit: 'Edit title',
+}
 
 const SIZE_CLASSES = {
   'heading-2': 'heading-2 font-semibold',
@@ -25,19 +44,18 @@ export interface EditableInlineHeadingProps {
   multiline?: boolean
   /** Extra-Buttons im Display-Mode rechts neben dem Edit-Trigger (z. B. Reset). */
   displayActions?: ReactNode
+  labels?: Partial<EditableInlineHeadingLabels>
 }
 
 /**
- * Pulse-EditableInlineHeading — präsentationsloser Inline-Title-Editor:
+ * EditableInlineHeading — präsentationsloser Inline-Title-Editor:
  * Display-Mode (Wert + Edit-Trigger + optionale `displayActions`) → Edit-Mode
  * (`<input>`/`<textarea>` mit expliziten Save/Cancel-Buttons). In den Edit-Mode
  * führt sowohl ein Klick auf den Titel selbst als auch das Stift-Icon. Enter
  * speichert, Escape verwirft, Fokus-Verlust speichert ebenfalls, Auto-Focus
  * beim Einstieg.
  *
- * Bündelt die zwei divergent gebauten Inline-Title-Editoren (PUL-414 § G2a-B5,
- * Inbox + Signal). **Domain-frei** — Persistenz/Override-Logik bleibt im
- * Call-Site (Feature-Wrapper).
+ * **Domain-frei** — Persistenz/Override-Logik bleibt im Call-Site.
  *
  * @example
  *   <EditableInlineHeading value={title} onSave={persist} />
@@ -50,7 +68,9 @@ export function EditableInlineHeading({
   size = 'heading-2',
   multiline = false,
   displayActions,
+  labels,
 }: EditableInlineHeadingProps) {
+  const l = useLabels('editableInlineHeading', defaultLabels, labels)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(value)
 
@@ -110,10 +130,10 @@ export function EditableInlineHeading({
             className={fieldClass}
           />
         )}
-        <IconButton variant="success" size="sm" onClick={save} aria-label="Speichern" title="Speichern (Enter)">
+        <IconButton variant="success" size="sm" onClick={save} aria-label={l.save} title={l.saveHint}>
           <SaveIcon aria-hidden="true" />
         </IconButton>
-        <IconButton variant="destructive" size="sm" onClick={cancel} aria-label="Abbrechen" title="Abbrechen (Esc)">
+        <IconButton variant="destructive" size="sm" onClick={cancel} aria-label={l.cancel} title={l.cancelHint}>
           <CancelIcon aria-hidden="true" />
         </IconButton>
       </span>
@@ -124,11 +144,11 @@ export function EditableInlineHeading({
     <span className="inline-flex items-center gap-1.5">
       {/* Der Titel selbst ist der primäre Edit-Trigger; das Stift-Icon bleibt als
           sichtbare Affordanz daneben. Accessible Name des Text-Buttons ist der
-          Titel — so liest ein Screenreader „Titel bearbeiten" nicht doppelt. */}
+          Titel — so liest ein Screenreader das Edit-Label nicht doppelt. */}
       <button
         type="button"
         onClick={startEdit}
-        title="Titel bearbeiten"
+        title={l.edit}
         className={cn(
           SIZE_CLASSES[size],
           '-mx-1 cursor-text rounded-sm px-1 text-left transition-colors hover:bg-muted/60',
@@ -136,7 +156,7 @@ export function EditableInlineHeading({
       >
         {value || placeholder}
       </button>
-      <IconButton variant="muted" size="sm" onClick={startEdit} aria-label="Titel bearbeiten" title="Titel bearbeiten">
+      <IconButton variant="muted" size="sm" onClick={startEdit} aria-label={l.edit} title={l.edit}>
         <EditIcon aria-hidden="true" />
       </IconButton>
       {displayActions}

@@ -1,20 +1,30 @@
+'use client'
+
 import { cn } from '../lib/cn'
 import { Sparkles } from 'lucide-react'
+import { useLabels } from '../i18n/context'
+
+export interface ComingSoonCardLabels {
+  /** Default body text and accessible name without a title. */
+  comingSoon: string
+  /** Accessible name when a `title` is given. */
+  titledStatus: (title: string) => string
+}
+
+const defaultLabels: ComingSoonCardLabels = {
+  comingSoon: 'Coming soon',
+  titledStatus: title => `"${title}" is coming soon`,
+}
 
 interface ComingSoonProps {
-  /**
-   * Identifier des Dashlets — wird per Lint-Regel ausgewertet, sobald die
-   * echte Komponente verfügbar ist (R-01-Drift-Schutz, siehe
-   * docs/frontend/redesign-analysis.md § 7 R-01).
-   */
-  dashlet: string
-  /** Optional: kurze Headline statt des Dashlet-Slug. */
+  /** Optional: short headline naming the upcoming feature. */
   title?: string
-  /** Optional: Begleittext unter der Headline. */
+  /** Optional: body text below the headline. Default `labels.comingSoon`. */
   description?: string
-  /** Optional: Höhe der leeren Datenfläche; default `md`. */
+  /** Optional: height of the empty area; default `md`. */
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  labels?: Partial<ComingSoonCardLabels>
 }
 
 const heightMap = {
@@ -24,26 +34,21 @@ const heightMap = {
 }
 
 /**
- * Platzhalter-Hülle für noch nicht implementierte Redesign-Dashlets.
- * Sieht zum Endzustand passend aus (Card-Hülle, Surface, Border), zeigt
- * aber nur einen dezenten Hinweis. Wird durch das jeweilige F-Ticket
- * ersetzt, sobald die echte Komponente da ist.
- *
- * Quelle: docs/frontend/redesign-analysis.md § 5a.5.
+ * Placeholder card for a feature that is not available yet. Matches the final
+ * card look (surface, dashed border) but only shows a subtle hint.
  */
 export function ComingSoon({
-  dashlet,
   title,
   description,
   size = 'md',
   className,
+  labels,
 }: ComingSoonProps) {
-  const displayTitle = title ?? humanize(dashlet)
+  const l = useLabels('comingSoonCard', defaultLabels, labels)
   return (
     <div
       role='status'
-      aria-label={`Dashlet "${displayTitle}" kommt später.`}
-      data-dashlet={dashlet}
+      aria-label={title ? l.titledStatus(title) : l.comingSoon}
       className={cn(
         'flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-card/40 p-6 text-center',
         heightMap[size],
@@ -51,18 +56,10 @@ export function ComingSoon({
       )}
     >
       <Sparkles className='size-5 text-muted-foreground' aria-hidden />
-      <div className='caption font-medium text-muted-foreground'>{displayTitle}</div>
+      {title && <div className='caption font-medium text-muted-foreground'>{title}</div>}
       <div className='caption text-muted-foreground/80'>
-        {description ?? 'Kommt später.'}
+        {description ?? l.comingSoon}
       </div>
     </div>
   )
-}
-
-function humanize(slug: string): string {
-  return slug
-    .split(/[-_]/)
-    .filter(Boolean)
-    .map(p => p.charAt(0).toUpperCase() + p.slice(1))
-    .join(' ')
 }

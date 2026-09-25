@@ -3,7 +3,7 @@ import {describe, expect, it, vi} from 'vitest'
 import {WeightDots} from './WeightDots'
 
 describe('WeightDots atom', () => {
-  it('renders 5 dots as radio buttons', () => {
+  it('renders 5 dots by default as radio buttons', () => {
     const {getAllByRole} = render(<WeightDots value={3} />)
     expect(getAllByRole('radio')).toHaveLength(5)
   })
@@ -55,11 +55,31 @@ describe('WeightDots atom', () => {
     expect(getByRole('group').getAttribute('aria-label')).toContain('4')
   })
 
-  it('per-dot aria-labels are present', () => {
+  it('per-dot aria-labels use the English default label', () => {
     const {getAllByRole} = render(<WeightDots value={3} />)
     const dots = getAllByRole('radio')
-    expect(dots[0].getAttribute('aria-label')).toBe('Gewicht 1')
-    expect(dots[4].getAttribute('aria-label')).toBe('Gewicht 5')
+    expect(dots[0].getAttribute('aria-label')).toBe('Weight 1')
+    expect(dots[4].getAttribute('aria-label')).toBe('Weight 5')
+  })
+
+  it('overrides labels via the labels prop', () => {
+    const {getAllByRole, getByRole} = render(<WeightDots value={2} labels={{label: 'Priority'}} />)
+    expect(getAllByRole('radio')[0].getAttribute('aria-label')).toBe('Priority 1')
+    expect(getByRole('group').getAttribute('aria-label')).toBe('Priority 2 / 5')
+  })
+
+  it('renders `max` dots', () => {
+    const onChange = vi.fn()
+    const {getAllByRole} = render(<WeightDots value={2} max={10} onChange={onChange} />)
+    const dots = getAllByRole('radio')
+    expect(dots).toHaveLength(10)
+    fireEvent.click(dots[7])
+    expect(onChange).toHaveBeenCalledWith(8)
+  })
+
+  it('passes data-testid through', () => {
+    const {getByTestId} = render(<WeightDots value={1} data-testid="weight" />)
+    expect(getByTestId('weight')).toBeTruthy()
   })
 
   it('filled dots use bg-primary, empty dots use neutral border', () => {

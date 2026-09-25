@@ -11,51 +11,48 @@ export default meta
 
 type Story = StoryObj<typeof SectionCardHeader>
 
-// Isolierte Darstellung: nur die Header-Komponente, in einer reinen
-// Breiten-Box (damit der `action`-Slot sein `justify-between`-Layout zeigt).
-// Bewusst KEINE DashboardCard drumherum — das wäre eine andere Komponente.
-// Wie der Header in einer Karte sitzt, zeigt die DashboardCard-Story
-// „In context".
+// Header in isolation inside a fixed-width box (so the `action` slot shows its
+// `justify-between` layout). No DashboardCard around it on purpose — the
+// DashboardCard story "In context" shows the combination.
 const Frame = ({children}: {children: ReactNode}) => (
   <div style={{width: 480}}>{children}</div>
 )
 
-// Neutraler Platzhalter, der den Body unterhalb des Headers andeutet und so
-// den `mb-3`-Abstand der Komponente sichtbar macht.
+// Neutral placeholder below the header that makes the `mb-3` spacing visible.
 const PlaceholderBody = () => (
-  <p className="body-sm text-muted-foreground">Body-Content folgt unterhalb …</p>
+  <p className="body-sm text-muted-foreground">Body content follows below …</p>
 )
 
 export const TitleOnly: Story = {
   name: 'Title only',
   render: () => (
     <Frame>
-      <SectionCardHeader title="Aktuelle Tasks" />
+      <SectionCardHeader title="Current tasks" />
       <PlaceholderBody />
     </Frame>
   ),
 }
 
 export const WithSubtitle: Story = {
-  name: 'Title + Subtitle',
+  name: 'Title + subtitle',
   render: () => (
     <Frame>
-      <SectionCardHeader title="Aktuelle Tasks" subtitle="5 offene · 2 überfällig" />
+      <SectionCardHeader title="Current tasks" subtitle="5 open · 2 overdue" />
       <PlaceholderBody />
     </Frame>
   ),
 }
 
 export const WithAction: Story = {
-  name: 'Title + Subtitle + Action-Link',
+  name: 'Title + subtitle + action link',
   render: () => (
     <Frame>
       <SectionCardHeader
-        title="Aktuelle Tasks"
-        subtitle="5 offene · 2 überfällig"
+        title="Current tasks"
+        subtitle="5 open · 2 overdue"
         action={
           <a href="#" className="caption text-primary hover:underline">
-            Alle anzeigen →
+            View all →
           </a>
         }
       />
@@ -64,23 +61,22 @@ export const WithAction: Story = {
   ),
 }
 
-// ContextMissionsGrid-Variante: embedded Section ohne eigene Card,
-// kompakterer Title + Inline-Count + Action-Link.
+// Embedded section without its own card: compact title + inline count + action link.
 export const BaseSizeWithCount: Story = {
-  name: 'titleSize="base" + Inline-Count + Action',
+  name: 'titleSize="base" + inline count + action',
   render: () => (
     <Frame>
       <SectionCardHeader
         titleSize="base"
         title={
           <>
-            Missions{' '}
+            Projects{' '}
             <span className="caption text-muted-foreground tabular-nums">(12)</span>
           </>
         }
         action={
           <a href="#" className="caption text-primary hover:underline">
-            + Neue Mission
+            + New project
           </a>
         }
       />

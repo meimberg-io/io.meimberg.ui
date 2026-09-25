@@ -6,9 +6,9 @@ const meta: Meta<typeof KpiTile> = {
   title: 'Molecules/KpiTile',
   component: KpiTile,
   args: {
-    label: 'Erledigt diese Woche',
+    label: 'Completed this week',
     value: 23,
-    sublabel: 'von 31',
+    sublabel: 'of 31',
     sparklineValues: [3, 5, 2, 7, 4, 8, 6, 9],
     delta: {value: 4, direction: 'up', isPositive: true},
     tone: 'neutral',
@@ -34,9 +34,9 @@ export const Default: Story = {}
 
 export const WithIcon: Story = {
   args: {
-    label: 'Buckets',
+    label: 'Projects',
     value: 4,
-    sublabel: 'verknüpft',
+    sublabel: 'linked',
     icon: <Inbox width={12} height={12} />,
     sparklineValues: undefined,
     delta: undefined,
@@ -45,9 +45,9 @@ export const WithIcon: Story = {
 
 export const WithSparklineAndDelta: Story = {
   args: {
-    label: 'Aktiv',
+    label: 'Active',
     value: 17,
-    sublabel: 'laufend',
+    sublabel: 'running',
     sparklineValues: [2, 4, 3, 6, 5, 7, 8, 10],
     delta: {value: 3, direction: 'up', isPositive: true},
   },
@@ -60,7 +60,7 @@ export const ToneNeutral: Story = {
 export const ToneSuccess: Story = {
   args: {
     tone: 'success',
-    label: 'Erledigt',
+    label: 'Done',
     value: 42,
     delta: {value: 6, direction: 'up', isPositive: true},
   },
@@ -69,7 +69,7 @@ export const ToneSuccess: Story = {
 export const ToneWarn: Story = {
   args: {
     tone: 'warn',
-    label: 'Bald fällig',
+    label: 'Due soon',
     value: 9,
     delta: {value: 2, direction: 'up', isPositive: false},
   },
@@ -78,7 +78,7 @@ export const ToneWarn: Story = {
 export const ToneDanger: Story = {
   args: {
     tone: 'danger',
-    label: 'Überfällig',
+    label: 'Overdue',
     value: 5,
     delta: {value: 3, direction: 'up', isPositive: false},
   },
@@ -92,18 +92,18 @@ export const VariantEmphasis: Story = {
   args: {
     variant: 'emphasis',
     tone: 'success',
-    label: 'Aktiv',
+    label: 'Active',
     value: 17,
-    sublabel: 'laufend',
+    sublabel: 'running',
   },
 }
 
 export const VariantMuted: Story = {
   args: {
     variant: 'muted',
-    label: 'Erledigt',
+    label: 'Done',
     value: 12,
-    sublabel: 'Missions',
+    sublabel: 'projects',
     sparklineValues: [1, 2, 3, 4],
   },
 }
@@ -111,9 +111,9 @@ export const VariantMuted: Story = {
 export const HeroKpi: Story = {
   name: 'Combo: Icon + Sparkline + Delta + emphasis',
   args: {
-    label: 'Offene Tasks',
+    label: 'Open tasks',
     value: 23,
-    sublabel: 'offen',
+    sublabel: 'open',
     tone: 'warn',
     variant: 'emphasis',
     icon: <ListTodo width={12} height={12} />,
@@ -124,7 +124,7 @@ export const HeroKpi: Story = {
 
 export const Flat: Story = {
   args: {
-    label: 'Inbox',
+    label: 'Messages',
     value: 7,
     delta: {value: 0, direction: 'flat'},
   },
@@ -132,10 +132,20 @@ export const Flat: Story = {
 
 export const NoSparkline: Story = {
   args: {
-    label: 'Signals',
+    label: 'Alerts',
     value: 12,
     sparklineValues: [],
     icon: <Radio width={12} height={12} />,
     delta: undefined,
+  },
+}
+
+export const CustomComparison: Story = {
+  name: 'Custom comparison label',
+  args: {
+    label: 'Revenue',
+    value: '€12.4k',
+    delta: {value: 8, direction: 'up'},
+    labels: {comparison: 'vs. last month'},
   },
 }

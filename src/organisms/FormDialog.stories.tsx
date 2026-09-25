@@ -18,10 +18,10 @@ export default meta
 
 type Story = StoryObj<typeof FormDialog>
 
-type BucketType = 'inbox' | 'task'
-const BUCKET_TYPES: ReadonlyArray<SegmentedOption<BucketType>> = [
-  {value: 'inbox', label: 'Inbox'},
-  {value: 'task', label: 'Task'},
+type ProjectType = 'internal' | 'client'
+const PROJECT_TYPES: ReadonlyArray<SegmentedOption<ProjectType>> = [
+  {value: 'internal', label: 'Internal'},
+  {value: 'client', label: 'Client'},
 ]
 
 function Trigger({label, onClick}: {label: string; onClick: () => void}) {
@@ -46,36 +46,36 @@ function SimpleDialog({
   footerInfo?: string
 }) {
   const [open, setOpen] = useState(true)
-  const [name, setName] = useState('Pulse-Backlog')
-  const [type, setType] = useState<BucketType>('inbox')
+  const [name, setName] = useState('Website relaunch')
+  const [type, setType] = useState<ProjectType>('internal')
   return (
     <>
-      <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+      <Trigger label="Open dialog" onClick={() => setOpen(true)} />
       <FormDialog
         open={open}
         onOpenChange={setOpen}
-        caption="Neuen Bucket anlegen"
-        title="Bucket konfigurieren"
-        submitLabel={viewOnly ? undefined : 'Bucket anlegen'}
+        caption="New project"
+        title="Configure project"
+        submitLabel={viewOnly ? undefined : 'Create project'}
         submitVariant={submitVariant}
         submitPending={submitPending}
         submitDisabled={submitDisabled}
         footerInfo={footerInfo}
         onSubmit={() => setOpen(false)}
       >
-        <FormSection title="Stammdaten">
+        <FormSection title="Basics">
           <FormField label="Name" required>
             <TextField value={name} onChange={e => setName(e.target.value)} />
           </FormField>
           <FormRow cols={2}>
-            <FormField label="Bucket-Typ">
-              <SegmentedSwitch value={type} options={BUCKET_TYPES} onChange={setType} />
+            <FormField label="Type">
+              <SegmentedSwitch value={type} options={PROJECT_TYPES} onChange={setType} />
             </FormField>
-            <FormField label="Short-Label" hint="(optional)">
-              <TextField placeholder="PUL" />
+            <FormField label="Short code" hint="(optional)">
+              <TextField placeholder="WEB" />
             </FormField>
           </FormRow>
-          <FormHelpText>Items werden auf INBOX eingeschränkt.</FormHelpText>
+          <FormHelpText>Internal projects are only visible to your team.</FormHelpText>
         </FormSection>
       </FormDialog>
     </>
@@ -83,11 +83,11 @@ function SimpleDialog({
 }
 
 export const Default: Story = {
-  render: () => <SimpleDialog footerInfo="Erster Sync direkt nach Anlegen" />,
+  render: () => <SimpleDialog footerInfo="Members are notified after creation" />,
 }
 
 export const SuccessVariant: Story = {
-  render: () => <SimpleDialog submitVariant="success" footerInfo="Wird sofort live" />,
+  render: () => <SimpleDialog submitVariant="success" footerInfo="Goes live immediately" />,
 }
 
 export const DestructiveVariant: Story = {
@@ -96,19 +96,18 @@ export const DestructiveVariant: Story = {
       const [open, setOpen] = useState(true)
       return (
         <>
-          <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+          <Trigger label="Open dialog" onClick={() => setOpen(true)} />
           <FormDialog
             open={open}
             onOpenChange={setOpen}
-            caption="Bucket löschen"
-            title="Pulse-Backlog wirklich löschen?"
-            submitLabel="Endgültig löschen"
+            caption="Delete project"
+            title="Delete “Website relaunch”?"
+            submitLabel="Delete permanently"
             submitVariant="destructive"
             onSubmit={() => setOpen(false)}
           >
             <p className="body-sm text-muted-foreground">
-              Alle in diesem Bucket gesammelten Items werden archiviert. Diese Aktion kann nicht
-              rückgängig gemacht werden.
+              All tasks in this project will be archived. This action cannot be undone.
             </p>
           </FormDialog>
         </>
@@ -123,7 +122,7 @@ export const Pending: Story = {
 }
 
 export const SubmitDisabled: Story = {
-  render: () => <SimpleDialog submitDisabled footerInfo="Pflichtfelder fehlen noch" />,
+  render: () => <SimpleDialog submitDisabled footerInfo="Required fields are missing" />,
 }
 
 export const ViewOnly: Story = {
@@ -136,25 +135,25 @@ export const WithHeroTint: Story = {
       const [open, setOpen] = useState(true)
       return (
         <>
-          <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+          <Trigger label="Open dialog" onClick={() => setOpen(true)} />
           <FormDialog
             open={open}
             onOpenChange={setOpen}
-            caption="Neuen Bucket anlegen"
-            title="Pulse-Backlog"
+            caption="New project"
+            title="Website relaunch"
             heroTint="220 100% 50%"
             hero={
               <div className="rounded-lg border border-border bg-card p-3 caption text-muted-foreground">
-                Live-Preview-Slot — z. B. <code>BucketLivePreview</code>.
+                Preview slot — e.g. a live preview card.
               </div>
             }
-            submitLabel="Bucket anlegen"
+            submitLabel="Create project"
             submitVariant="success"
             onSubmit={() => setOpen(false)}
           >
-            <FormSection title="Quelle">
-              <FormField label="Account">
-                <TextField placeholder="meimberg.atlassian.net" />
+            <FormSection title="Source">
+              <FormField label="Repository">
+                <TextField placeholder="github.com/acme/website" />
               </FormField>
             </FormSection>
           </FormDialog>
@@ -171,29 +170,29 @@ export const WithFooterActions: Story = {
       const [open, setOpen] = useState(true)
       return (
         <>
-          <Trigger label="Dialog öffnen" onClick={() => setOpen(true)} />
+          <Trigger label="Open dialog" onClick={() => setOpen(true)} />
           <FormDialog
             open={open}
             onOpenChange={setOpen}
-            caption="Inbox-Item"
-            title="Was wird das?"
-            cancelLabel="Schließen"
+            caption="Request"
+            title="How should this be handled?"
+            cancelLabel="Close"
             footerActions={
               <>
                 <Button size="sm" variant="outline">
-                  Signal
+                  Approve
                 </Button>
                 <Button size="sm" variant="outline">
-                  Task
+                  Assign
                 </Button>
                 <Button size="sm" variant="destructive">
-                  Löschen
+                  Delete
                 </Button>
               </>
             }
           >
             <p className="body-sm text-muted-foreground">
-              Multi-Action-Footer für Detail-Dialoge mit mehreren parallelen Aktionen.
+              Multi-action footer for detail dialogs with several parallel actions.
             </p>
           </FormDialog>
         </>

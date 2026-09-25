@@ -7,7 +7,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../lib/cn";
 
 const buttonVariants = cva(
-  // PUL-456: `pointer-coarse:min-h-tap` (44px) hebt die Trefferfläche NUR auf
+  // `pointer-coarse:min-h-tap` (44px) hebt die Trefferfläche NUR auf
   // Touch-Geräten an — Desktop-Dichte (pointer:fine) bleibt unverändert.
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md body font-medium ring-offset-background transition-colors cursor-pointer pointer-coarse:min-h-tap disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {

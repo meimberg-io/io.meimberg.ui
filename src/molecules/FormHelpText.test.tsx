@@ -4,12 +4,12 @@ import {FormHelpText} from './FormHelpText'
 
 describe('FormHelpText', () => {
   it('renders the children text', () => {
-    render(<FormHelpText>Items werden auf INBOX eingeschränkt.</FormHelpText>)
-    expect(screen.getByText('Items werden auf INBOX eingeschränkt.')).toBeInTheDocument()
+    render(<FormHelpText>Only items from the selected folder are synced.</FormHelpText>)
+    expect(screen.getByText('Only items from the selected folder are synced.')).toBeInTheDocument()
   })
 
   it('prefixes the text with an aria-hidden arrow glyph', () => {
-    const {container} = render(<FormHelpText>Hinweis</FormHelpText>)
+    const {container} = render(<FormHelpText>Note</FormHelpText>)
     const arrow = container.querySelector('[aria-hidden="true"]')
     expect(arrow).not.toBeNull()
     expect(arrow?.textContent).toBe('↗')

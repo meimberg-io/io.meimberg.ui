@@ -1,7 +1,6 @@
-// PUL-412 (G0): Foundations/Radius — Border-Radius-Scale als Cheatsheet.
-// Quelle: app/src/app/globals.css `@theme inline` Z. 307–309 +
-// `--radius: 0.5rem` in :root (Z. 68). Tailwind v4 leitet --radius-sm/-md/-lg
-// per calc() davon ab.
+// Foundations/Radius — border radius scale. Every step derives from
+// `--radius` (src/tokens/theme.css), so changing that one token rescales
+// the whole UI.
 
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {PageHeader} from './_Swatch'
@@ -23,13 +22,13 @@ interface Step {
 }
 
 const STEPS: Step[] = [
-  {className: 'rounded-none', cssVar: '0', computed: '0', purpose: 'Hard-Edge (Header-Strip, Table-Cells).'},
-  {className: 'rounded-sm', cssVar: '--radius-sm', computed: 'calc(0.5rem - 4px) = 4px', purpose: 'Kleine Tags, Badges, Counter.'},
-  {className: 'rounded-md', cssVar: '--radius-md', computed: 'calc(0.5rem - 2px) = 6px', purpose: 'Inputs, Buttons, Pills (Default-Trigger).'},
-  {className: 'rounded-lg', cssVar: '--radius-lg / --radius', computed: '0.5rem = 8px', purpose: 'Cards, Form-Sections, Standard-Container.'},
-  {className: 'rounded-xl', cssVar: '(static)', computed: '12px', purpose: 'Floating-Elements (Popover, Dialog-Inner-Shell).'},
-  {className: 'rounded-2xl', cssVar: '(static)', computed: '16px', purpose: 'Selten — große Hero-Cards / Promo-Surfaces.'},
-  {className: 'rounded-full', cssVar: '9999px', computed: '9999px', purpose: 'Pills, Avatars, Switch, Circle-Buttons.'},
+  {className: 'rounded-none', cssVar: '0', computed: '0', purpose: 'Hard edges (header strips, table cells).'},
+  {className: 'rounded-sm', cssVar: '--radius-sm', computed: 'calc(var(--radius) - 4px) = 4px', purpose: 'Small tags, badges, counters.'},
+  {className: 'rounded-md', cssVar: '--radius-md', computed: 'calc(var(--radius) - 2px) = 6px', purpose: 'Buttons, pills, compact controls.'},
+  {className: 'rounded-lg', cssVar: '--radius-lg', computed: 'var(--radius) = 8px', purpose: 'Cards, inputs (field-shell), standard containers.'},
+  {className: 'rounded-xl', cssVar: '--radius-xl', computed: 'calc(var(--radius) + 4px) = 12px', purpose: 'Floating elements (popovers, icon tiles).'},
+  {className: 'rounded-2xl', cssVar: '--radius-2xl', computed: 'calc(var(--radius) + 8px) = 16px', purpose: 'Large hero cards, bottom sheets.'},
+  {className: 'rounded-full', cssVar: '9999px', computed: '9999px', purpose: 'Pills, avatars, switches, circular buttons.'},
 ]
 
 export const All: Story = {
@@ -37,7 +36,7 @@ export const All: Story = {
     <div style={{maxWidth: 900}}>
       <PageHeader
         title="Radius"
-        lead="Border-Radius-Scale. Pulse setzt --radius: 0.5rem (8 px) als Basis, Tailwind v4 leitet --radius-sm/-md/-lg per calc() davon ab. Größere Werte (xl/2xl) sind statisch (12 / 16 px). Konsequenz einer --radius-Änderung: alle md/lg-basierten Komponenten verschieben sich proportional — also bewusst global einsetzen."
+        lead="Border radius scale. The base is --radius: 0.5rem (8 px); sm/md/lg/xl/2xl are derived from it via calc(), and the form dialog shell uses --radius + 6px. Changing --radius shifts every step proportionally — set it once, globally, as part of a brand."
       />
 
       <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
@@ -46,7 +45,7 @@ export const All: Story = {
             key={s.className}
             style={{
               display: 'grid',
-              gridTemplateColumns: '120px 80px 1fr 220px',
+              gridTemplateColumns: '120px 80px 1fr 260px',
               gap: 16,
               alignItems: 'center',
               padding: 12,

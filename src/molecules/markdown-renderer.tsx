@@ -1,8 +1,8 @@
 'use client'
 
-// MIPUL-186 · Sanitized Markdown Renderer für Signal-Bodies und ähnliche
-// Felder. react-markdown + GFM (Tabellen, Tasklisten, Strikethrough) +
-// rehype-sanitize. Tailwind-Typography für Lesbarkeit.
+// Sanitized Markdown renderer for user-provided text fields.
+// react-markdown + GFM (tables, task lists, strikethrough) + rehype-sanitize.
+// Tailwind Typography for readability.
 
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -54,12 +54,7 @@ export function MarkdownRenderer({ value, className }: Props) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-        urlTransform={url => {
-          // Standard-URL-Filter aus react-markdown plus relative Pfade
-          // /api/attachments/<uuid> für unsere Attachment-Route.
-          if (url.startsWith('/api/attachments/')) return url
-          return defaultUrlTransform(url)
-        }}
+        urlTransform={transformUrl}
       >
         {value || ''}
       </ReactMarkdown>
@@ -67,8 +62,10 @@ export function MarkdownRenderer({ value, className }: Props) {
   )
 }
 
-// Aus react-markdown's Default-urlTransform: erlaubt http/https/mailto/tel/relative.
-function defaultUrlTransform(url: string): string {
-  const safe = /^(https?:|mailto:|tel:|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i
-  return safe.test(url) ? url : ''
+// react-markdown's default filter: absolute URLs only with a safe scheme
+// (http, https, mailto, tel); relative URLs are same-origin and pass through.
+const SAFE_URL = /^(https?:|mailto:|tel:|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i
+
+function transformUrl(url: string): string {
+  return SAFE_URL.test(url) ? url : ''
 }

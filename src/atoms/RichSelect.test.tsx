@@ -10,11 +10,21 @@ const items: RichSelectItem[] = [
 ]
 
 describe('RichSelect', () => {
-  it('renders the placeholder when nothing is selected', () => {
-    render(
-      <RichSelect items={items} selected={null} onSelect={() => {}} placeholder="Wählen…" />,
-    )
-    expect(screen.getByText('Wählen…')).toBeInTheDocument()
+  it('renders the English default placeholder when nothing is selected', () => {
+    render(<RichSelect items={items} selected={null} onSelect={() => {}} />)
+    expect(screen.getByText('Select…')).toBeInTheDocument()
+  })
+
+  it('prefers the placeholder prop', () => {
+    render(<RichSelect items={items} selected={null} onSelect={() => {}} placeholder="Pick one" />)
+    expect(screen.getByText('Pick one')).toBeInTheDocument()
+  })
+
+  it('overrides labels via the labels prop', async () => {
+    const user = userEvent.setup()
+    render(<RichSelect items={[]} selected={null} onSelect={() => {}} labels={{noOptions: 'Nothing here'}} />)
+    await user.click(screen.getByRole('combobox'))
+    expect(screen.getByText('Nothing here')).toBeInTheDocument()
   })
 
   it('renders the selected label in the trigger', () => {
@@ -48,7 +58,7 @@ describe('RichSelect', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 
-  describe('searchable mode (PUL-397)', () => {
+  describe('searchable mode', () => {
     it('renders a searchbox at the top of the popover when searchable', async () => {
       const user = userEvent.setup()
       render(<RichSelect items={items} selected={null} onSelect={() => {}} searchable />)
@@ -67,12 +77,12 @@ describe('RichSelect', () => {
       expect(screen.queryByText('Charlie')).not.toBeInTheDocument()
     })
 
-    it('shows "Nichts gefunden" when no items match', async () => {
+    it('shows "No results" when no items match', async () => {
       const user = userEvent.setup()
       render(<RichSelect items={items} selected={null} onSelect={() => {}} searchable />)
       await user.click(screen.getByRole('combobox'))
       await user.type(screen.getByRole('searchbox'), 'zzz')
-      expect(screen.getByText('Nichts gefunden')).toBeInTheDocument()
+      expect(screen.getByText('No results')).toBeInTheDocument()
     })
 
     it('resets the query when the popover closes', async () => {

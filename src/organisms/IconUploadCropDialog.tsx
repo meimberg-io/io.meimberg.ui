@@ -7,30 +7,52 @@ import {
 } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Slider } from '../ui/slider'
+import { useLabels } from '../i18n/context'
 
 const ALLOWED_MIME = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
 const ALLOWED_ACCEPT = ALLOWED_MIME.join(',')
 const RASTER_MIME = new Set(['image/png', 'image/jpeg', 'image/webp'])
 
+export interface IconUploadCropDialogLabels {
+  title: string
+  description: string
+  zoom: string
+  cancel: string
+  save: string
+  uploading: string
+}
+
+const defaultLabels: IconUploadCropDialogLabels = {
+  title: 'Upload icon',
+  description: 'Choose a square crop. The result is saved as PNG.',
+  zoom: 'Zoom',
+  cancel: 'Cancel',
+  save: 'Save',
+  uploading: 'Uploading…',
+}
+
 interface Props {
   open: boolean
   onOpenChange: (next: boolean) => void
-  /** Aufgerufen mit dem fertigen, quadratischen Blob (PNG für Raster, original für SVG). */
+  /** Called with the final square file (PNG for raster, original for SVG). */
   onSubmit: (file: File) => Promise<void> | void
+  /** Dialog title. Takes precedence over `labels.title`. */
   title?: string
+  labels?: Partial<IconUploadCropDialogLabels>
 }
 
 /**
- * Datei-Picker → Crop-Dialog → quadratischer PNG-Blob.
+ * File picker → crop dialog → square PNG blob.
  *
- * - PNG/JPEG/WebP: clientseitiges Crop in <canvas>, Output als PNG.
- * - SVG: kein Crop (Vektor), wird unverändert weitergereicht.
- * - Keine Größen-/Auflösungs-Beschränkung (per Spec).
+ * - PNG/JPEG/WebP: client-side crop in <canvas>, output as PNG.
+ * - SVG: no crop (vector), passed through unchanged.
+ * - No size/resolution limit.
  *
- * Der Dialog steuert den File-Picker selbst — der Aufrufer muss nur `open`
- * toggeln und `onSubmit` implementieren.
+ * The dialog drives the file picker itself — callers only toggle `open`
+ * and implement `onSubmit`.
  */
-export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title = 'Icon hochladen' }: Props) {
+export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title, labels }: Props) {
+  const l = useLabels('iconUploadCropDialog', defaultLabels, labels)
   const inputRef = useRef<HTMLInputElement>(null)
   const [pickedFile, setPickedFile] = useState<File | null>(null)
   const [imageSrc, setImageSrc] = useState<string | null>(null)
@@ -39,9 +61,9 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title = 'Ic
   const [croppedAreaPx, setCroppedAreaPx] = useState<Area | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  // State-Reset synchron beim Open-Toggle (React-Pattern „State zurücksetzen,
-  // wenn sich ein Prop ändert", https://react.dev/learn/you-might-not-need-an-effect).
-  // Nicht in einem useEffect — das löst die react-hooks/set-state-in-effect-Lint aus.
+  // Reset state synchronously when `open` toggles ("adjusting state when a
+  // prop changes", https://react.dev/learn/you-might-not-need-an-effect) —
+  // not in an effect, which would trip react-hooks/set-state-in-effect.
   const [openSnapshot, setOpenSnapshot] = useState(open)
   if (open !== openSnapshot) {
     setOpenSnapshot(open)
@@ -54,8 +76,8 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title = 'Ic
     }
   }
 
-  // Beim Öffnen den File-Picker triggern (echter DOM-Seiteneffekt).
-  // Trick: timeout-deferred, sonst blockt Browser die Click-Heuristik.
+  // Open the file picker when the dialog opens (a real DOM side effect).
+  // Deferred via timeout, otherwise the browser's click heuristic blocks it.
   useEffect(() => {
     if (!open) return
     const t = setTimeout(() => inputRef.current?.click(), 0)
@@ -68,20 +90,20 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title = 'Ic
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]
-    e.target.value = '' // Reset, sodass dieselbe Datei erneut wählbar ist.
+    e.target.value = '' // Reset so the same file can be picked again.
     if (!f) {
       onOpenChange(false)
       return
     }
     if (!ALLOWED_MIME.includes(f.type)) {
-      // Soft-Fail: Dialog schließen; Aufrufer kann via toast nachreichen.
+      // Soft fail: close the dialog; the caller may follow up with a toast.
       onOpenChange(false)
       return
     }
     setPickedFile(f)
 
     if (f.type === 'image/svg+xml') {
-      // SVG braucht keinen Crop — direkt an onSubmit.
+      // SVG needs no crop — hand it straight to onSubmit.
       void (async () => {
         try {
           setSubmitting(true)
@@ -129,9 +151,9 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title = 'Ic
       <Dialog open={open && !!showCropUI} onOpenChange={onOpenChange}>
         <DialogContent className='max-w-md'>
           <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
+            <DialogTitle>{title ?? l.title}</DialogTitle>
             <DialogDescription>
-              Wähle einen quadratischen Ausschnitt. Das Ergebnis wird als PNG gespeichert.
+              {l.description}
             </DialogDescription>
           </DialogHeader>
           {imageSrc && pickedFile && RASTER_MIME.has(pickedFile.type) && (
@@ -149,7 +171,7 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title = 'Ic
                 />
               </div>
               <div className='space-y-2'>
-                <label className='caption text-muted-foreground'>Zoom</label>
+                <label className='caption text-muted-foreground'>{l.zoom}</label>
                 <Slider
                   value={[zoom]}
                   onValueChange={([v]) => setZoom(v)}
@@ -162,10 +184,10 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title = 'Ic
           )}
           <DialogFooter>
             <Button variant='outline' onClick={() => onOpenChange(false)} disabled={submitting}>
-              Abbrechen
+              {l.cancel}
             </Button>
             <Button onClick={() => void handleSubmit()} disabled={submitting || !croppedAreaPx}>
-              {submitting ? 'Lade hoch…' : 'Speichern'}
+              {submitting ? l.uploading : l.save}
             </Button>
           </DialogFooter>
         </DialogContent>

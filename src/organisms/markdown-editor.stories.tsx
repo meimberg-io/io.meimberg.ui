@@ -17,7 +17,7 @@ function Controlled({initial = '', placeholder, disabled}: {initial?: string; pl
     <div className="flex flex-col gap-2 w-full max-w-2xl">
       <MarkdownEditor value={value} onChange={setValue} placeholder={placeholder} disabled={disabled} />
       <details>
-        <summary className="caption text-muted-foreground cursor-pointer">Markdown-Output</summary>
+        <summary className="caption text-muted-foreground cursor-pointer">Markdown output</summary>
         <pre className="caption font-mono mt-2 whitespace-pre-wrap bg-surface-2 p-3 rounded">
           {value || '(empty)'}
         </pre>
@@ -26,19 +26,19 @@ function Controlled({initial = '', placeholder, disabled}: {initial?: string; pl
   )
 }
 
-export const Empty: Story = {render: () => <Controlled placeholder="Schreib was…" />}
+export const Empty: Story = {render: () => <Controlled placeholder="Write something…" />}
 
 export const Prefilled: Story = {
   render: () => (
     <Controlled
-      initial={`# Pulse-Backlog
+      initial={`# Release notes
 
-Heute reduziert auf **P1** + Signals.
+Focus this week: **performance** and accessibility.
 
-- [ ] PUL-398: Stories für molecules/
-- [x] PUL-397: Tailwind-Sweep
+- [ ] Add stories for all molecules
+- [x] Migrate buttons to the new variants
 
-\`make check-stories\` muss grün sein.`}
+\`pnpm test\` must pass before merging.`}
     />
   ),
 }
@@ -46,7 +46,7 @@ Heute reduziert auf **P1** + Signals.
 export const Disabled: Story = {
   render: () => (
     <Controlled
-      initial="Read-only Markdown — Toolbar ist deaktiviert."
+      initial="Read-only Markdown — the toolbar is disabled."
       disabled
     />
   ),

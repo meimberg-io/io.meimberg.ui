@@ -1,8 +1,7 @@
 'use client'
 
-// PUL-352 · Help-Text-Stempel unter einer Form-Section („↗ Items werden auf
-// INBOX eingeschränkt"). Pfeil-Prefix ist Teil der Bibliothek — Call-Sites
-// liefern nur den Text, kein zusätzliches Affordanz-Glyph.
+// Help text below a form section. The arrow prefix is part of the component —
+// call sites pass only the text, no extra affordance glyph.
 
 import type {ReactNode} from 'react'
 import {cn} from '../lib/cn'

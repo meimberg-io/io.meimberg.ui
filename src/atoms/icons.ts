@@ -1,4 +1,4 @@
-// PUL-318 / PUL-462: Lucide-Icon-Re-Export für die @meimberg/ui-Atoms.
+// Lucide-Icon-Re-Export für die @meimberg/ui-Atoms.
 //
 // Bewusst eine **eigene Datei** (nicht in Icon.tsx integriert und nicht im
 // Root-Barrel), weil Lucide einige Namen exportiert, die mit unseren Atoms
@@ -8,8 +8,8 @@
 //
 // Call-Sites:
 //   import { Icon } from '@meimberg/ui'
-//   import { Inbox, Radio } from '@meimberg/ui/atoms/icons'
-//   <Icon icon={Inbox} size="md" />
+//   import { Folder, Star } from '@meimberg/ui/atoms/icons'
+//   <Icon icon={Folder} size="md" />
 //
 // Tree-shaking durch Webpack/Next entfernt ungenutzte Icons am Build.
 //

@@ -11,20 +11,20 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-type Stage = 'seed' | 'sprout' | 'cluster'
-const STAGES: ReadonlyArray<SelectFieldOption<Stage>> = [
-  {value: 'seed', label: 'Seeds'},
-  {value: 'sprout', label: 'Sprouts'},
-  {value: 'cluster', label: 'Clusters'},
+type Status = 'draft' | 'review' | 'published'
+const STATUSES: ReadonlyArray<SelectFieldOption<Status>> = [
+  {value: 'draft', label: 'Draft'},
+  {value: 'review', label: 'In review'},
+  {value: 'published', label: 'Published'},
 ]
 
 type Priority = 'none' | 'low' | 'medium' | 'high' | 'critical'
 const PRIORITIES: ReadonlyArray<SelectFieldOption<Priority>> = [
-  {value: 'none', label: '— Keine —'},
-  {value: 'low', label: 'Niedrig'},
-  {value: 'medium', label: 'Mittel'},
-  {value: 'high', label: 'Hoch'},
-  {value: 'critical', label: 'Kritisch'},
+  {value: 'none', label: '— None —'},
+  {value: 'low', label: 'Low'},
+  {value: 'medium', label: 'Medium'},
+  {value: 'high', label: 'High'},
+  {value: 'critical', label: 'Critical'},
 ]
 
 type LongOpt = `opt-${number}`
@@ -33,15 +33,15 @@ const LONG_LIST: ReadonlyArray<SelectFieldOption<LongOpt>> = Array.from({length:
   label: `Option ${i + 1}`,
 }))
 
-function StageDemo({initial, size}: {initial?: Stage | null; size?: 'sm' | 'md'}) {
-  const [value, setValue] = useState<Stage | null>(initial ?? null)
+function StatusDemo({initial, size}: {initial?: Status | null; size?: 'sm' | 'md'}) {
+  const [value, setValue] = useState<Status | null>(initial ?? null)
   return (
     <div style={{width: 220}}>
-      <SelectField<Stage>
+      <SelectField<Status>
         value={value}
-        options={STAGES}
+        options={STATUSES}
         onChange={setValue}
-        placeholder="Stage wählen…"
+        placeholder="Select status…"
         size={size}
       />
     </div>
@@ -49,23 +49,23 @@ function StageDemo({initial, size}: {initial?: Stage | null; size?: 'sm' | 'md'}
 }
 
 export const Default: Story = {
-  render: () => <StageDemo initial="sprout" />,
+  render: () => <StatusDemo initial="review" />,
 }
 
 export const Empty: Story = {
-  render: () => <StageDemo initial={null} />,
+  render: () => <StatusDemo initial={null} />,
 }
 
 export const Small: Story = {
-  render: () => <StageDemo initial="seed" size="sm" />,
+  render: () => <StatusDemo initial="draft" size="sm" />,
 }
 
 export const Disabled: Story = {
   render: () => (
     <div style={{width: 220}}>
-      <SelectField<Stage>
-        value="cluster"
-        options={STAGES}
+      <SelectField<Status>
+        value="published"
+        options={STATUSES}
         onChange={() => {}}
         disabled
       />
@@ -83,7 +83,7 @@ export const WithSentinelClearOption: Story = {
             value={value}
             options={PRIORITIES}
             onChange={setValue}
-            placeholder="Priorität…"
+            placeholder="Priority…"
           />
         </div>
       )
@@ -95,15 +95,15 @@ export const WithSentinelClearOption: Story = {
 export const WithDisabledOption: Story = {
   render: () => {
     function Demo() {
-      const items: ReadonlyArray<SelectFieldOption<Stage>> = [
-        {value: 'seed', label: 'Seeds'},
-        {value: 'sprout', label: 'Sprouts (in Vorbereitung)', disabled: true},
-        {value: 'cluster', label: 'Clusters'},
+      const items: ReadonlyArray<SelectFieldOption<Status>> = [
+        {value: 'draft', label: 'Draft'},
+        {value: 'review', label: 'In review (coming soon)', disabled: true},
+        {value: 'published', label: 'Published'},
       ]
-      const [value, setValue] = useState<Stage | null>('seed')
+      const [value, setValue] = useState<Status | null>('draft')
       return (
         <div style={{width: 240}}>
-          <SelectField<Stage> value={value} options={items} onChange={setValue} />
+          <SelectField<Status> value={value} options={items} onChange={setValue} />
         </div>
       )
     }
@@ -121,7 +121,7 @@ export const LongList: Story = {
             value={value}
             options={LONG_LIST}
             onChange={setValue}
-            placeholder="Aus 50 Optionen wählen…"
+            placeholder="Pick one of 50 options…"
           />
         </div>
       )

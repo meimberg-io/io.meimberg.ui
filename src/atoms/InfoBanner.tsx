@@ -18,17 +18,16 @@ export interface InfoBannerProps
 }
 
 /**
- * Pulse-InfoBanner — kleine Inline-Hinweis-Box („Kein Inhalt", „Keine
- * Beschreibung", Empty-Hint) für Detail-Dialog-Bodies und Listen-Surfaces.
+ * InfoBanner — kleine Inline-Hinweis-Box („No content", „No description",
+ * Empty-Hint) für Detail-Dialog-Bodies und Listen-Surfaces.
  *
- * Bündelt das in PUL-414 (G2a-B3 / G2b-D3 / G2b-T7) identifizierte Inline-
- * Hinweis-Box-Pattern. Abgrenzung zur `<EmptyState>`-Molecule: die ist der
+ * Abgrenzung zur `<EmptyState>`-Molecule: die ist der
  * große, zentrierte Section-/Page-Empty-State; InfoBanner ist die kleine,
  * fließende Hinweiszeile.
  *
  * @example
- *   <InfoBanner>Kein Inhalt.</InfoBanner>
- *   <InfoBanner tone="subtle" italic={false}>Keine weiteren Tags verfügbar.</InfoBanner>
+ *   <InfoBanner>No content.</InfoBanner>
+ *   <InfoBanner tone="subtle" italic={false}>No more tags available.</InfoBanner>
  */
 export function InfoBanner({tone = 'muted', italic = true, className, children, ...rest}: InfoBannerProps) {
   return (

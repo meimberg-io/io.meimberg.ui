@@ -1,25 +1,38 @@
 'use client'
 
-// PUL-352 · Rich-Select — Dropdown mit Auto-Flip (öffnet nach oben, wenn
-// unten zu wenig Platz ist), Sub-Text in Items, Custom-Render-Slots. Höhe
-// 40px (über `.rich-select`-Klasse). Quelle:
-// docs/frontend/redesign/source/v3/mission/Buckets.html § .rich-select.
+// Rich-Select — Dropdown mit Auto-Flip (öffnet nach oben, wenn unten zu wenig
+// Platz ist), Sub-Text in Items, Custom-Render-Slots. Höhe 40px (`field-shell`).
 //
-// PUL-352 Followup — Popover via `createPortal` ans <body>, damit sie nicht
-// von Eltern-Containern mit `overflow: hidden` (z. B. FormDialog-Shell)
-// clipped wird. Position + Flip rechnet `usePopoverPosition` aus dem
-// Trigger-Rect.
+// Popover via `createPortal` ans <body>, damit er nicht von Eltern-Containern
+// mit `overflow: hidden` (z. B. FormDialog-Shell) geclippt wird. Position +
+// Flip rechnet `usePopoverPosition` aus dem Trigger-Rect.
 //
-// PUL-397 — `searchable`-Modus: Suchfeld am Top des Popovers. Default-Filter
-// macht Substring-Match auf `label + sub`. Search-Query resettet beim Close
-// (vorhersehbares Verhalten — kein „stale Filter" beim Re-Open). Ersetzt
-// die alte `TimezoneSelect`-Eigenimplementation.
+// `searchable`-Modus: Suchfeld am Top des Popovers. Default-Filter macht
+// Substring-Match auf `label + sub`. Search-Query resettet beim Close
+// (vorhersehbares Verhalten — kein „stale Filter" beim Re-Open).
 
 import {useEffect, useMemo, useRef, useState} from 'react'
 import {createPortal} from 'react-dom'
 import type {ReactNode} from 'react'
 import {ChevronDown, Search} from '../atoms/icons'
 import {usePopoverPosition} from '../hooks/use-popover-position'
+import {useLabels} from '../i18n/context'
+
+export interface RichSelectLabels {
+  placeholder: string
+  searchPlaceholder: string
+  /** Leere Trefferliste bei aktiver Suche. */
+  noResults: string
+  /** Leere Item-Liste ohne Suche. */
+  noOptions: string
+}
+
+const defaultLabels: RichSelectLabels = {
+  placeholder: 'Select…',
+  searchPlaceholder: 'Search…',
+  noResults: 'No results',
+  noOptions: 'No options',
+}
 
 export interface RichSelectItem {
   /** Stabile id für `key` + Selektion. */
@@ -47,14 +60,15 @@ interface Props<T extends RichSelectItem> {
   disabled?: boolean
   /** Geschätzte Popup-Höhe für die Flip-Entscheidung. Default 320px. */
   estimatedHeight?: number
-  /** PUL-397: Wenn true, rendert ein Suchfeld am Top des Popovers.
+  /** Wenn true, rendert ein Suchfeld am Top des Popovers.
    *  Default-Filter: case-insensitive substring auf `String(label) + ' ' + String(sub)`.
    *  Query resettet beim Schließen. */
   searchable?: boolean
-  /** PUL-397: Custom-Filter überschreibt den Default-Filter. */
+  /** Custom-Filter überschreibt den Default-Filter. */
   filterItem?: (item: T, query: string) => boolean
-  /** PUL-397: Placeholder im Search-Input. Default „Suchen…". */
+  /** Placeholder im Search-Input. Überschreibt `labels.searchPlaceholder`. */
   searchPlaceholder?: string
+  labels?: Partial<RichSelectLabels>
   /** Test-Hook. */
   'data-testid'?: string
 }
@@ -75,14 +89,16 @@ export function RichSelect<T extends RichSelectItem>({
   renderSelected,
   renderItem,
   leadingIcon,
-  placeholder = 'Wählen…',
+  placeholder,
   disabled,
   estimatedHeight = 320,
   searchable = false,
   filterItem,
-  searchPlaceholder = 'Suchen…',
+  searchPlaceholder,
+  labels,
   'data-testid': testId,
 }: Props<T>) {
+  const l = useLabels('richSelect', defaultLabels, labels)
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -107,7 +123,7 @@ export function RichSelect<T extends RichSelectItem>({
     estimatedHeight: effectiveHeight,
   })
 
-  // PUL-397: zentrale close-Funktion — resettet die Search-Query beim
+  // Zentrale close-Funktion — resettet die Search-Query beim
   // Schließen (vorhersehbares Verhalten beim Wieder-Öffnen). Würde sonst
   // im Effect mit setState gehen, was `react-hooks/set-state-in-effect`
   // flagged.
@@ -158,7 +174,7 @@ export function RichSelect<T extends RichSelectItem>({
     : (
       <>
         {leadingIcon}
-        <span className="body-sm text-muted-foreground flex-1 truncate">{placeholder}</span>
+        <span className="body-sm text-muted-foreground flex-1 truncate">{placeholder ?? l.placeholder}</span>
       </>
     )
 
@@ -185,11 +201,10 @@ export function RichSelect<T extends RichSelectItem>({
       {open && position && createPortal(
         <div
           ref={popoverRef}
-          // PUL-420 (G5): Popover-Look inline (war `.rich-select-menu` in
-          // globals.css). `pointer-events-auto`: Radix-Dialog setzt während
-          // Open `body { pointer-events: none }` — das Portal erbt das, ohne
+          // `pointer-events-auto`: Radix-Dialog setzt während Open
+          // `body { pointer-events: none }` — das Portal erbt das, ohne
           // Override wären die Items click-tot.
-          className="pointer-events-auto flex max-h-80 flex-col overflow-hidden rounded-[10px] border border-border bg-card shadow-[var(--elev-floating)]"
+          className="pointer-events-auto flex max-h-80 flex-col overflow-hidden rounded-[calc(var(--radius)+2px)] border border-border bg-card shadow-[var(--elev-floating)]"
           data-direction={direction}
           // Marker für FormDialog: Klick/Escape auf diesem Portal-Popover
           // schließt NICHT den umgebenden Dialog (siehe FormDialog.tsx).
@@ -202,8 +217,8 @@ export function RichSelect<T extends RichSelectItem>({
             // z-100 reicht nicht, wenn der Popover innerhalb eines Dialogs
             // mit `backdrop-filter` rendert — das Overlay erzeugt einen
             // eigenen Stacking-Context, der den Popover-Portal überdeckt.
-            // Pulse Dialog-Overlay sitzt bei z-50, Dialog-Content bei z-50;
-            // wir wählen 1000 als sicheren Wert über allen Pulse-Layern.
+            // Dialog-Overlay und -Content sitzen bei z-50; 1000 liegt sicher
+            // über allen Layern.
             zIndex: 1000,
           }}
         >
@@ -221,7 +236,7 @@ export function RichSelect<T extends RichSelectItem>({
                 role="searchbox"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder={searchPlaceholder}
+                placeholder={searchPlaceholder ?? l.searchPlaceholder}
                 className="min-w-0 flex-1 border-0 bg-transparent text-[13px] text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
@@ -229,7 +244,7 @@ export function RichSelect<T extends RichSelectItem>({
           <div id={listboxId} role="listbox" className="min-h-0 flex-1 overflow-y-auto">
             {filteredItems.length === 0 ? (
               <div className="px-3 py-3 caption text-muted-foreground">
-                {searchable && query.trim() !== '' ? 'Nichts gefunden' : 'Keine Optionen'}
+                {searchable && query.trim() !== '' ? l.noResults : l.noOptions}
               </div>
             ) : (
               filteredItems.map(item => {

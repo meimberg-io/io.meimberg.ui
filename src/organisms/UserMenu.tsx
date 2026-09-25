@@ -1,16 +1,17 @@
 'use client'
 
-// PUL-464 (S2): UserMenu — Avatar-Trigger mit Popover (Name/E-Mail + Menü).
+// User menu — avatar trigger with a popover (name/email + menu).
 //
-// Generisch: Identität (name/email/avatarUrl) + Menü-Links kommen als Props,
-// die Abmelden-Aktion als `footer`-Slot (Server-Action/Auth bleibt beim
-// Consumer — das Package kennt kein Auth). Initialen werden aus dem Namen
-// abgeleitet. Link-Renderer als Slot (Default `<a>`).
+// Identity (name/email/avatarUrl) and menu links come in as props, the
+// sign-out action as `footer` slot (auth stays with the consumer — the
+// package knows nothing about auth). Initials are derived from the name.
+// Link renderer as slot (default `<a>`).
 
 import type {ComponentType, ReactNode} from 'react'
 import {Avatar, AvatarFallback, AvatarImage} from '../ui/avatar'
 import {Popover, PopoverContent, PopoverTrigger} from '../ui/popover'
 import {Separator} from '../ui/separator'
+import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
 
 export interface UserMenuItem {
@@ -26,17 +27,27 @@ export type UserMenuLinkComponent = ComponentType<{
   children: ReactNode
 }>
 
+export interface UserMenuLabels {
+  /** aria-label of the trigger button. */
+  trigger: string
+}
+
+const defaultLabels: UserMenuLabels = {
+  trigger: 'User menu',
+}
+
 export interface UserMenuProps {
   name: string
   email: string
   avatarUrl?: string | null
-  /** Collapsed-Sidebar: nur Avatar, kein Name/E-Mail im Trigger. */
+  /** Collapsed sidebar: avatar only, no name/email in the trigger. */
   collapsed?: boolean
   items?: UserMenuItem[]
   linkComponent?: UserMenuLinkComponent
   onNavigate?: () => void
-  /** Footer im Popover (z. B. Abmelden-<form action={signOut}>). */
+  /** Footer in the popover (e.g. a sign-out `<form action={signOut}>`). */
   footer?: ReactNode
+  labels?: Partial<UserMenuLabels>
 }
 
 const DefaultLink: UserMenuLinkComponent = ({href, children, ...rest}) => (
@@ -66,7 +77,9 @@ export function UserMenu({
   linkComponent: Link = DefaultLink,
   onNavigate,
   footer,
+  labels,
 }: UserMenuProps) {
+  const l = useLabels('userMenu', defaultLabels, labels)
   const label = name.trim().length > 0 ? name : email
   const initialsLabel = initials(name, email)
 
@@ -84,7 +97,7 @@ export function UserMenu({
           'flex w-full items-center gap-3 rounded-md px-2 py-2 transition-colors cursor-pointer',
           'hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         )}
-        aria-label="User menu"
+        aria-label={l.trigger}
       >
         {avatar('h-8 w-8')}
         {!collapsed && (

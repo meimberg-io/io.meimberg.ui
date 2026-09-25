@@ -14,49 +14,49 @@ type Story = StoryObj<typeof FormField>
 export const Default: Story = {
   args: {
     label: 'Name',
-    children: <TextField placeholder="Pulse" />,
+    children: <TextField placeholder="Jane Doe" />,
   },
 }
 
 export const Required: Story = {
   args: {
-    label: 'Titel',
+    label: 'Title',
     required: true,
-    children: <TextField placeholder="Pflichtfeld" />,
+    children: <TextField placeholder="Required" />,
   },
 }
 
 export const WithHint: Story = {
   args: {
-    label: 'Short-Label',
+    label: 'Short label',
     hint: '(optional)',
-    children: <TextField placeholder="PUL" />,
+    children: <TextField placeholder="ABC" />,
   },
 }
 
 export const WithDescription: Story = {
   args: {
-    label: 'API-Token',
-    description: 'Wird verschlüsselt in pgsodium abgelegt; nach dem Speichern nicht mehr lesbar.',
+    label: 'API token',
+    description: 'Stored encrypted; cannot be read again after saving.',
     children: <TextField type="password" />,
   },
 }
 
 export const WithError: Story = {
   args: {
-    label: 'E-Mail',
-    error: 'Bitte gültige E-Mail-Adresse angeben.',
-    children: <TextField defaultValue="nicht-valide" />,
+    label: 'Email',
+    error: 'Please enter a valid email address.',
+    children: <TextField defaultValue="not-valid" />,
   },
 }
 
 export const Combined: Story = {
   args: {
-    label: 'Bucket-Name',
+    label: 'List name',
     required: true,
-    hint: 'max. 40 Zeichen',
-    description: 'Wird im UI als Listen-Titel angezeigt.',
-    error: 'Bucket-Name existiert bereits.',
-    children: <TextField defaultValue="Pulse-Backlog" />,
+    hint: 'max. 40 characters',
+    description: 'Shown as the list title.',
+    error: 'A list with this name already exists.',
+    children: <TextField defaultValue="Backlog" />,
   },
 }
