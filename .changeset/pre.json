@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "next",
+  "initialVersions": {
+    "@meimberg/ui": "1.3.0"
+  },
+  "changesets": [
+    "phase-2-neutral"
+  ]
+}
