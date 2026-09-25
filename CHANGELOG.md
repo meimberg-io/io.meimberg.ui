@@ -1,5 +1,17 @@
 # @meimberg/ui
 
+## 2.1.0
+
+### Minor Changes
+
+- 3d5dce1: Neuer Export `@meimberg/ui/eslint`: die DS-Nutzungsregeln für Apps als Bausteine (`restrictedImportPaths`, `restrictedImportPatterns`, `restrictedSyntax`) plus fertiges Flat-Config-Array `recommended` (auch Default-Export). Deckt `lucide-react` nur über `atoms/icons`, rohe `<input>`/`<textarea>`/`<select>`, `heading-1`-Titel, `max-w-[1440px]`, Inline-Card-Frames, `hover-lift`, `setTheme`, Vendor-Primitives mit DS-Wrapper (`ui/avatar`, `ui/calendar`, `ui/sonner`, `react-day-picker`), direkte Radix-Importe und pfadbasierte `KpiTile`-Importe ab. Apps mit eigenen Restriktionslisten spreaden die Bausteine in jeden Block (Flat Config merged Rule-Optionen nicht), siehe README § ESLint-Regeln für Apps. Der Next-Starter lintet mit `recommended` (`pnpm lint`).
+- 3d5dce1: Test-Tooling für Apps (Konsolidierung Phase 4, Schritt 2).
+
+  - `@meimberg/ui/testing/setup`: Vitest-Setup mit jest-dom-Matchern und jsdom-Polyfills (`matchMedia`, `ResizeObserver`, Pointer-Capture, `scrollIntoView`, Range-Rects); polyfillt nur, was fehlt.
+  - `@meimberg/ui/testing`: `renderWithUi(ui, options?)` rendert in `UiProviders` (Optionen `providers`, `messages`/`locale`/`dateLocale`, `withToaster`, `wrapper` für App-Provider) und liefert eine `userEvent`-Instanz `user` mit.
+  - Bin `meimberg-ui-check-stories`: Story-Coverage-Check für Apps (`--root`, `--src`, `--layers`, `--ignore`, `--ignore-dirs`, `--allowlist`), nimmt Server-Components aus.
+  - Neue optionale Peers für die Test-Exporte: `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`.
+
 ## 2.0.0
 
 ### Major Changes
