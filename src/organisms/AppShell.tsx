@@ -11,6 +11,7 @@
 import type {ReactNode} from 'react'
 import {SidebarProvider, SidebarTrigger} from '../ui/sidebar'
 import {useLabels} from '../i18n/context'
+import {cn} from '../lib/cn'
 
 export interface AppShellLabels {
   /** Accessible name of the sidebar toggle in the top bar. */
@@ -29,14 +30,16 @@ export interface AppShellProps {
   /** Top bar, right side (e.g. action buttons). */
   headerEnd?: ReactNode
   children: ReactNode
+  /** Extra classes for the frame (`min-h-screen flex w-full`). */
+  className?: string
   labels?: Partial<AppShellLabels>
 }
 
-export function AppShell({sidebar, headerStart, headerEnd, children, labels}: AppShellProps) {
+export function AppShell({sidebar, headerStart, headerEnd, children, className, labels}: AppShellProps) {
   const l = useLabels('appShell', defaultLabels, labels)
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className={cn('min-h-screen flex w-full', className)}>
         {sidebar}
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 flex items-center gap-3 border-b border-border px-4 bg-surface-1">

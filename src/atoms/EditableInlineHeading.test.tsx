@@ -69,4 +69,11 @@ describe('EditableInlineHeading', () => {
     render(<EditableInlineHeading value="Old" onSave={vi.fn()} labels={{edit: 'Rename'}} />)
     expect(screen.getByRole('button', {name: 'Rename'})).toBeInTheDocument()
   })
+
+  it('applies className to the container in display and edit mode', async () => {
+    const {container} = render(<EditableInlineHeading value="Old" onSave={vi.fn()} className="custom-heading" />)
+    expect(container.firstElementChild).toHaveClass('custom-heading')
+    await startEditing()
+    expect(container.firstElementChild).toHaveClass('custom-heading')
+  })
 })

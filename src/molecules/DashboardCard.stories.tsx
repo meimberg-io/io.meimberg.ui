@@ -32,7 +32,8 @@ export const Compact: Story = {
   name: 'padding="compact" (p-4)',
   args: {
     padding: 'compact',
-    className: 'group relative hover-card cursor-pointer overflow-hidden',
+    interactive: true,
+    className: 'group relative overflow-hidden',
     children: <Filler label="Card body · p-4" />,
     style: {width: 320},
   },

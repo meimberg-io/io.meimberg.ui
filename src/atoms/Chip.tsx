@@ -1,89 +1,186 @@
 'use client'
 
-import type {ButtonHTMLAttributes, ComponentType, ReactNode} from 'react'
-import {Icon, type IconSize} from './Icon'
-import type {LucideProps} from './icons'
+// Chip — interaktive Pill in zwei Formen:
+//   · Toggle (Default): `<button aria-pressed>` für Filter, Saved-Views,
+//     Tab-artige Auswahlen; `active` tönt ihn im `tone`, `count` zeigt eine
+//     Zahl rechts.
+//   · Entfernbar (`onRemove`): `<span>` mit ✕-Button für angewendete Filter;
+//     immer im `tone` getönt, `prefix` steht gedämpft vor dem Wert.
+// Größen auf der Control-Skala: `xs` 26 px (Filterleisten, rounded-full),
+// `sm` 32 px (Property-Bars neben Form-Triggern, rounded-md).
+// `compactBelow` blendet das Label unterhalb des Breakpoints aus; Icon,
+// Count und ✕ bleiben.
+//
+// Die Klassen-Strings stehen als Literale, damit Tailwind sie beim Scan der
+// Package-Quelle findet.
+
+import type {ButtonHTMLAttributes, HTMLAttributes, ReactNode} from 'react'
 import {cn} from '../lib/cn'
+import {CONTROL_SIZE, SHOW_FROM, type Breakpoint, type IconComponent, type Tone} from '../lib/variants'
+import {useLabels} from '../i18n/context'
+import {Icon} from './Icon'
+import {CloseIcon} from './icons'
 
-export type ChipSize = 'sm' | 'md'
+export type ChipSize = 'xs' | 'sm'
 
-export interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
-  /** Aktiver (Toggle-)Zustand. Steuert visuelle Hervorhebung + `aria-pressed`. */
-  active?: boolean
-  /** Optional: führendes Lucide-Icon. */
-  icon?: ComponentType<LucideProps>
-  /** Optional: trailing Counter (zeigt eine kleine `caption`-Zahl rechts). */
-  count?: number
-  /** Optional: Tonal-Klasse für aktiven Zustand. Default: primary. */
-  activeClassName?: string
-  /**
-   * Größen-Variante:
-   *   - `sm` (Default): `.pill`-Geometrie, rounded-full, ~24 px hoch, 12 px Font.
-   *     Für Filter-Bars, Saved-Views, Tab-artige Auswahlen.
-   *   - `md`: rounded-md, 32 px hoch, 14 px Font. Für Property-Bars in
-   *     Editor-Surfaces (Detail-Dialoge etc.), wo die Chip neben
-   *     Form-Triggern (Dropdown/DatePicker/TagSelector size='sm' / `h-8`)
-   *     sitzt und visuell zu denen aligned sein muss.
-   *
-   * Größenänderungen für ALLE Chips — hier. Wer eine dritte Größe braucht,
-   * erweitert den Type, ändert nicht via className-Override.
-   */
+export interface ChipLabels {
+  /** a11y-Label des ✕-Buttons. */
+  remove: string
+}
+
+const defaultLabels: ChipLabels = {
+  remove: 'Remove filter',
+}
+
+const SIZE_CLASS: Record<ChipSize, string> = {
+  xs: cn(CONTROL_SIZE.xs.height, CONTROL_SIZE.xs.text, 'gap-1.5 rounded-full px-2.5'),
+  sm: cn(CONTROL_SIZE.sm.height, CONTROL_SIZE.sm.text, 'gap-1.5 rounded-md px-2.5'),
+}
+
+/** Getönter Zustand: aktiver Toggle und entfernbarer Chip. */
+const TINT_CLASS: Record<Tone, string> = {
+  neutral: 'border-foreground/20 bg-secondary text-foreground',
+  primary: 'border-primary/30 bg-primary/10 text-primary',
+  success: 'border-success/30 bg-success/10 text-success',
+  warning: 'border-warning/30 bg-warning/10 text-warning',
+  info: 'border-info/30 bg-info/10 text-info',
+  destructive: 'border-destructive/30 bg-destructive/10 text-destructive',
+}
+
+const IDLE_CLASS = 'border-border text-muted-foreground hover:text-foreground hover:bg-accent/40'
+
+interface ChipCommon {
+  /** Farbe des getönten Zustands. Default `primary`. */
+  tone?: Tone
+  /** `xs` 26 px (Default) · `sm` 32 px. */
   size?: ChipSize
+  /** Führendes Icon; der Chip setzt die Größe. */
+  icon?: IconComponent
+  /** Beliebiges führendes Visual (Dot, Glyph, Avatar) — Alternative zu `icon`. */
+  leading?: ReactNode
+  /**
+   * Label unterhalb dieses Breakpoints ausblenden (Icon bleibt). Ein
+   * String-Label wird dann zum `aria-label` (Toggle) bzw. `title`
+   * (entfernbar); bei Nicht-String-Labels `aria-label` selbst setzen.
+   */
+  compactBelow?: Breakpoint
+  className?: string
   children?: ReactNode
 }
 
-/**
- * Chip-Atom — klickbare Toggle-Pill für Filter, Saved-Views, Tab-artige
- * Auswahlen. `cursor-pointer` ist **in der Komponente** verankert
- * (Regel `clickable-cursor-pointer`).
- *
- * Aktiver Zustand bekommt `aria-pressed="true"` plus visuelle Hervorhebung.
- *
- * @example
- *   <Chip active={view === 'today'} onClick={() => setView('today')}>
- *     Heute
- *   </Chip>
- *   <Chip icon={Flame} count={3} active>Brennt</Chip>
- *   <Chip size="md" icon={Check} active>Erledigt</Chip>
- */
-export function Chip({
-  active = false,
+export type ChipToggleProps = ChipCommon &
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'prefix'> & {
+    /** Aktiver Toggle-Zustand (`aria-pressed`). */
+    active?: boolean
+    /** Zahl rechts neben dem Label. */
+    count?: number
+    onRemove?: undefined
+    prefix?: undefined
+    labels?: undefined
+  }
+
+export type ChipRemovableProps = ChipCommon &
+  Omit<HTMLAttributes<HTMLSpanElement>, 'children' | 'prefix'> & {
+    /** Rendert den ✕-Button. */
+    onRemove: () => void
+    /** Gedämpfter Prefix vor dem Wert (z. B. „Project:"). */
+    prefix?: ReactNode
+    labels?: Partial<ChipLabels>
+    active?: undefined
+    count?: undefined
+  }
+
+export type ChipProps = ChipToggleProps | ChipRemovableProps
+
+function labelClass(compactBelow: Breakpoint | undefined): string | undefined {
+  return compactBelow ? cn(SHOW_FROM[compactBelow], 'items-center gap-1') : undefined
+}
+
+/** Accessible Name, wenn das sichtbare Label ausgeblendet werden kann. */
+function compactName(compactBelow: Breakpoint | undefined, children: ReactNode): string | undefined {
+  return compactBelow && compactBelow !== 'none' && typeof children === 'string' ? children : undefined
+}
+
+function Leading({icon, leading, size}: Pick<ChipCommon, 'icon' | 'leading'> & {size: ChipSize}) {
+  if (icon) return <Icon icon={icon} size={CONTROL_SIZE[size].icon} />
+  return <>{leading}</>
+}
+
+export function Chip(props: ChipProps) {
+  if (props.onRemove !== undefined) return <RemovableChip {...props} />
+  return <ToggleChip {...props} />
+}
+
+function ToggleChip({
+  tone = 'primary',
+  size = 'xs',
   icon,
+  leading,
+  compactBelow,
+  active = false,
   count,
-  activeClassName,
-  size = 'sm',
   className,
   children,
   type = 'button',
+  'aria-label': ariaLabel,
   ...rest
-}: ChipProps) {
-  // `sm` = `.pill` (rounded-full, py-0.5 px-2, 12px font) — Filter-Bar-Variante.
-  // `md` = rounded-md, h-8 px-2.5, 14px font — Property-Bar-Variante.
-  // Beide teilen den Toggle-/Hover-/Active-State.
-  const sizeClass: string =
-    size === 'md'
-      ? 'inline-flex items-center gap-1.5 rounded-md border h-8 px-2.5 text-sm transition-colors'
-      : 'pill transition-colors'
-  const iconSize: IconSize = size === 'md' ? 'sm' : 'xs'
+}: ChipToggleProps) {
   return (
     <button
       type={type}
       aria-pressed={active}
+      aria-label={ariaLabel ?? compactName(compactBelow, children)}
       className={cn(
-        sizeClass,
-        'cursor-pointer focus-ring',
-        active
-          ? cn('border-primary bg-primary/10 text-primary', activeClassName)
-          : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent/40',
+        'inline-flex shrink-0 items-center whitespace-nowrap border cursor-pointer transition-colors focus-ring',
+        SIZE_CLASS[size],
+        active ? TINT_CLASS[tone] : IDLE_CLASS,
         className,
       )}
       {...rest}
     >
-      {icon ? <Icon icon={icon} size={iconSize} /> : null}
-      <span>{children}</span>
-      {typeof count === 'number' ? (
-        <span className="caption tabular-nums opacity-80">{count}</span>
-      ) : null}
+      <Leading icon={icon} leading={leading} size={size} />
+      {children != null && <span data-slot="label" className={labelClass(compactBelow)}>{children}</span>}
+      {typeof count === 'number' && <span data-slot="count" className="caption tabular-nums opacity-80">{count}</span>}
     </button>
+  )
+}
+
+function RemovableChip({
+  tone = 'primary',
+  size = 'xs',
+  icon,
+  leading,
+  compactBelow,
+  onRemove,
+  prefix,
+  labels,
+  title,
+  className,
+  children,
+  ...rest
+}: ChipRemovableProps) {
+  const l = useLabels('chip', defaultLabels, labels)
+  return (
+    <span
+      title={title ?? compactName(compactBelow, children)}
+      className={cn('inline-flex shrink-0 items-center whitespace-nowrap border', SIZE_CLASS[size], TINT_CLASS[tone], className)}
+      {...rest}
+    >
+      <Leading icon={icon} leading={leading} size={size} />
+      {(prefix != null || children != null) && (
+        <span data-slot="label" className={cn('inline-flex items-center gap-1', labelClass(compactBelow))}>
+          {prefix != null && <span className="text-muted-foreground">{prefix}</span>}
+          {children}
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={l.remove}
+        className="-mr-1 inline-flex items-center justify-center rounded-full p-0.5 cursor-pointer hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Icon icon={CloseIcon} size={CONTROL_SIZE[size].icon} />
+      </button>
+    </span>
   )
 }

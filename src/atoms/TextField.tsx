@@ -5,10 +5,10 @@
 // `field-shell`-Utility (40px Höhe, 1.5px Border, 8px Radius, Primary-Glow
 // im Focus).
 //
-// `leadingIcon` / `trailingIcon` als Slots: das Padding-
-// Adjustment wird inline gesetzt, damit der CSS-Cascade-Fight gegen `pl-9` /
-// `pr-9` nicht mehr stattfindet. Konsumenten geben nur das Icon, die
-// Geometrie regelt der Primitive.
+// `leading` / `trailing` als Slots für beliebige Visuals (Icon, Spinner,
+// Glyph): das Padding-Adjustment wird inline gesetzt, damit der
+// CSS-Cascade-Fight gegen `pl-9` / `pr-9` nicht mehr stattfindet.
+// Konsumenten geben nur den Inhalt, die Geometrie regelt der Primitive.
 
 import {forwardRef} from 'react'
 import type {InputHTMLAttributes, ReactNode, TextareaHTMLAttributes} from 'react'
@@ -16,12 +16,12 @@ import {cn} from '../lib/cn'
 import {useFormFieldId} from '../molecules/FormField'
 
 type CommonProps = {
-  /** Icon links im Input (nur für `as='input'`). Wird absolut positioniert
-   *  und das `padding-left` des Inputs entsprechend erhöht. */
-  leadingIcon?: ReactNode
-  /** Icon rechts im Input (nur für `as='input'`). Wird absolut positioniert
-   *  und das `padding-right` des Inputs entsprechend erhöht. */
-  trailingIcon?: ReactNode
+  /** Visual links im Input (nur für `as='input'`), z. B. ein 14-px-Icon.
+   *  Wird absolut positioniert, `padding-left` entsprechend erhöht. */
+  leading?: ReactNode
+  /** Visual rechts im Input (nur für `as='input'`). Wird absolut
+   *  positioniert, `padding-right` entsprechend erhöht. */
+  trailing?: ReactNode
 }
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & CommonProps & {as?: 'input'}
@@ -65,15 +65,15 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
     const {
       className,
       type = 'text',
-      leadingIcon,
-      trailingIcon,
+      leading,
+      trailing,
       style: userStyle,
       id: ownId,
       ...rest
     } = stripAs(props) as InputProps
 
-    const hasLeading = !!leadingIcon
-    const hasTrailing = !!trailingIcon
+    const hasLeading = Boolean(leading)
+    const hasTrailing = Boolean(trailing)
 
     // Padding-Adjustment per inline style — schlägt jede `padding`-Regel aus
     // `field-shell` (egal in welchem Layer).
@@ -101,7 +101,7 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none inline-flex items-center"
             aria-hidden="true"
           >
-            {leadingIcon}
+            {leading}
           </span>
         )}
         {inputEl}
@@ -110,7 +110,7 @@ export const TextField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Text
             className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center"
             aria-hidden="true"
           >
-            {trailingIcon}
+            {trailing}
           </span>
         )}
       </div>

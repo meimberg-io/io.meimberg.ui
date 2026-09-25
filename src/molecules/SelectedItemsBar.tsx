@@ -3,6 +3,7 @@
 import type {ReactNode} from 'react'
 import {Button} from '../atoms/Button'
 import {CloseIcon} from '../atoms/icons'
+import {cn} from '../lib/cn'
 import {useLabels} from '../i18n/context'
 
 export interface SelectedItemsBarLabels {
@@ -26,6 +27,7 @@ export interface SelectedItemsBarProps {
   clearLabel?: string
   /** The selected item chips/badges (content-agnostic). */
   children: ReactNode
+  className?: string
   labels?: Partial<SelectedItemsBarLabels>
 }
 
@@ -38,7 +40,7 @@ export interface SelectedItemsBarProps {
  *
  * @example
  *   <SelectedItemsBar onClearAll={clearAll}>
- *     {selected.map(t => <Pill key={t.id}>{t.name}</Pill>)}
+ *     {selected.map(t => <Badge key={t.id}>{t.name}</Badge>)}
  *   </SelectedItemsBar>
  */
 export function SelectedItemsBar({
@@ -46,11 +48,12 @@ export function SelectedItemsBar({
   onClearAll,
   clearLabel,
   children,
+  className,
   labels,
 }: SelectedItemsBarProps) {
   const l = useLabels('selectedItemsBar', defaultLabels, labels)
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+    <div className={cn('flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card px-3 py-2', className)}>
       <span className="caption text-muted-foreground">{label ?? l.selected}</span>
       {children}
       <Button type="button" variant="ghost" icon={CloseIcon} className="ml-auto" onClick={onClearAll}>

@@ -37,9 +37,16 @@ export function Shell({ children }: { children: ReactNode }) {
           groups={groups}
           currentPath={path}
           linkComponent={Link}
-          header={collapsed => <span className="heading-3">{collapsed ? 'S' : 'Starter'}</span>}
-          footer={collapsed => (
-            <UserMenu name="Ada Lovelace" email="ada@example.com" collapsed={collapsed} linkComponent={Link} />
+          header={({ collapsed }) => <span className="heading-3">{collapsed ? 'S' : 'Starter'}</span>}
+          footer={({ collapsed, closeMobile }) => (
+            <UserMenu
+              name="Ada Lovelace"
+              email="ada@example.com"
+              collapsed={collapsed}
+              linkComponent={Link}
+              onNavigate={closeMobile}
+              items={[{ label: 'Settings', href: '/settings', icon: Settings }]}
+            />
           )}
         />
       }

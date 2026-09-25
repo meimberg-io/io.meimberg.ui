@@ -1,30 +1,47 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
 import {Chip} from './Chip'
-import {Folder, Sparkles, Check} from './icons'
+import {BadgeDot} from './Badge'
+import {Check, Flame, Folder} from './icons'
 
 const meta: Meta<typeof Chip> = {
   title: 'Atoms/Chip',
   component: Chip,
-  args: {
-    children: 'Today',
-    active: false,
+  args: {children: 'Today'},
+  argTypes: {
+    tone: {control: 'inline-radio', options: ['neutral', 'primary', 'success', 'warning', 'info', 'destructive']},
+    size: {control: 'inline-radio', options: ['xs', 'sm']},
   },
 }
-
 export default meta
+
 type Story = StoryObj<typeof Chip>
 
 export const Inactive: Story = {}
 
-export const Active: Story = {args: {active: true, children: 'Today'}}
+export const Active: Story = {args: {active: true}}
 
-export const WithIcon: Story = {
-  args: {active: true, icon: Folder, children: 'Projects'},
+export const WithIconAndCount: Story = {
+  args: {active: true, icon: Flame, count: 3, children: 'Urgent'},
 }
 
-export const WithCount: Story = {
-  args: {active: true, icon: Sparkles, count: 3, children: 'Urgent'},
+export const Tones: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-2">
+      {(['neutral', 'primary', 'success', 'warning', 'info', 'destructive'] as const).map(tone => (
+        <Chip key={tone} tone={tone} active>{tone}</Chip>
+      ))}
+    </div>
+  ),
+}
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex items-center gap-2">
+      <Chip size="xs" icon={Check} active>xs · 26</Chip>
+      <Chip size="sm" icon={Check} active>sm · 32</Chip>
+    </div>
+  ),
 }
 
 export const Toggleable: Story = {
@@ -32,11 +49,7 @@ export const Toggleable: Story = {
     const Demo = () => {
       const [active, setActive] = useState(false)
       return (
-        <Chip
-          active={active}
-          icon={Check}
-          onClick={() => setActive(v => !v)}
-        >
+        <Chip active={active} icon={Check} onClick={() => setActive(v => !v)}>
           Toggle me
         </Chip>
       )
@@ -45,24 +58,28 @@ export const Toggleable: Story = {
   },
 }
 
-/**
- * `size='md'` für Property-Bars in Editor-Surfaces. Rounded-md, 32 px
- * hoch, 14 px Font — aligned zu Form-Triggern (Dropdown/DatePicker size='sm').
- * Default bleibt `sm` (Pill, 24 px) für Filter-Bars.
- */
-export const SizeMedium: Story = {
-  args: {size: 'md', icon: Check, children: 'Done', active: true},
+export const Removable: Story = {
+  render: () => {
+    const Demo = () => {
+      const [filters, setFilters] = useState(['Alpha', 'Beta', 'Gamma'])
+      return (
+        <div className="flex flex-wrap items-center gap-2">
+          {filters.map(f => (
+            <Chip key={f} prefix="Project:" onRemove={() => setFilters(prev => prev.filter(x => x !== f))}>
+              {f}
+            </Chip>
+          ))}
+          <Chip tone="neutral" leading={<BadgeDot className="text-success" />} onRemove={() => {}}>
+            Status: open
+          </Chip>
+        </div>
+      )
+    }
+    return <Demo />
+  },
 }
 
-export const SizeMediumInactive: Story = {
-  args: {size: 'md', icon: Check, children: 'Open', active: false},
-}
-
-export const SizeComparison: Story = {
-  render: () => (
-    <div className="flex items-center gap-2">
-      <Chip size="sm" icon={Check} active>Done (sm)</Chip>
-      <Chip size="md" icon={Check} active>Done (md)</Chip>
-    </div>
-  ),
+/** Resize the viewport below `md`: the label disappears, the icon stays. */
+export const CompactBelow: Story = {
+  args: {icon: Folder, compactBelow: 'md', active: true, children: 'Projects'},
 }

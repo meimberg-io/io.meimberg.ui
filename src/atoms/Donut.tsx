@@ -1,4 +1,5 @@
 import type {SVGProps} from 'react'
+import {cn} from '../lib/cn'
 
 export interface DonutSegment {
   /** Anteil-Wert (numeric, beliebige Einheit — Summe wird normiert). */
@@ -32,6 +33,7 @@ export function Donut({
   segments,
   size = 64,
   strokeWidth = 8,
+  className,
   ...rest
 }: DonutProps) {
   const total = segments.reduce((s, seg) => s + seg.value, 0)
@@ -42,7 +44,7 @@ export function Donut({
 
   if (total <= 0) {
     return (
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden {...rest}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden className={className} {...rest}>
         <circle
           cx={cx}
           cy={cy}
@@ -68,7 +70,7 @@ export function Donut({
       height={size}
       viewBox={`0 0 ${size} ${size}`}
       aria-hidden
-      style={{transform: 'rotate(-90deg)'}}
+      className={cn('-rotate-90', className)}
       {...rest}
     >
       {segments.map((seg, i) => {

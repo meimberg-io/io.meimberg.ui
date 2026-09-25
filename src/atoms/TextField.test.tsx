@@ -32,4 +32,24 @@ describe('TextField', () => {
     expect(el.className).toContain('field-shell')
     expect(el.className).toContain('font-mono')
   })
+
+  it('renders leading and trailing slots and pads the input for them', () => {
+    render(
+      <TextField
+        placeholder="x"
+        leading={<span data-testid="lead">L</span>}
+        trailing={<span data-testid="trail">T</span>}
+      />,
+    )
+    expect(screen.getByTestId('lead')).toBeInTheDocument()
+    expect(screen.getByTestId('trail')).toBeInTheDocument()
+    const input = screen.getByPlaceholderText('x')
+    expect(input.style.paddingLeft).toBe('36px')
+    expect(input.style.paddingRight).toBe('36px')
+  })
+
+  it('renders the bare input without slots', () => {
+    const {container} = render(<TextField placeholder="x" />)
+    expect(container.firstElementChild?.tagName).toBe('INPUT')
+  })
 })

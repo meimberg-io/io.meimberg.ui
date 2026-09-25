@@ -3,7 +3,7 @@
 import {useEffect, useMemo, useState} from 'react'
 import {useTheme} from 'next-themes'
 import {Sun, Moon, Monitor} from '../atoms/icons'
-import {SegmentedSwitch, type SegmentedOption} from './SegmentedSwitch'
+import {SegmentedControl, type SegmentedControlOption} from './SegmentedControl'
 import {useLabels} from '../i18n/context'
 
 /**
@@ -40,16 +40,17 @@ const defaultLabels: ThemeToggleLabels = {
   system: 'System — follows the operating system',
 }
 
-interface Props {
+export interface ThemeToggleProps {
   labels?: Partial<ThemeToggleLabels>
+  className?: string
 }
 
-export function ThemeToggle({labels}: Props = {}) {
+export function ThemeToggle({labels, className}: ThemeToggleProps = {}) {
   const l = useLabels('themeToggle', defaultLabels, labels)
-  const options = useMemo<ReadonlyArray<SegmentedOption<ThemeChoice>>>(() => [
-    {value: 'light', icon: <Sun width={15} height={15} />, ariaLabel: l.light},
-    {value: 'dark', icon: <Moon width={15} height={15} />, ariaLabel: l.dark},
-    {value: 'system', icon: <Monitor width={15} height={15} />, ariaLabel: l.system},
+  const options = useMemo<ReadonlyArray<SegmentedControlOption<ThemeChoice>>>(() => [
+    {value: 'light', icon: Sun, ariaLabel: l.light},
+    {value: 'dark', icon: Moon, ariaLabel: l.dark},
+    {value: 'system', icon: Monitor, ariaLabel: l.system},
   ], [l])
   const {theme, setTheme} = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -59,14 +60,15 @@ export function ThemeToggle({labels}: Props = {}) {
   useEffect(() => setMounted(true), [])
 
   if (!mounted) {
-    return <SegmentedSwitch value="system" options={options} onChange={() => {}} disabled />
+    return <SegmentedControl value="system" options={options} onChange={() => {}} disabled className={className} />
   }
 
   return (
-    <SegmentedSwitch<ThemeChoice>
+    <SegmentedControl<ThemeChoice>
       value={(theme as ThemeChoice | undefined) ?? 'system'}
       options={options}
       onChange={setTheme}
+      className={className}
     />
   )
 }

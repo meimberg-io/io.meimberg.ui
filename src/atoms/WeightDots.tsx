@@ -6,6 +6,7 @@
 // Die Farb-Tokens (bg-primary, bg-muted-foreground …) bleiben hier im Atom,
 // damit die ESLint-Regel gegen Tokens ausserhalb von atoms/ greifen kann.
 
+import type {HTMLAttributes} from 'react'
 import {cn} from '../lib/cn'
 import {useLabels} from '../i18n/context'
 
@@ -20,7 +21,7 @@ const defaultLabels: WeightDotsLabels = {
   label: 'Weight',
 }
 
-export interface WeightDotsProps {
+export interface WeightDotsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
   /** Aktueller Wert (1..max). */
   value: number
   /** Anzahl der Dots. Default 5. */
@@ -29,12 +30,9 @@ export interface WeightDotsProps {
   onChange?: (value: number) => void
   /** Read-only-Modus: keine Klick-Handler, kein Cursor-Pointer. */
   readOnly?: boolean
-  /** Optionale Tailwind-Klassen für den äußeren Container. */
-  className?: string
-  /** A11y-Label für die gesamte Gruppe (z. B. „Weight for project X"). */
+  /** A11y-Label für die gesamte Gruppe (z. B. „Weight for project X"). Default aus `labels.label`. */
   'aria-label'?: string
   labels?: Partial<WeightDotsLabels>
-  'data-testid'?: string
 }
 
 /**
@@ -53,16 +51,16 @@ export function WeightDots({
   className,
   'aria-label': ariaLabel,
   labels,
-  'data-testid': testId,
+  ...rest
 }: WeightDotsProps) {
   const l = useLabels('weightDots', defaultLabels, labels)
   const values = Array.from({length: max}, (_, i) => i + 1)
   return (
     <div
       role="group"
+      {...rest}
       aria-label={ariaLabel ?? `${l.label} ${value} / ${max}`}
       className={cn('inline-flex items-center gap-1', className)}
-      data-testid={testId}
     >
       {values.map(n => {
         const filled = n <= value

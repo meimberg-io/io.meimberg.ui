@@ -50,4 +50,11 @@ describe('Sparkline atom', () => {
     const {container} = render(<Sparkline values={[1, 2, 3]} />)
     expect(container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
   })
+
+  it('merges className with the base block class', () => {
+    const {container} = render(<Sparkline values={[1, 2, 3]} className="text-success" />)
+    const cls = container.querySelector('svg')!.getAttribute('class')
+    expect(cls).toContain('block')
+    expect(cls).toContain('text-success')
+  })
 })

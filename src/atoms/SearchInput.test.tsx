@@ -50,4 +50,43 @@ describe('SearchInput', () => {
     await user.click(screen.getByRole('button', {name: /Clear search/}))
     expect(onChange).toHaveBeenCalledWith('')
   })
+
+  it('defaults to size lg (bordered field)', () => {
+    renderWithProviders(<SearchInput value='' onChange={vi.fn()} />)
+    expect(screen.getByRole('textbox').parentElement).toHaveAttribute('data-size', 'lg')
+    expect(screen.getByRole('textbox').className).toContain('border')
+  })
+
+  it('size xs renders the borderless 26px filter-bar look', () => {
+    renderWithProviders(<SearchInput size='xs' value='' onChange={vi.fn()} />)
+    const wrapper = screen.getByRole('textbox').parentElement!
+    expect(wrapper).toHaveAttribute('data-size', 'xs')
+    expect(wrapper.className).toContain('md:w-[200px]')
+    const input = screen.getByRole('textbox')
+    expect(input.className).toContain('h-6.5')
+    expect(input.className).toContain('bg-transparent')
+    expect(input.className).not.toMatch(/\bborder\b/)
+    expect(wrapper.querySelector('svg')!.getAttribute('class')).toContain('size-3.5')
+  })
+
+  it('uses the placeholder as accessible name unless aria-label is given', () => {
+    const {rerender} = renderWithProviders(<SearchInput size='xs' value='' onChange={vi.fn()} placeholder='Filter tasks' />)
+    expect(screen.getByRole('textbox', {name: 'Filter tasks'})).toBeInTheDocument()
+    rerender(<SearchInput size='xs' value='' onChange={vi.fn()} placeholder='Filter tasks' aria-label='Search tasks' />)
+    expect(screen.getByRole('textbox', {name: 'Search tasks'})).toBeInTheDocument()
+  })
+
+  it('renders the clear button at size xs', () => {
+    renderWithProviders(<SearchInput size='xs' value='x' onChange={vi.fn()} />)
+    expect(screen.getByRole('button', {name: 'Clear search'}).className).toContain('size-6.5')
+  })
+
+  it('passes data attributes through to the input and className to the wrapper', () => {
+    renderWithProviders(
+      <SearchInput value='' onChange={vi.fn()} data-testid='task-search' className='ml-auto' />,
+    )
+    const input = screen.getByTestId('task-search')
+    expect(input.tagName).toBe('INPUT')
+    expect(input.parentElement!.className).toContain('ml-auto')
+  })
 })

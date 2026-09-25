@@ -1,17 +1,18 @@
 'use client'
 
-// Form-Field — Label/Hint/Slot/Error in einheitlichem Spacing.
-// Konsumenten liefern den eigentlichen Input als `children`; wir kümmern uns
-// um Label-Abstand (`mb-1.5`), Optional-Hint rechts neben Label, sowie
-// Required-Marker und Error-Footer.
+// FormField — Label/Hint/Beschreibung/Slot/Fehler in einheitlichem Spacing.
+// Konsumenten liefern das eigentliche Control als `children`.
 //
-// `FormFieldContext` propagiert die generierte `id` an Children,
-// damit `<label htmlFor>` ↔ `<input id>` auch ohne expliziten `htmlFor`-Prop
-// auto-verknüpft werden (Voraussetzung für `getByLabelText` in Tests + a11y).
-// Atoms wie `TextField` consumen den Context.
+// Label ↔ Control: Die Field-ID läuft auf zwei Wegen zum Control —
+//   1. per Context (`useFormFieldId`), den die DS-Controls (TextField,
+//      DatePicker, Select, …) lesen,
+//   2. per `cloneElement`, wenn das einzige Kind ein Element ohne eigene `id`
+//      ist und kein `htmlFor` gesetzt ist — damit funktionieren auch rohe
+//      `<input>`/`<textarea>`/`ui/input`.
+// Bringt das Kind eine eigene `id` mit, zeigt das Label darauf.
 
-import {createContext, useContext, useId} from 'react'
-import type {ReactNode} from 'react'
+import {Children, Fragment, cloneElement, createContext, isValidElement, useContext, useId} from 'react'
+import type {ReactElement, ReactNode} from 'react'
 import {cn} from '../lib/cn'
 
 interface FormFieldContextValue {
@@ -19,28 +20,35 @@ interface FormFieldContextValue {
 }
 const FormFieldContext = createContext<FormFieldContextValue | null>(null)
 
-/** Atoms (TextField etc.) lesen die generierte Field-Id darüber, damit der
- *  `label htmlFor` auto-matched. Keine API-Erweiterung am Consumer nötig. */
+/** Field-ID des umgebenden `<FormField>` — Controls setzen sie als `id`, wenn sie keine eigene haben. */
 export function useFormFieldId(): string | undefined {
   return useContext(FormFieldContext)?.id
 }
 
-interface Props {
+export interface FormFieldProps {
   /** Label-Text oder -Node. */
   label: ReactNode
-  /** Kleiner Hint rechts vom Label (z. B. "(optional)"). */
+  /** Kleiner Hint rechts vom Label (z. B. „(optional)"). */
   hint?: ReactNode
-  /** Wenn true: roter Stern hinter Label. */
+  /** Roter Stern hinter dem Label (per CSS, nicht im Accessible Name). */
   required?: boolean
-  /** Wenn gesetzt: roter Footer-Text unter Children. */
+  /** Fehlertext unter dem Control. */
   error?: ReactNode
-  /** Beschreibungstext unter dem Label, über dem Slot (optional). */
+  /** Beschreibung unter dem Label, über dem Control. */
   description?: ReactNode
-  /** Slot — i.d.R. `<TextField>` / `<RichSelect>` / etc. */
+  /** Das Control — i. d. R. ein DS-Control oder ein einzelnes `<input>`/`<textarea>`. */
   children: ReactNode
   className?: string
-  /** Eigene id für a11y-Verknüpfung — sonst auto via useId. */
+  /** Explizite Control-ID (wenn das Control tiefer verschachtelt ist). Sonst Kind-`id` oder `useId()`. */
   htmlFor?: string
+}
+
+type IdProps = {id?: string}
+
+/** Das einzige Kind, wenn es ein echtes Element ist (kein Fragment, kein Text, keine Liste). */
+function singleElement(children: ReactNode): ReactElement<IdProps> | null {
+  if (Children.count(children) !== 1 || !isValidElement<IdProps>(children)) return null
+  return children.type === Fragment ? null : children
 }
 
 export function FormField({
@@ -52,32 +60,31 @@ export function FormField({
   children,
   className,
   htmlFor,
-}: Props) {
+}: FormFieldProps) {
   const autoId = useId()
-  const id = htmlFor ?? autoId
+  const child = singleElement(children)
+  const childId = child?.props.id
+  const id = htmlFor ?? childId ?? autoId
+  // Mit explizitem `htmlFor` setzt der Caller die ID selbst (verschachteltes Control).
+  const content = child && childId == null && htmlFor == null ? cloneElement(child, {id}) : children
   return (
     <FormFieldContext.Provider value={{id}}>
       <div className={cn('min-w-0', className)}>
-        {/* Label-Text steht DIREKT als Children — testing-library's
-         *  `getByLabelText('Title')` matched gegen den textContent.
-         *  Required-Marker läuft per CSS-`::after` (`form-field-required`-
-         *  Utility), damit der Asterisk NICHT in textContent landet. */}
+        {/* Label-Text steht direkt als Kind — `getByLabelText('Title')`
+         *  matcht gegen den textContent. Der Required-Stern läuft per
+         *  CSS-`::after` (`form-field-required`), damit er nicht im
+         *  Accessible Name landet. */}
         <label
           htmlFor={id}
-          className={cn(
-            'caption text-muted-foreground mb-1.5 block',
-            required && 'form-field-required',
-          )}
+          className={cn('caption text-muted-foreground mb-1.5 block', required && 'form-field-required')}
         >
           {label}
-          {hint && (
-            <span className="ml-1.5 text-muted-foreground/70 font-normal">{hint}</span>
-          )}
+          {hint && <span className="ml-1.5 text-muted-foreground/70 font-normal">{hint}</span>}
         </label>
         {description && (
           <p className="caption text-muted-foreground/80 mb-1.5 leading-relaxed">{description}</p>
         )}
-        {children}
+        {content}
         {error && <p className="caption text-destructive mt-1.5">{error}</p>}
       </div>
     </FormFieldContext.Provider>

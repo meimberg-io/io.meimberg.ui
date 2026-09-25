@@ -49,7 +49,7 @@ export const AutomationsEmpty: Story = {
 export const Dashed: Story = {
   name: 'Dashed (filtered list empty)',
   args: {
-    tone: 'dashed',
+    variant: 'dashed',
     icon: Search,
     title: 'No results',
     description: 'Nothing matches the active filters. Reset filters.',
@@ -59,7 +59,7 @@ export const Dashed: Story = {
 export const DashedWithLinkAction: Story = {
   name: 'Dashed + link action',
   args: {
-    tone: 'dashed',
+    variant: 'dashed',
     icon: FolderKanban,
     title: 'No projects',
     description: 'Create the first project in this workspace.',

@@ -44,6 +44,8 @@ export interface EditableInlineHeadingProps {
   multiline?: boolean
   /** Extra-Buttons im Display-Mode rechts neben dem Edit-Trigger (z. B. Reset). */
   displayActions?: ReactNode
+  /** Extra-Klassen am äußeren Container (beide Modi). */
+  className?: string
   labels?: Partial<EditableInlineHeadingLabels>
 }
 
@@ -68,6 +70,7 @@ export function EditableInlineHeading({
   size = 'heading-2',
   multiline = false,
   displayActions,
+  className,
   labels,
 }: EditableInlineHeadingProps) {
   const l = useLabels('editableInlineHeading', defaultLabels, labels)
@@ -108,7 +111,7 @@ export function EditableInlineHeading({
   if (editing) {
     const fieldClass = cn('flex-1 min-w-0', SIZE_CLASSES[size])
     return (
-      <span className="inline-flex w-full items-center gap-1.5" onBlur={handleBlur}>
+      <span className={cn('inline-flex w-full items-center gap-1.5', className)} onBlur={handleBlur}>
         {multiline ? (
           <TextField
             as="textarea"
@@ -141,7 +144,7 @@ export function EditableInlineHeading({
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5">
+    <span className={cn('inline-flex items-center gap-1.5', className)}>
       {/* Der Titel selbst ist der primäre Edit-Trigger; das Stift-Icon bleibt als
           sichtbare Affordanz daneben. Accessible Name des Text-Buttons ist der
           Titel — so liest ein Screenreader das Edit-Label nicht doppelt. */}

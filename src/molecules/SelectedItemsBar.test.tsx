@@ -51,4 +51,13 @@ describe('SelectedItemsBar', () => {
     expect(screen.getByText('Tags:')).toBeInTheDocument()
     expect(screen.getByRole('button', {name: /Remove tags/})).toBeInTheDocument()
   })
+
+  it('merges className on the bar', () => {
+    const {container} = render(
+      <SelectedItemsBar onClearAll={() => {}} className='mb-4'>
+        <span>design</span>
+      </SelectedItemsBar>,
+    )
+    expect((container.firstElementChild as HTMLElement).className).toContain('mb-4')
+  })
 })

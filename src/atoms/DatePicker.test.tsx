@@ -114,4 +114,22 @@ describe('DatePicker', () => {
     expect(root).not.toBeNull()
     expect(root).toHaveClass('relative')
   })
+
+  it('defaults to size lg (40 px, full width) and supports sm (32 px)', () => {
+    const {rerender} = render(<DatePicker value={null} onChange={() => {}} />)
+    expect(screen.getByRole('button')).toHaveClass('h-10', 'w-full')
+    rerender(<DatePicker value={null} onChange={() => {}} size="sm" />)
+    expect(screen.getByRole('button')).toHaveClass('h-8', 'w-auto')
+  })
+
+  it('passes data-* and aria-* attributes through to the trigger', () => {
+    render(<DatePicker value={null} onChange={() => {}} data-testid="due" aria-describedby="hint" />)
+    const trigger = screen.getByTestId('due')
+    expect(trigger).toHaveAttribute('aria-describedby', 'hint')
+  })
+
+  it('prefers an explicit id over the FormField context id', () => {
+    render(<DatePicker value={null} onChange={() => {}} id="due-date" />)
+    expect(screen.getByRole('button')).toHaveAttribute('id', 'due-date')
+  })
 })

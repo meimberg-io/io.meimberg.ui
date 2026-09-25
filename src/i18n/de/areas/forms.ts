@@ -2,7 +2,6 @@
 
 import type {FormsMessages} from '../../areas/forms'
 import {comingSoon} from '../comingSoon'
-import {comingSoonCard} from '../comingSoonCard'
 import {datePicker} from '../datePicker'
 import {editableInlineHeading} from '../editableInlineHeading'
 import {editableSection} from '../editableSection'
@@ -14,7 +13,6 @@ import {weightDots} from '../weightDots'
 
 export const formsMessages: FormsMessages = {
   comingSoon,
-  comingSoonCard,
   datePicker,
   editableInlineHeading,
   editableSection,

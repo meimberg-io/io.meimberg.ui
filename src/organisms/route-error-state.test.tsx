@@ -42,4 +42,13 @@ describe('RouteErrorState', () => {
     expect(screen.getByRole('heading', { name: 'Oops' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reload' })).toBeInTheDocument()
   })
+
+  it('merges className on the root', () => {
+    renderWithProviders(
+      <RouteErrorState error={new Error('boom')} reset={vi.fn()} className='py-8' />,
+    )
+    const root = screen.getByRole('heading').parentElement!
+    expect(root.className).toContain('py-8')
+    expect(root.className).not.toContain('py-16')
+  })
 })

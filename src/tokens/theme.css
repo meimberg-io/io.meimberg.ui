@@ -348,7 +348,7 @@
 
 /* Vereinheitlichter Active-State-Cue auf Form-Triggern.
  *   `:focus-visible` — Tastatur-Fokus · `[data-state="open"]` — Radix-Trigger
- *   · `[data-open="true"]` — eigene Trigger (z. B. RichSelect). */
+ *   · `[data-open="true"]` — eigene Trigger. */
 @utility focus-ring {
   &:focus-visible,
   &[data-state="open"],
@@ -367,7 +367,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  /* Longhand statt Shorthand — `<TextField leadingIcon/trailingIcon>` setzen
+  /* Longhand statt Shorthand — `<TextField leading/trailing>` setzen
    * `padding-left/right` per inline style; Shorthand würde das resetten. */
   padding-block: 0;
   padding-left: 12px;
@@ -428,7 +428,7 @@
   padding: 80px 16px;
   z-index: 50;
   /* Kein backdrop-filter — würde einen Stacking-Context erzeugen, in dem das
-   * Portal-Popover (RichSelect-Listbox an document.body) event-mäßig hinter
+   * Portal-Popover (Select-/Combobox-Liste an document.body) event-mäßig hinter
    * dem Dialog-Footer läge. Solide Background-Tönung genügt. */
   animation: dlg-fade-in .15s ease-out;
 }

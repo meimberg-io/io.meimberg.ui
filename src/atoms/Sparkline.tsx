@@ -1,4 +1,5 @@
 import type {SVGProps} from 'react'
+import {cn} from '../lib/cn'
 
 export interface SparklineProps extends Omit<SVGProps<SVGSVGElement>, 'children' | 'fill' | 'values'> {
   /** Daten-Reihe. Mindestens 2 Werte. */
@@ -29,11 +30,12 @@ export function Sparkline({
   width = 120,
   height = 36,
   fill = true,
+  className,
   ...rest
 }: SparklineProps) {
   if (values.length < 2) {
     return (
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden {...rest} />
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden className={cn('block', className)} {...rest} />
     )
   }
 
@@ -57,7 +59,7 @@ export function Sparkline({
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       aria-hidden
-      className="block"
+      className={cn('block', className)}
       {...rest}
     >
       {fill ? <path d={area} fill={color} fillOpacity="0.12" /> : null}

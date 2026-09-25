@@ -2,6 +2,7 @@ import {describe, expect, it, vi, beforeEach} from 'vitest'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '../test/render'
 import {ThemeToggle} from './ThemeToggle'
+import {de} from '../i18n/de'
 
 // next-themes mocken: volle Kontrolle über `theme` und `setTheme`.
 // Der echte ThemeProvider in `renderWithProviders` wird durch unseren Mock
@@ -43,21 +44,33 @@ describe('ThemeToggle', () => {
     expect(system.getAttribute('aria-checked')).toBe('true')
   })
 
-  it('clicking a segment calls setTheme with its value', async () => {
-    mockedTheme = 'system'
+  it('clicking a segment calls setTheme with its value (not for the active one)', async () => {
+    mockedTheme = 'light'
     const {user} = renderWithProviders(<ThemeToggle />)
-    await user.click(await screen.findByRole('radio', {name: /Light mode/}))
-    expect(setTheme).toHaveBeenCalledWith('light')
-    await user.click(screen.getByRole('radio', {name: /Dark mode/}))
+    await user.click(await screen.findByRole('radio', {name: /Dark mode/}))
     expect(setTheme).toHaveBeenCalledWith('dark')
     await user.click(screen.getByRole('radio', {name: /System/}))
     expect(setTheme).toHaveBeenCalledWith('system')
+    await user.click(screen.getByRole('radio', {name: /Light mode/}))
+    expect(setTheme).toHaveBeenCalledTimes(2)
   })
 
   it('segments are clickable (cursor-pointer)', async () => {
     renderWithProviders(<ThemeToggle />)
     const light = await screen.findByRole('radio', {name: /Light mode/})
     expect(light.className).toContain('cursor-pointer')
+  })
+
+  it('renders icon segments and merges className', async () => {
+    renderWithProviders(<ThemeToggle className="ml-auto" />)
+    const light = await screen.findByRole('radio', {name: /Light mode/})
+    expect(light.querySelector('svg')).toBeTruthy()
+    expect(screen.getByRole('radiogroup').className).toContain('ml-auto')
+  })
+
+  it('uses the German package via UiI18nProvider', async () => {
+    renderWithProviders(<ThemeToggle />, {messages: de.messages})
+    expect(await screen.findByRole('radio', {name: 'Dark Mode'})).toBeTruthy()
   })
 
   it('overrides labels via the labels prop', async () => {

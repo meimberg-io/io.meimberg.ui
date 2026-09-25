@@ -6,9 +6,12 @@
 // Generisch über `glyph`-Slot — Konsumenten füllen den Icon-Slab mit dem
 // passenden Glyph (Icon, Logo, Initialen).
 
-import type {ReactNode} from 'react'
+import type {ButtonHTMLAttributes, ReactNode} from 'react'
+import {Check} from '../atoms/icons'
+import {cn} from '../lib/cn'
 
-interface Props {
+export interface SelectableTileProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'onClick'> {
   /** Label rechts vom Icon. */
   label: ReactNode
   /** Inhalt des Icon-Slabs (50px breit, full-height, randlos). */
@@ -20,10 +23,6 @@ interface Props {
   glyphColor?: string
   active: boolean
   onClick: () => void
-  disabled?: boolean
-  title?: string
-  /** Test-Hook, z. B. `source-tile-cloud`. */
-  'data-testid'?: string
 }
 
 export function SelectableTile({
@@ -34,21 +33,24 @@ export function SelectableTile({
   active,
   onClick,
   disabled,
-  title,
-  'data-testid': testId,
-}: Props) {
+  className,
+  ...rest
+}: SelectableTileProps) {
   return (
     <button
       type="button"
+      {...rest}
+      aria-pressed={active}
       data-on={active}
       data-disabled={disabled || undefined}
-      data-testid={testId}
       disabled={disabled}
       onClick={onClick}
-      title={title}
       // `group` + `group-data-[on=true]:`-Varianten stylen Label und
       // Checkmark aus dem Aktiv-Zustand des Buttons.
-      className="group relative flex min-h-[52px] cursor-pointer items-stretch overflow-hidden rounded-[calc(var(--radius)+2px)] border-[1.5px] border-border bg-card text-left transition-[border-color,box-shadow,background-color] duration-150 hover:border-muted-foreground/40 hover:shadow-[0_4px_12px_-6px_hsl(var(--foreground)/0.1)] data-[on=true]:border-primary data-[on=true]:shadow-[0_0_0_3px_hsl(var(--primary)/0.1),0_4px_12px_-6px_hsl(var(--primary)/0.2)] data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-55"
+      className={cn(
+        'group relative flex min-h-[52px] cursor-pointer items-stretch overflow-hidden rounded-[calc(var(--radius)+2px)] border-[1.5px] border-border bg-card text-left transition-[border-color,box-shadow,background-color] duration-150 hover:border-muted-foreground/40 hover:shadow-[0_4px_12px_-6px_hsl(var(--foreground)/0.1)] data-[on=true]:border-primary data-[on=true]:shadow-[0_0_0_3px_hsl(var(--primary)/0.1),0_4px_12px_-6px_hsl(var(--primary)/0.2)] data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-55',
+        className,
+      )}
     >
       <span
         className="flex w-[50px] shrink-0 items-center justify-center border-r border-[hsl(var(--foreground)/0.06)]"
@@ -66,18 +68,7 @@ export function SelectableTile({
         className="-ml-1 mr-2.5 flex size-4 shrink-0 scale-50 items-center justify-center self-center rounded-full bg-primary text-white opacity-0 transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.4,1.4,0.5,1)] group-data-[on=true]:scale-100 group-data-[on=true]:opacity-100"
         aria-hidden="true"
       >
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
+        <Check className="size-2.5" strokeWidth={3.5} />
       </span>
     </button>
   )

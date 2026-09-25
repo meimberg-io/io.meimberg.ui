@@ -5,8 +5,8 @@
 // Konsumenten geben Layout-Klassen (lg:col-span-2, overflow-hidden, …) via
 // `className` weiter; Padding wählen sie via Prop.
 
-import type {HTMLAttributes, ReactNode} from 'react'
-import {Card} from '../ui/card'
+import type {ReactNode} from 'react'
+import {Card, type CardProps} from '../ui/card'
 import {cn} from '../lib/cn'
 
 const PADDING_CLASSES = {
@@ -19,8 +19,7 @@ const PADDING_CLASSES = {
   none: '',
 } as const
 
-export interface DashboardCardProps
-  extends HTMLAttributes<HTMLDivElement> {
+export interface DashboardCardProps extends CardProps {
   /**
    * Padding-Variante.
    * - `dashboard` (Default): `p-5` — Standard für Dashboard-Sections.

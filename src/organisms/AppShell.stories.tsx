@@ -35,7 +35,7 @@ export const Default: Story = {
         <AppSidebar
           groups={groups}
           currentPath="/projects"
-          header={collapsed => (collapsed ? <span className="font-bold">A</span> : <span className="body font-bold">Acme</span>)}
+          header={({collapsed}) => (collapsed ? <span className="font-bold">A</span> : <span className="body font-bold">Acme</span>)}
         />
       }
       headerStart={

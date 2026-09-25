@@ -15,7 +15,7 @@ const meta: Meta<typeof KpiTile> = {
     variant: 'default',
   },
   argTypes: {
-    tone: {control: 'inline-radio', options: ['neutral', 'success', 'warn', 'danger']},
+    tone: {control: 'inline-radio', options: ['neutral', 'success', 'warning', 'destructive']},
     variant: {control: 'inline-radio', options: ['default', 'emphasis', 'muted']},
   },
   decorators: [
@@ -37,7 +37,7 @@ export const WithIcon: Story = {
     label: 'Projects',
     value: 4,
     sublabel: 'linked',
-    icon: <Inbox width={12} height={12} />,
+    icon: Inbox,
     sparklineValues: undefined,
     delta: undefined,
   },
@@ -66,18 +66,18 @@ export const ToneSuccess: Story = {
   },
 }
 
-export const ToneWarn: Story = {
+export const ToneWarning: Story = {
   args: {
-    tone: 'warn',
+    tone: 'warning',
     label: 'Due soon',
     value: 9,
     delta: {value: 2, direction: 'up', isPositive: false},
   },
 }
 
-export const ToneDanger: Story = {
+export const ToneDestructive: Story = {
   args: {
-    tone: 'danger',
+    tone: 'destructive',
     label: 'Overdue',
     value: 5,
     delta: {value: 3, direction: 'up', isPositive: false},
@@ -114,9 +114,9 @@ export const HeroKpi: Story = {
     label: 'Open tasks',
     value: 23,
     sublabel: 'open',
-    tone: 'warn',
+    tone: 'warning',
     variant: 'emphasis',
-    icon: <ListTodo width={12} height={12} />,
+    icon: ListTodo,
     sparklineValues: [10, 12, 9, 14, 16, 18, 20, 23],
     delta: {value: 5, direction: 'up', isPositive: false},
   },
@@ -135,7 +135,7 @@ export const NoSparkline: Story = {
     label: 'Alerts',
     value: 12,
     sparklineValues: [],
-    icon: <Radio width={12} height={12} />,
+    icon: Radio,
     delta: undefined,
   },
 }

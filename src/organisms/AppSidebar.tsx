@@ -48,6 +48,18 @@ export type SidebarLinkComponent = ComponentType<{
   children: ReactNode
 }>
 
+/** Context passed to the `header`/`footer` render functions. */
+export interface AppSidebarSlotContext {
+  /** Desktop sidebar collapsed to the icon rail. */
+  collapsed: boolean
+  /** Sidebar renders as the mobile off-canvas sheet. */
+  isMobile: boolean
+  /** Closes the mobile off-canvas (no-op on desktop), e.g. after a click in the footer menu. */
+  closeMobile: () => void
+}
+
+export type AppSidebarSlot = (ctx: AppSidebarSlotContext) => ReactNode
+
 export interface AppSidebarProps {
   groups: SidebarNavGroup[]
   /** Current path (e.g. Next `usePathname()`). */
@@ -58,10 +70,10 @@ export interface AppSidebarProps {
   linkComponent?: SidebarLinkComponent
   /** Extra callback on navigation (the component closes the mobile sidebar itself). */
   onNavigate?: () => void
-  /** Header slot (logo/brand). Receives the collapsed state. */
-  header?: (collapsed: boolean) => ReactNode
-  /** Footer slot (e.g. user menu). Receives the collapsed state. */
-  footer?: (collapsed: boolean) => ReactNode
+  /** Header slot (logo/brand). */
+  header?: AppSidebarSlot
+  /** Footer slot (e.g. user menu). */
+  footer?: AppSidebarSlot
   className?: string
 }
 
@@ -87,16 +99,20 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const {state, isMobile, setOpenMobile} = useSidebar()
   const collapsed = state === 'collapsed'
+  const closeMobile = () => {
+    if (isMobile) setOpenMobile(false)
+  }
+  const ctx: AppSidebarSlotContext = {collapsed, isMobile, closeMobile}
 
   const handleNavigate = () => {
-    if (isMobile) setOpenMobile(false)
+    closeMobile()
     onNavigate?.()
   }
 
   return (
     <Sidebar collapsible="icon" className={cn('border-r border-sidebar-border', className)}>
       <SidebarContent>
-        {header ? <div className="flex items-center gap-3 px-4 py-5">{header(collapsed)}</div> : null}
+        {header ? <div className="flex items-center gap-3 px-4 py-5">{header(ctx)}</div> : null}
 
         {groups.map((group, gi) => (
           <SidebarGroup key={group.label ?? gi}>
@@ -142,7 +158,7 @@ export function AppSidebar({
       </SidebarContent>
 
       {footer ? (
-        <SidebarFooter className="border-t border-sidebar-border p-3">{footer(collapsed)}</SidebarFooter>
+        <SidebarFooter className="border-t border-sidebar-border p-3">{footer(ctx)}</SidebarFooter>
       ) : null}
     </Sidebar>
   )

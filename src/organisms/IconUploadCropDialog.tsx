@@ -6,6 +6,8 @@ import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription,
 } from '../ui/dialog'
 import { Button } from '../atoms/Button'
+import { Loader2 } from '../atoms/icons'
+import { cn } from '../lib/cn'
 import { Slider } from '../ui/slider'
 import { useLabels } from '../i18n/context'
 
@@ -31,13 +33,15 @@ const defaultLabels: IconUploadCropDialogLabels = {
   uploading: 'Uploading…',
 }
 
-interface Props {
+export interface IconUploadCropDialogProps {
   open: boolean
   onOpenChange: (next: boolean) => void
   /** Called with the final square file (PNG for raster, original for SVG). */
   onSubmit: (file: File) => Promise<void> | void
   /** Dialog title. Takes precedence over `labels.title`. */
   title?: string
+  /** Extra classes on the dialog content. */
+  className?: string
   labels?: Partial<IconUploadCropDialogLabels>
 }
 
@@ -51,7 +55,7 @@ interface Props {
  * The dialog drives the file picker itself — callers only toggle `open`
  * and implement `onSubmit`.
  */
-export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title, labels }: Props) {
+export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title, className, labels }: IconUploadCropDialogProps) {
   const l = useLabels('iconUploadCropDialog', defaultLabels, labels)
   const inputRef = useRef<HTMLInputElement>(null)
   const [pickedFile, setPickedFile] = useState<File | null>(null)
@@ -140,7 +144,6 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title, labe
 
   return (
     <>
-      { }
       <input
         ref={inputRef}
         type='file'
@@ -149,7 +152,7 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title, labe
         onChange={handleFile}
       />
       <Dialog open={open && !!showCropUI} onOpenChange={onOpenChange}>
-        <DialogContent className='max-w-md'>
+        <DialogContent className={cn('max-w-md', className)}>
           <DialogHeader>
             <DialogTitle>{title ?? l.title}</DialogTitle>
             <DialogDescription>
@@ -186,7 +189,13 @@ export function IconUploadCropDialog({ open, onOpenChange, onSubmit, title, labe
             <Button variant='outline' size='lg' onClick={() => onOpenChange(false)} disabled={submitting}>
               {l.cancel}
             </Button>
-            <Button size='lg' onClick={() => void handleSubmit()} disabled={submitting || !croppedAreaPx}>
+            <Button
+              size='lg'
+              icon={submitting ? Loader2 : undefined}
+              busy={submitting}
+              disabled={!croppedAreaPx}
+              onClick={() => void handleSubmit()}
+            >
               {submitting ? l.uploading : l.save}
             </Button>
           </DialogFooter>

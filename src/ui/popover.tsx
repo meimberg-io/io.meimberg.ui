@@ -11,9 +11,7 @@ const PopoverTrigger = PopoverPrimitive.Trigger;
 
 // PopoverAnchor exportieren, damit Konsumenten die Popover-Position
 // an ein bestehendes Element verankern können, ohne den Trigger zu sein.
-// Genutzt z. B. von `OptionsDropdown`, dessen Trigger der `FilterPillButton`-
-// Atom ist (eigenes onClick zum Toggeln) — der Anchor liefert die Position
-// für den portalisierten Content.
+// Genutzt z. B. vom Link-Popover im MarkdownEditor, der an der Toolbar hängt.
 const PopoverAnchor = PopoverPrimitive.Anchor;
 
 const PopoverContent = React.forwardRef<

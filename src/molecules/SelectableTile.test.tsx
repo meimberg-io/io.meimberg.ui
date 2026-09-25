@@ -41,4 +41,22 @@ describe('SelectableTile', () => {
     await user.click(screen.getByRole('button'))
     expect(onClick).not.toHaveBeenCalled()
   })
+
+  it('merges className, passes data-*/aria-* through and exposes aria-pressed', () => {
+    render(
+      <SelectableTile
+        label="Cloud"
+        glyph={<span>C</span>}
+        active
+        onClick={() => {}}
+        className="col-span-2"
+        data-testid="tile-cloud"
+        aria-describedby="hint"
+      />,
+    )
+    const tile = screen.getByTestId('tile-cloud')
+    expect(tile).toHaveClass('col-span-2', 'group')
+    expect(tile).toHaveAttribute('aria-describedby', 'hint')
+    expect(tile).toHaveAttribute('aria-pressed', 'true')
+  })
 })

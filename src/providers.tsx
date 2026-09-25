@@ -5,7 +5,7 @@
 // Manche Primitives setzen React-Contexts voraus:
 //   • Theme (next-themes) — ThemeToggle liest/setzt das Theme, Dark Mode hängt
 //     an der Klasse `.dark`.
-//   • Tooltip (Radix TooltipProvider) — Dropdown & Co. rendern Tooltips.
+//   • Tooltip (Radix TooltipProvider) — Select.IconTrigger & Co. rendern Tooltips.
 //   • Sprache (UiI18nProvider) — Labels, Zahlen- und Datumsformat.
 //
 // `UiProviders` bündelt genau diese Contexts, damit eine Consumer-App das

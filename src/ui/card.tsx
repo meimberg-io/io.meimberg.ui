@@ -4,8 +4,20 @@ import * as React from "react";
 
 import { cn } from "../lib/cn";
 
-const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("rounded-lg border bg-card text-card-foreground shadow-card", className)} {...props} />
+// Vendor-Änderung (Phase 3): `interactive` ergänzt den Hover-Akzent
+// (`hover-card`: Border-Shift + Shadow) und den Pointer-Cursor für klickbare
+// Karten. Sonst unverändert gegenüber shadcn.
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Klickbare Karte: Hover-Akzent (`hover-card`) + `cursor-pointer`. */
+  interactive?: boolean;
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(({ className, interactive = false, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("rounded-lg border bg-card text-card-foreground shadow-card", interactive && "hover-card cursor-pointer", className)}
+    {...props}
+  />
 ));
 Card.displayName = "Card";
 
@@ -42,4 +54,5 @@ const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardFooter.displayName = "CardFooter";
 
+export type { CardProps };
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };

@@ -3,14 +3,14 @@
 // Two-level sub-navigation (e.g. settings).
 //
 // Desktop (`>= md`): narrow nav sidebar left + content right. Mobile
-// (`< md`): the sidebar gives way to a <SelectField> that navigates to the
+// (`< md`): the sidebar gives way to a field <Select> that navigates to the
 // sub-page. Exactly one nav is visible per breakpoint. Framework-agnostic:
 // `currentPath` as prop, desktop links via the `linkComponent` slot, mobile
 // navigation via `onNavigate(href)` (e.g. Next `router.push`). No page
 // padding — the consumer wraps it (e.g. in <PageContainer>).
 
 import type {ComponentType, ReactNode} from 'react'
-import {SelectField} from '../atoms/SelectField'
+import {Select} from '../atoms/Select'
 import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
 
@@ -84,7 +84,7 @@ export function SubNavLayout({
   return (
     <div className={cn('flex flex-col gap-4 md:flex-row md:gap-8', className)}>
       <div className="md:hidden">
-        <SelectField
+        <Select
           value={active?.href ?? null}
           onChange={href => onNavigate?.(href)}
           placeholder={mobilePlaceholder ?? l.mobilePlaceholder}

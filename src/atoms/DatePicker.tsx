@@ -2,7 +2,7 @@
 
 // Single-Date-Picker via Popover + Calendar. Ersetzt `<input type="date">`.
 // ESLint blockt `from '../ui/calendar'`-Imports außerhalb dieser Datei
-// (analog `from '../ui/select'` → Dropdown.tsx).
+// (die übrigen Vendor-Primitives kapseln die Atoms genauso).
 //
 // API-Entscheidungen:
 // - Value-Typ: `string | null` als ISO-Date (YYYY-MM-DD), kein `Date`-Objekt —
@@ -15,27 +15,30 @@
 //   `allowClear` — Kein Datum.
 
 import {useState} from 'react'
-import type {ReactNode} from 'react'
+import type {ButtonHTMLAttributes, MouseEvent, ReactNode} from 'react'
 import {format, parseISO, startOfToday, addDays, nextSaturday, nextMonday} from 'date-fns'
 import type {Locale} from 'date-fns'
 import {CalendarDays, X, Sun, Armchair, CalendarClock, Ban} from '../atoms/icons'
-import type {LucideIcon} from '../atoms/icons'
 import {Calendar} from '../ui/calendar'
 import {Popover, PopoverContent, PopoverTrigger} from '../ui/popover'
 import {cn} from '../lib/cn'
+import {CONTROL_SIZE, type IconComponent} from '../lib/variants'
 import {formatAbsoluteDate} from '../lib/datetime'
 import {useFormFieldId} from '../molecules/FormField'
 import {useDateLocale, useLabels, useUiLocale} from '../i18n/context'
 
 /**
- * Trigger-Größen-Variante:
- *   - `default`: 40 px (Form-Field-Standard), `w-full`, body-Font, 12 px Padding.
- *     Für klassische Form-Layouts mit Label oben + Feld drunter.
- *   - `sm`: 32 px (h-8), `w-auto`, text-sm, kompaktes Padding. Für
- *     Property-Bars/Toolbars neben `<Chip size='md'>` / `<OptionsDropdown size='chip'>`
- *     — Geometrie ist auf diese Nachbar-Atoms abgestimmt.
+ * Trigger-Größe auf der Control-Skala:
+ *   - `lg` (Default): 40 px, `w-full` — Formularfelder mit Label darüber.
+ *   - `sm`: 32 px, `w-auto` — Property-Bars in Dialogen neben
+ *     `<Chip size="sm">` / `<Select size="sm">`.
  */
-export type DatePickerSize = 'default' | 'sm'
+export type DatePickerSize = 'sm' | 'lg'
+
+const SIZE_CLASS: Record<DatePickerSize, string> = {
+  sm: cn(CONTROL_SIZE.sm.height, CONTROL_SIZE.sm.text, 'w-auto gap-1.5 px-2.5'),
+  lg: cn(CONTROL_SIZE.lg.height, CONTROL_SIZE.lg.text, 'w-full gap-2 px-3'),
+}
 
 export interface DatePickerLabels {
   placeholder: string
@@ -57,7 +60,8 @@ const defaultLabels: DatePickerLabels = {
   noDate: 'No date',
 }
 
-interface Props {
+export interface DatePickerProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'defaultValue' | 'onChange' | 'children' | 'type' | 'placeholder'> {
   /** YYYY-MM-DD oder null. Date-only — keine TZ-Probleme, drop-in für `<input type="date">`. */
   value: string | null
   onChange: (value: string | null) => void
@@ -75,19 +79,15 @@ interface Props {
   allowClear?: boolean
   /** Quick-Actions über dem Kalender. Default `true`. */
   showShortcuts?: boolean
-  /** Trigger-Größe. Default `default` (40 px Form-Field). `sm` (32 px) für
-   *  Property-Bars — Geometrie aligned zu Chip 'md' / OptionsDropdown 'chip'.
-   *  Wer eine dritte Größe braucht: hier erweitern, **nicht** per className-
-   *  Override. */
+  /** Trigger-Größe. Default `lg` (40 px). `sm` (32 px) für Property-Bars.
+   *  Weitere Größen hier ergänzen, **nicht** per className-Override. */
   size?: DatePickerSize
   labels?: Partial<DatePickerLabels>
-  className?: string
-  'data-testid'?: string
 }
 
 interface DateShortcut {
   label: string
-  icon: LucideIcon
+  icon: IconComponent
   /** Zieldatum, oder `null` um den Wert zu leeren. */
   date: Date | null
   /** Kurz-Hint rechts (z. B. "Sat, Jun 6"). */
@@ -140,11 +140,12 @@ export function DatePicker({
   locale,
   allowClear,
   showShortcuts = true,
-  size = 'default',
+  size = 'lg',
   labels,
   className,
-  'data-testid': testId,
-}: Props) {
+  id: ownId,
+  ...rest
+}: DatePickerProps) {
   const contextId = useFormFieldId()
   const l = useLabels('datePicker', defaultLabels, labels)
   const uiLocale = useUiLocale()
@@ -169,7 +170,7 @@ export function DatePicker({
     setOpen(false)
   }
 
-  const handleClear = (event: React.MouseEvent) => {
+  const handleClear = (event: MouseEvent) => {
     // Verhindert, dass das Popover öffnet, wenn der User auf den X-Button klickt.
     event.stopPropagation()
     onChange(null)
@@ -180,15 +181,13 @@ export function DatePicker({
       {/* `focus-ring` greift auch auf `[data-state="open"]` (Radix-Trigger)
           und ersetzt den `focus:ring-*`. */}
       <PopoverTrigger
-        id={contextId}
+        {...rest}
+        id={ownId ?? contextId}
         type="button"
         disabled={disabled}
-        data-testid={testId}
         className={cn(
           'focus-ring inline-flex items-center rounded-md border border-input bg-background text-left transition-colors cursor-pointer',
-          size === 'sm'
-            ? 'h-8 w-auto gap-1.5 px-2.5 py-1 text-sm'
-            : 'h-10 w-full gap-2 px-3 py-2 body',
+          SIZE_CLASS[size],
           'hover:bg-accent/50 focus:outline-none',
           'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background',
           className,

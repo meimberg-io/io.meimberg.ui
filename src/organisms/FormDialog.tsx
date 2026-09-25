@@ -8,16 +8,14 @@
 // If a form doesn't fit this pattern, extend this component rather than
 // bending the form.
 
-import {forwardRef} from 'react'
 import type {ReactNode} from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import {Info, Loader2, X} from '../atoms/icons'
-import {Button} from '../atoms/Button'
+import {Check, Info, Loader2, X} from '../atoms/icons'
+import {Button, type ButtonTone} from '../atoms/Button'
+import type {IconComponent} from '../lib/variants'
 import {useIsMobile} from '../hooks/use-mobile'
 import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
-
-type SubmitVariant = 'primary' | 'success' | 'destructive'
 
 export interface FormDialogLabels {
   /** Footer cancel button in form mode. */
@@ -34,7 +32,7 @@ const defaultLabels: FormDialogLabels = {
   closeHero: 'Close dialog',
 }
 
-interface Props {
+export interface FormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   /** Caption above the title in the hero (e.g. "Create project"). */
@@ -54,12 +52,14 @@ interface Props {
   /** When omitted → view-only mode: no submit button, the cancel button
    *  becomes a "Close" button. */
   submitLabel?: ReactNode
-  submitVariant?: SubmitVariant
+  /** Colour of the submit button. Default `primary`. */
+  submitTone?: ButtonTone
   submitDisabled?: boolean
-  submitPending?: boolean
-  /** Optional submit icon override (default: checkmark for `success`,
-   *  none otherwise). */
-  submitIcon?: ReactNode
+  /** Submit is running: spinner icon, clicks ignored, Cancel disabled. */
+  submitBusy?: boolean
+  /** Leading submit icon (default: `Check` for `success`, none otherwise).
+   *  Replaced by a spinner while `submitBusy`. */
+  submitIcon?: IconComponent
   /** Footer cancel label. Takes precedence over `labels.cancel` /
    *  `labels.close`. */
   cancelLabel?: ReactNode
@@ -73,8 +73,10 @@ interface Props {
   onCancel?: () => void
   /** Body — usually several `<FormSection>`s. */
   children: ReactNode
-  /** Test hook on the submit button. */
+  /** Test hook on the submit button (`data-testid`). */
   submitTestId?: string
+  /** Extra classes on the dialog shell. */
+  className?: string
   labels?: Partial<FormDialogLabels>
 }
 
@@ -88,9 +90,9 @@ export function FormDialog({
   maxWidth = 620,
   disableMobileSheet,
   submitLabel,
-  submitVariant = 'primary',
+  submitTone = 'primary',
   submitDisabled,
-  submitPending,
+  submitBusy = false,
   submitIcon,
   cancelLabel,
   footerInfo,
@@ -99,8 +101,9 @@ export function FormDialog({
   onCancel,
   children,
   submitTestId,
+  className,
   labels,
-}: Props) {
+}: FormDialogProps) {
   const l = useLabels('formDialog', defaultLabels, labels)
   const viewOnly = submitLabel === undefined
   const effectiveCancelLabel = cancelLabel ?? (viewOnly ? l.close : l.cancel)
@@ -109,7 +112,7 @@ export function FormDialog({
     else onOpenChange(false)
   }
   const handleSubmit = () => {
-    if (viewOnly || submitDisabled || submitPending) return
+    if (viewOnly || submitDisabled || submitBusy) return
     if (onSubmit) void onSubmit()
   }
 
@@ -138,6 +141,7 @@ export function FormDialog({
             mobileSheet
               ? 'inset-x-0 bottom-0 rounded-t-2xl rounded-b-none'
               : 'top-20 inset-x-0 mx-auto',
+            className,
           )}
           style={
             mobileSheet
@@ -145,15 +149,11 @@ export function FormDialog({
               : {maxWidth, width: 'calc(100vw - 32px)'}
           }
           onEscapeKeyDown={event => {
-            // Popover surfaces (own portals marked `data-portal-popover`,
-            // Radix floats inside `data-radix-popper-content-wrapper`) live
-            // outside DialogContent in the DOM. While one is open, Escape
-            // must only close the popover (handled there), not the dialog.
-            if (
-              document.querySelector(
-                '[data-portal-popover],[data-radix-popper-content-wrapper]',
-              )
-            ) {
+            // Popover surfaces (Radix floats inside
+            // `data-radix-popper-content-wrapper`) live outside DialogContent
+            // in the DOM. While one is open, Escape must only close the
+            // popover (handled there), not the dialog.
+            if (document.querySelector('[data-radix-popper-content-wrapper]')) {
               event.preventDefault()
               return
             }
@@ -169,7 +169,6 @@ export function FormDialog({
             // `event.detail.originalEvent`.
             //
             // Matched conventions:
-            //   • `[data-portal-popover]` — own marker for custom portals
             //   • `[data-radix-popper-content-wrapper]` — all Radix floats
             //   • ARIA roles that only occur in popover surfaces (menu,
             //     menuitem*, listbox, option) — covers popovers that unmount
@@ -190,7 +189,6 @@ export function FormDialog({
             const path = (originalEvent.composedPath?.() as Element[]) ?? []
             const looksLikePopoverInteraction = path.some(el => {
               if (!(el instanceof Element)) return false
-              if (el.hasAttribute('data-portal-popover')) return true
               if (el.hasAttribute('data-radix-popper-content-wrapper')) return true
               const role = el.getAttribute('role')
               return (
@@ -260,23 +258,25 @@ export function FormDialog({
               <Button
                 type="button"
                 variant="ghost"
-                size="lg"
+                size="md"
                 onClick={handleCancel}
-                disabled={submitPending}
+                disabled={submitBusy}
               >
                 {effectiveCancelLabel}
               </Button>
               {!viewOnly && (
-                <SubmitButton
-                  variant={submitVariant}
-                  disabled={submitDisabled || submitPending}
-                  pending={submitPending}
-                  icon={submitIcon}
+                <Button
+                  type="button"
+                  size="md"
+                  tone={submitTone}
+                  icon={submitBusy ? Loader2 : (submitIcon ?? (submitTone === 'success' ? Check : undefined))}
+                  busy={submitBusy}
+                  disabled={submitDisabled}
                   onClick={handleSubmit}
-                  testId={submitTestId}
+                  data-testid={submitTestId}
                 >
                   {submitLabel}
-                </SubmitButton>
+                </Button>
               )}
             </div>
           </div>
@@ -286,60 +286,3 @@ export function FormDialog({
   )
 }
 
-interface SubmitButtonProps {
-  variant: SubmitVariant
-  disabled?: boolean
-  pending?: boolean
-  icon?: ReactNode
-  onClick: () => void
-  children: ReactNode
-  testId?: string
-}
-
-const VARIANT_CLASS: Record<SubmitVariant, string> = {
-  primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-  success: 'bg-success text-success-foreground hover:bg-success/90',
-  destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-}
-
-const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(function SubmitButton(
-  {variant, disabled, pending, icon, onClick, children, testId},
-  ref,
-) {
-  // Default icon: checkmark for success, none otherwise.
-  const showIcon = icon ?? (variant === 'success' ? <CheckIcon /> : null)
-  return (
-    <button
-      ref={ref}
-      type="button"
-      data-testid={testId}
-      disabled={disabled}
-      onClick={onClick}
-      className={cn(
-        'inline-flex items-center gap-1.5 px-4 py-2 rounded-md body-sm font-medium cursor-pointer transition-colors',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
-        VARIANT_CLASS[variant],
-      )}
-    >
-      {pending ? <Loader2 width={13} height={13} className="animate-spin" /> : showIcon}
-      <span>{children}</span>
-    </button>
-  )
-})
-
-function CheckIcon() {
-  return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  )
-}

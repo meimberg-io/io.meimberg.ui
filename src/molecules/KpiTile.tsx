@@ -6,8 +6,11 @@
 //   • `value: string | number` — strings for pre-formatted values
 //     (e.g. `'12h'`, `'87 %'`).
 //   • `sparklineValues` and `delta` are optional and independent.
-//   • `icon` renders in a 20px tone chip top-left; `accent` is a free ReactNode
-//     slot in the same chip and wins over `icon`.
+//   • `icon` (component reference, rendered at 12 px) sits in a 20px tone chip
+//     top-left; `accent` is a free ReactNode slot in the same chip and wins
+//     over `icon`.
+//   • No test ids are wired: `data-*`/`aria-*` pass through to the root; the
+//     delta row carries `data-slot="delta"`.
 //   • `tone` drives sparkline, delta and chip colour semantically.
 //   • `variant` replaces separate emphasis/muted booleans (mutually exclusive).
 //   • The delta's comparison text (`labels.comparison`) names the reference
@@ -17,9 +20,10 @@ import type {HTMLAttributes, ReactNode} from 'react'
 import {Sparkline} from '../atoms/Sparkline'
 import {ArrowDown, ArrowRight, ArrowUp} from '../atoms/icons'
 import {cn} from '../lib/cn'
+import type {IconComponent, Tone} from '../lib/variants'
 import {useLabels} from '../i18n/context'
 
-export type KpiTone = 'neutral' | 'success' | 'warn' | 'danger'
+export type KpiTone = Extract<Tone, 'neutral' | 'success' | 'warning' | 'destructive'>
 export type KpiVariant = 'default' | 'emphasis' | 'muted'
 
 export interface KpiDelta {
@@ -51,35 +55,33 @@ export interface KpiTileProps extends HTMLAttributes<HTMLDivElement> {
   sparklineValues?: number[]
   delta?: KpiDelta
   tone?: KpiTone
-  /** Icon slot — rendered in a 20px tone chip top-left. */
-  icon?: ReactNode
+  /** Icon — rendered at 12 px in a 20px tone chip top-left. */
+  icon?: IconComponent
   /** Free-form ReactNode slot in the tone chip top-left — overrides `icon`. */
   accent?: ReactNode
   variant?: KpiVariant
-  /** Test id of the tile root. Default `kpi-tile`. */
-  'data-testid'?: string
   labels?: Partial<KpiTileLabels>
 }
 
 const TONE_TEXT: Record<KpiTone, string> = {
   neutral: 'text-foreground',
   success: 'text-success',
-  warn: 'text-warning',
-  danger: 'text-destructive',
+  warning: 'text-warning',
+  destructive: 'text-destructive',
 }
 
 const TONE_SPARK: Record<KpiTone, string> = {
   neutral: 'text-foreground/40',
   success: 'text-success',
-  warn: 'text-warning',
-  danger: 'text-destructive',
+  warning: 'text-warning',
+  destructive: 'text-destructive',
 }
 
 const TONE_CHIP: Record<KpiTone, string> = {
   neutral: 'bg-muted text-foreground',
   success: 'bg-success/15 text-success',
-  warn: 'bg-warning/15 text-warning',
-  danger: 'bg-destructive/15 text-destructive',
+  warning: 'bg-warning/15 text-warning',
+  destructive: 'bg-destructive/15 text-destructive',
 }
 
 export function KpiTile({
@@ -89,23 +91,21 @@ export function KpiTile({
   sparklineValues,
   delta,
   tone = 'neutral',
-  icon,
+  icon: IconCmp,
   accent,
   variant = 'default',
   className,
-  'data-testid': testId = 'kpi-tile',
   labels,
   ...rest
 }: KpiTileProps) {
   const l = useLabels('kpiTile', defaultLabels, labels)
-  const chip = accent ?? icon
+  const chip = accent ?? (IconCmp ? <IconCmp className="size-3" /> : null)
   const isMuted = variant === 'muted'
   const isEmphasis = variant === 'emphasis'
   const showSpark =
     !isMuted && sparklineValues !== undefined && sparklineValues.length >= 2
   return (
     <div
-      data-testid={testId}
       data-tone={tone}
       data-variant={variant}
       className={cn(
@@ -175,7 +175,7 @@ function DeltaRow({
     return (
       <div
         className="text-xs text-muted-foreground/60 tabular-nums"
-        data-testid="kpi-tile-delta"
+        data-slot="delta"
       >
         — {comparison}
       </div>
@@ -189,14 +189,14 @@ function DeltaRow({
     : delta.direction === 'flat'
     ? 'text-muted-foreground/60'
     : 'text-destructive'
-  // Tinted tiles (success/warn/danger) keep their tile tone instead of the
+  // Tinted tiles (success/warning/destructive) keep their tile tone instead of the
   // delta heuristic — the arrow still communicates up/down.
   const visualClass = tone === 'neutral' ? colorClass : TONE_TEXT[tone]
   const sign = delta.value > 0 ? '+' : ''
   return (
     <div
       className={cn('flex items-center gap-1 text-xs tabular-nums', visualClass)}
-      data-testid="kpi-tile-delta"
+      data-slot="delta"
     >
       <Arrow className="size-3" />
       <span>

@@ -26,7 +26,7 @@ function Demo({
 }) {
   const [value, setValue] = useState<string | null>(initial ?? null)
   return (
-    <div style={{width: 260}}>
+    <div className='w-[260px]'>
       <DatePicker
         value={value}
         onChange={setValue}
@@ -59,8 +59,7 @@ export const WithMinMax: Story = {
   render: () => <Demo initial="2026-05-19" min="2026-05-01" max="2026-05-31" />,
 }
 
-// Kompakte Property-Bar-Variante: 32 px hoch, w-auto, text-sm — aligned zu
-// Chip 'md' / OptionsDropdown 'chip'.
+// Compact property-bar variant: 32 px, w-auto — aligned with Chip/Select size 'sm'.
 function SmDemo({initial, placeholder}: {initial: string | null; placeholder?: string}) {
   const [value, setValue] = useState<string | null>(initial)
   return (
@@ -77,7 +76,7 @@ function SmDemo({initial, placeholder}: {initial: string | null; placeholder?: s
 }
 
 export const SmCompact: Story = {
-  name: "size='sm' (Property-Bar)",
+  name: "size='sm' (property bar)",
   render: () => <SmDemo initial='2026-05-19' />,
 }
 
@@ -89,7 +88,7 @@ export const SmCompactEmpty: Story = {
 function CustomLabelsDemo() {
   const [value, setValue] = useState<string | null>(null)
   return (
-    <div style={{width: 260}}>
+    <div className='w-[260px]'>
       <DatePicker
         value={value}
         onChange={setValue}

@@ -1,5 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
-import {UserMenu} from './UserMenu'
+import {UserMenu, type UserMenuItem} from './UserMenu'
 import {User, Settings, LogOut} from '../atoms/icons'
 
 const meta: Meta<typeof UserMenu> = {
@@ -12,9 +12,9 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-const items = [
-  {label: 'Edit profile', href: '/settings/profile', icon: <User className="h-4 w-4" />},
-  {label: 'Settings', href: '/settings', icon: <Settings className="h-4 w-4" />},
+const items: UserMenuItem[] = [
+  {label: 'Edit profile', href: '/settings/profile', icon: User},
+  {label: 'Settings', href: '/settings', icon: Settings},
 ]
 
 const signOut = (
@@ -49,6 +49,21 @@ export const WithAvatarImage: Story = {
       avatarUrl="https://avatars.githubusercontent.com/u/9919?s=80"
       items={items}
       footer={signOut}
+    />
+  ),
+}
+
+/** Action items (`onSelect`) next to links; `tone="destructive"` for sign-out. */
+export const WithActionItems: Story = {
+  render: () => (
+    <UserMenu
+      name="Alex Morgan"
+      email="alex@example.com"
+      items={[
+        ...items,
+        {label: 'Keyboard shortcuts', onSelect: () => {}},
+        {label: 'Sign out', icon: LogOut, onSelect: () => {}, tone: 'destructive'},
+      ]}
     />
   ),
 }

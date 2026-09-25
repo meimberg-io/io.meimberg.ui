@@ -97,4 +97,11 @@ describe('WeightDots atom', () => {
     rerender(<WeightDots value={3} readOnly />)
     expect(getAllByRole('radio')[0].className).not.toContain('cursor-pointer')
   })
+
+  it('passes arbitrary HTML attributes to the group', () => {
+    const {getByRole} = render(<WeightDots value={2} id="weight" aria-describedby="hint" />)
+    const group = getByRole('group')
+    expect(group).toHaveAttribute('id', 'weight')
+    expect(group).toHaveAttribute('aria-describedby', 'hint')
+  })
 })

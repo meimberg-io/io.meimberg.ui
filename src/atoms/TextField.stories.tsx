@@ -23,25 +23,25 @@ export const Disabled: Story = {
   args: {defaultValue: 'Read-only', disabled: true},
 }
 
-export const WithLeadingIcon: Story = {
+export const WithLeading: Story = {
   args: {
     placeholder: 'Search…',
-    leadingIcon: <Search width={14} height={14} />,
+    leading: <Search width={14} height={14} />,
   },
 }
 
-export const WithTrailingIcon: Story = {
+export const WithTrailing: Story = {
   args: {
     defaultValue: 'Checking',
-    trailingIcon: <Loader2 width={14} height={14} className="animate-spin" />,
+    trailing: <Loader2 width={14} height={14} className="animate-spin" />,
   },
 }
 
-export const WithBothIcons: Story = {
+export const WithLeadingAndTrailing: Story = {
   args: {
     placeholder: 'Checking…',
-    leadingIcon: <Search width={14} height={14} />,
-    trailingIcon: <Loader2 width={14} height={14} className="animate-spin" />,
+    leading: <Search width={14} height={14} />,
+    trailing: <Loader2 width={14} height={14} className="animate-spin" />,
   },
 }
 

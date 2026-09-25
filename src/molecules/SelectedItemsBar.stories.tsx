@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {SelectedItemsBar} from './SelectedItemsBar'
-import {Pill} from '../index'
+import {Badge} from '../index'
 
 const meta: Meta<typeof SelectedItemsBar> = {
   title: 'Molecules/SelectedItemsBar',
@@ -16,9 +16,9 @@ type Story = StoryObj<typeof SelectedItemsBar>
 export const MultipleItems: Story = {
   render: args => (
     <SelectedItemsBar {...args}>
-      <Pill className="bg-surface-2 text-foreground">design</Pill>
-      <Pill className="bg-surface-2 text-foreground">research</Pill>
-      <Pill className="bg-surface-2 text-foreground">backlog</Pill>
+      <Badge>design</Badge>
+      <Badge>research</Badge>
+      <Badge>backlog</Badge>
     </SelectedItemsBar>
   ),
 }
@@ -26,7 +26,7 @@ export const MultipleItems: Story = {
 export const SingleItem: Story = {
   render: args => (
     <SelectedItemsBar {...args}>
-      <Pill className="bg-surface-2 text-foreground">design</Pill>
+      <Badge>design</Badge>
     </SelectedItemsBar>
   ),
 }

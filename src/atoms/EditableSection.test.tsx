@@ -28,4 +28,20 @@ describe('EditableSection', () => {
     render(<EditableSection title="Projects" onAdd={vi.fn()} labels={{add: 'New'}} />)
     expect(screen.getByRole('button', {name: 'New'})).toBeInTheDocument()
   })
+
+  it('reflects the editing state via aria-pressed on the icon-only toggle', () => {
+    const {rerender} = render(<EditableSection title="Projects" editing={false} onToggleEdit={vi.fn()} />)
+    expect(screen.getByRole('button', {name: 'Edit'})).toHaveAttribute('aria-pressed', 'false')
+    rerender(<EditableSection title="Projects" editing onToggleEdit={vi.fn()} />)
+    const toggle = screen.getByRole('button', {name: 'Edit'})
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    expect(toggle).toHaveClass('text-primary')
+  })
+
+  it('merges className into the header', () => {
+    render(<EditableSection title="Projects" className="mb-0" />)
+    const header = screen.getByRole('banner')
+    expect(header).toHaveClass('mb-0')
+    expect(header).not.toHaveClass('mb-3')
+  })
 })

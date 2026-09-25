@@ -1,12 +1,15 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import type { LucideIcon } from '../atoms/icons';
+import type { HTMLAttributes, ReactNode } from 'react';
 import { Button } from '../atoms/Button';
 import { AddIcon } from '../atoms/icons';
+import { cn } from '../lib/cn';
+import type { IconComponent } from '../lib/variants';
 
-interface EmptyStateProps {
-  icon?: LucideIcon;
+export type EmptyStateVariant = 'plain' | 'dashed';
+
+export interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  icon?: IconComponent;
   title: string;
   description: string;
   actionLabel?: string;
@@ -17,12 +20,12 @@ interface EmptyStateProps {
    */
   action?: ReactNode;
   /**
-   * Visuelle Variante.
-   * - `default` (Default) — große, zentrierte Page-Hero (size-20-Icon, py-20).
+   * Visuelle Form.
+   * - `plain` (Default) — große, zentrierte Page-Hero (size-20-Icon, py-20).
    * - `dashed` — Section-Empty mit gestricheltem Border (`p-12`, 32px-Icon,
    *   heading-3). Für gefilterte Listen-/Grid-Leerzustände.
    */
-  tone?: 'default' | 'dashed';
+  variant?: EmptyStateVariant;
 }
 
 export function EmptyState({
@@ -32,28 +35,37 @@ export function EmptyState({
   actionLabel,
   onAction,
   action,
-  tone = 'default',
+  variant = 'plain',
+  className,
+  ...rest
 }: EmptyStateProps) {
-  if (tone === 'dashed') {
-    const dashedAction =
-      action ??
-      (actionLabel && onAction ? (
-        <Button onClick={onAction} icon={AddIcon} data-testid="empty-state-action">
-          {actionLabel}
-        </Button>
-      ) : null);
+  const resolvedAction =
+    action ??
+    (actionLabel && onAction ? (
+      <Button onClick={onAction} icon={AddIcon}>
+        {actionLabel}
+      </Button>
+    ) : null);
+
+  if (variant === 'dashed') {
     return (
-      <div className="flex flex-col items-center rounded-lg border border-dashed border-border bg-card p-12 text-center">
+      <div
+        className={cn(
+          'flex flex-col items-center rounded-lg border border-dashed border-border bg-card p-12 text-center',
+          className,
+        )}
+        {...rest}
+      >
         {Icon && <Icon className="size-8 text-muted-foreground mb-3" />}
         <h3 className="heading-3 text-foreground mb-1">{title}</h3>
         <p className="body-sm text-muted-foreground max-w-sm">{description}</p>
-        {dashedAction && <div className="mt-3">{dashedAction}</div>}
+        {resolvedAction && <div className="mt-3">{resolvedAction}</div>}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
+    <div className={cn('flex flex-col items-center justify-center py-20 text-center', className)} {...rest}>
       {Icon && (
         <div className="relative mb-6">
           <div className="flex size-20 items-center justify-center rounded-2xl bg-surface-2 border border-border">
@@ -64,12 +76,7 @@ export function EmptyState({
       )}
       <h3 className="heading-2 font-semibold text-foreground mb-2">{title}</h3>
       <p className="body text-muted-foreground max-w-xs mb-6">{description}</p>
-      {action ??
-        (actionLabel && onAction && (
-          <Button onClick={onAction} icon={AddIcon} data-testid="empty-state-action">
-            {actionLabel}
-          </Button>
-        ))}
+      {resolvedAction}
     </div>
   );
 }

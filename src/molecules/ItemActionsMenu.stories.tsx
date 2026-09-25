@@ -20,7 +20,7 @@ type Story = StoryObj<typeof ItemActionsMenu>
 
 export const Default: Story = {
   render: () => (
-    <ItemActionsMenu testId="story-default-actions">
+    <ItemActionsMenu>
       <DropdownMenuItem>
         <EditIcon className="mr-2 size-4" />
         Edit
@@ -34,9 +34,9 @@ export const Default: Story = {
 }
 
 export const CompactSize: Story = {
-  name: 'size="sm" (compact trigger)',
+  name: 'size="xs" (compact trigger)',
   render: () => (
-    <ItemActionsMenu testId="story-sm-actions" size="sm">
+    <ItemActionsMenu size="xs">
       <DropdownMenuItem>
         <EditIcon className="mr-2 size-4" />
         Edit
@@ -48,7 +48,7 @@ export const CompactSize: Story = {
 export const WithSeparator: Story = {
   name: 'With separator (destructive last)',
   render: () => (
-    <ItemActionsMenu testId="story-separator-actions">
+    <ItemActionsMenu>
       <DropdownMenuItem>
         <ArrowRight className="mr-2 size-4" />
         Duplicate
@@ -69,7 +69,7 @@ export const WithSeparator: Story = {
 export const WithSubMenu: Story = {
   name: 'With submenu (Move to project)',
   render: () => (
-    <ItemActionsMenu testId="story-submenu-actions">
+    <ItemActionsMenu>
       <DropdownMenuItem>
         <ArrowRight className="mr-2 size-4" />
         Duplicate

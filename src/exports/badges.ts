@@ -1,10 +1,5 @@
 // Owned by area badges — add exports of components in this area here.
+export * from '../atoms/Badge'
 export * from '../atoms/Chip'
-export * from '../atoms/CounterPill'
-export * from '../atoms/FilterChip'
-export * from '../atoms/IconBadge'
-export * from '../atoms/MetaPill'
-export * from '../atoms/Pill'
-export * from '../atoms/SegControl'
-export * from '../atoms/SegmentedSwitch'
+export * from '../atoms/SegmentedControl'
 export * from '../atoms/ThemeToggle'

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { AlertTriangle } from '../atoms/icons'
 import { Button } from '../atoms/Button'
 import { useLabels } from '../i18n/context'
+import { cn } from '../lib/cn'
 
 export interface RouteErrorStateLabels {
   title: string
@@ -20,13 +21,14 @@ const defaultLabels: RouteErrorStateLabels = {
   details: 'Technical details',
 }
 
-interface Props {
+export interface RouteErrorStateProps {
   error: Error & { digest?: string }
   reset: () => void
+  className?: string
   labels?: Partial<RouteErrorStateLabels>
 }
 
-export function RouteErrorState({ error, reset, labels }: Props) {
+export function RouteErrorState({ error, reset, className, labels }: RouteErrorStateProps) {
   const l = useLabels('routeErrorState', defaultLabels, labels)
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function RouteErrorState({ error, reset, labels }: Props) {
   const isDev = typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'
 
   return (
-    <div className='flex flex-col items-center justify-center text-center py-16 px-4'>
+    <div className={cn('flex flex-col items-center justify-center text-center py-16 px-4', className)}>
       <div className='flex size-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive mb-4'>
         <AlertTriangle className='size-6' />
       </div>

@@ -7,8 +7,8 @@
 // `<DropdownMenuItem>` / `<DropdownMenuSeparator>` / `<DropdownMenuSub>` from
 // `ui/dropdown-menu`; only the trigger + content frame lives here.
 //
-// The trigger is always an `<IconButton>` with `<MoreVertical>`; `size` is
-// passed through to it.
+// The trigger is always an `<IconButton>` with `<MoreVertical>`; `size`,
+// `className` and `data-testid` are passed through to it.
 
 import {type ReactNode} from 'react'
 import {
@@ -33,22 +33,17 @@ const defaultLabels: ItemActionsMenuLabels = {
 export interface ItemActionsMenuProps {
   /** Menu content (DropdownMenuItem, -Separator, -Sub) from `ui/dropdown-menu`. */
   children: ReactNode
-  /** Stable test id of the trigger for E2E specs (e.g. `row-actions`). */
-  testId: string
-  /** Trigger size — `default` (size-8) or `sm` (compact icon slot).
-   *  Default `default`. */
-  size?: 'default' | 'sm'
+  /** Trigger size on the control scale. Default `sm` (32 px). */
+  size?: ControlSize
   /** Accessible label of the trigger. Takes precedence over `labels.trigger`. */
   ariaLabel?: string
   /** DropdownMenuContent alignment. Default `end` (right-aligned to the trigger). */
   align?: 'start' | 'center' | 'end'
+  /** Extra classes for the trigger button. */
+  className?: string
+  /** Test id of the trigger (optional, e.g. `row-actions`). */
+  'data-testid'?: string
   labels?: Partial<ItemActionsMenuLabels>
-}
-
-// Both trigger sizes share the 32 px box of the control scale.
-const TRIGGER_SIZE: Record<NonNullable<ItemActionsMenuProps['size']>, ControlSize> = {
-  default: 'sm',
-  sm: 'sm',
 }
 
 /**
@@ -56,7 +51,7 @@ const TRIGGER_SIZE: Record<NonNullable<ItemActionsMenuProps['size']>, ControlSiz
  * action menus on cards / rows.
  *
  * @example
- *   <ItemActionsMenu testId="row-actions">
+ *   <ItemActionsMenu data-testid="row-actions">
  *     <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
  *     <DropdownMenuSeparator />
  *     <DropdownMenuItem onClick={onDelete} className="text-destructive">
@@ -66,17 +61,18 @@ const TRIGGER_SIZE: Record<NonNullable<ItemActionsMenuProps['size']>, ControlSiz
  */
 export function ItemActionsMenu({
   children,
-  testId,
-  size = 'default',
+  size = 'sm',
   ariaLabel,
   align = 'end',
+  className,
+  'data-testid': testId,
   labels,
 }: ItemActionsMenuProps) {
   const l = useLabels('itemActionsMenu', defaultLabels, labels)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <IconButton size={TRIGGER_SIZE[size]} aria-label={ariaLabel ?? l.trigger} data-testid={testId}>
+        <IconButton size={size} className={className} aria-label={ariaLabel ?? l.trigger} data-testid={testId}>
           <MoreVertical />
         </IconButton>
       </DropdownMenuTrigger>

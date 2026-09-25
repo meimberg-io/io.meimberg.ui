@@ -16,7 +16,7 @@ export const InTopbarRow: Story = {
   render: () => (
     <div className="flex items-center justify-between border border-border rounded-md px-4 py-2 max-w-md">
       <span className="body-sm text-muted-foreground">Topbar mock</span>
-      <ThemeToggle />
+      <ThemeToggle className="w-32" />
     </div>
   ),
 }

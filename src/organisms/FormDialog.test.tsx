@@ -1,6 +1,7 @@
 import {describe, expect, it, vi} from 'vitest'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {Star} from '../atoms/icons'
 import {UiI18nProvider} from '../i18n/context'
 import {formDialog as formDialogDe} from '../i18n/de/formDialog'
 import {FormDialog} from './FormDialog'
@@ -62,23 +63,114 @@ describe('FormDialog', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
-  it('does not fire onSubmit while pending', async () => {
+  it('marks the submit busy, spins the icon and ignores clicks while submitBusy', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
+    render(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" submitBusy onSubmit={onSubmit}>
+        body
+      </FormDialog>,
+    )
+    const submit = screen.getByRole('button', {name: 'OK'})
+    expect(submit).toHaveAttribute('aria-busy', 'true')
+    expect(submit).toHaveAttribute('data-busy', 'true')
+    // Busy is not disabled — no disabled look, clicks are swallowed by Button.
+    expect(submit).not.toBeDisabled()
+    expect(submit.querySelector('svg.animate-spin')).toBeTruthy()
+    expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+    await user.click(submit)
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('does not fire onSubmit when submitDisabled', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    render(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" submitDisabled onSubmit={onSubmit}>
+        body
+      </FormDialog>,
+    )
+    expect(screen.getByRole('button', {name: 'OK'})).toBeDisabled()
+    await user.click(screen.getByRole('button', {name: 'OK'}))
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('applies submitTone and shows the default Check icon only for success', () => {
+    const {rerender} = render(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" submitTone="success" onSubmit={() => {}}>
+        body
+      </FormDialog>,
+    )
+    let submit = screen.getByRole('button', {name: 'OK'})
+    expect(submit).toHaveClass('bg-success')
+    expect(submit.querySelector('svg.lucide-check')).toBeTruthy()
+
+    rerender(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" submitTone="destructive" onSubmit={() => {}}>
+        body
+      </FormDialog>,
+    )
+    submit = screen.getByRole('button', {name: 'OK'})
+    expect(submit).toHaveClass('bg-destructive')
+    expect(submit.querySelector('svg')).toBeNull()
+  })
+
+  it('defaults to a primary submit without icon', () => {
+    render(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" onSubmit={() => {}}>
+        body
+      </FormDialog>,
+    )
+    const submit = screen.getByRole('button', {name: 'OK'})
+    expect(submit).toHaveClass('bg-primary')
+    expect(submit.querySelector('svg')).toBeNull()
+  })
+
+  it('renders a custom submitIcon and replaces it with the spinner while busy', () => {
+    const {rerender} = render(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" submitIcon={Star} onSubmit={() => {}}>
+        body
+      </FormDialog>,
+    )
+    expect(screen.getByRole('button', {name: 'OK'}).querySelector('svg.lucide-star')).toBeTruthy()
+    rerender(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" submitIcon={Star} submitBusy onSubmit={() => {}}>
+        body
+      </FormDialog>,
+    )
+    const submit = screen.getByRole('button', {name: 'OK'})
+    expect(submit.querySelector('svg.lucide-star')).toBeNull()
+    expect(submit.querySelector('svg.animate-spin')).toBeTruthy()
+  })
+
+  it('renders both footer buttons at size md, Cancel as ghost', () => {
+    render(
+      <FormDialog open onOpenChange={() => {}} title="t" submitLabel="OK" onSubmit={() => {}}>
+        body
+      </FormDialog>,
+    )
+    expect(screen.getByRole('button', {name: 'OK'})).toHaveClass('h-9')
+    const cancel = screen.getByRole('button', {name: 'Cancel'})
+    expect(cancel).toHaveClass('h-9')
+    expect(cancel).not.toHaveClass('bg-primary')
+  })
+
+  it('puts submitTestId on the submit button and className on the shell', () => {
     render(
       <FormDialog
         open
         onOpenChange={() => {}}
         title="t"
         submitLabel="OK"
-        submitPending
-        onSubmit={onSubmit}
+        submitTestId="save-project"
+        className="custom-shell"
+        onSubmit={() => {}}
       >
         body
       </FormDialog>,
     )
-    await user.click(screen.getByRole('button', {name: 'OK'}))
-    expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.getByTestId('save-project')).toHaveAccessibleName('OK')
+    expect(screen.getByRole('dialog')).toHaveClass('custom-shell', 'form-dialog-shell')
   })
 
   it('renders footerInfo and footerActions', () => {

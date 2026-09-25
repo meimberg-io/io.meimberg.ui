@@ -17,7 +17,7 @@ export const Muted: Story = {
 
 export const Subtle: Story = {
   args: {
-    tone: 'subtle',
+    variant: 'subtle',
     italic: false,
     children: 'No more tags available to narrow down.',
   },

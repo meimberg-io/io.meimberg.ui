@@ -6,8 +6,10 @@ import {FormRow} from '../molecules/FormRow'
 import {FormField} from '../molecules/FormField'
 import {FormHelpText} from '../molecules/FormHelpText'
 import {TextField} from '../atoms/TextField'
-import {SegmentedSwitch, type SegmentedOption} from '../atoms/SegmentedSwitch'
-import {Button} from '../atoms/Button'
+import {SegmentedControl, type SegmentedControlOption} from '../atoms/SegmentedControl'
+import {Button, type ButtonTone} from '../atoms/Button'
+import {Star} from '../atoms/icons'
+import type {IconComponent} from '../lib/variants'
 
 const meta: Meta<typeof FormDialog> = {
   title: 'Organisms/FormDialog',
@@ -19,7 +21,7 @@ export default meta
 type Story = StoryObj<typeof FormDialog>
 
 type ProjectType = 'internal' | 'client'
-const PROJECT_TYPES: ReadonlyArray<SegmentedOption<ProjectType>> = [
+const PROJECT_TYPES: ReadonlyArray<SegmentedControlOption<ProjectType>> = [
   {value: 'internal', label: 'Internal'},
   {value: 'client', label: 'Client'},
 ]
@@ -33,15 +35,17 @@ function Trigger({label, onClick}: {label: string; onClick: () => void}) {
 }
 
 function SimpleDialog({
-  submitVariant = 'primary',
-  submitPending = false,
+  submitTone = 'primary',
+  submitBusy = false,
   submitDisabled = false,
+  submitIcon,
   viewOnly = false,
   footerInfo,
 }: {
-  submitVariant?: 'primary' | 'success' | 'destructive'
-  submitPending?: boolean
+  submitTone?: ButtonTone
+  submitBusy?: boolean
   submitDisabled?: boolean
+  submitIcon?: IconComponent
   viewOnly?: boolean
   footerInfo?: string
 }) {
@@ -57,9 +61,10 @@ function SimpleDialog({
         caption="New project"
         title="Configure project"
         submitLabel={viewOnly ? undefined : 'Create project'}
-        submitVariant={submitVariant}
-        submitPending={submitPending}
+        submitTone={submitTone}
+        submitBusy={submitBusy}
         submitDisabled={submitDisabled}
+        submitIcon={submitIcon}
         footerInfo={footerInfo}
         onSubmit={() => setOpen(false)}
       >
@@ -69,7 +74,7 @@ function SimpleDialog({
           </FormField>
           <FormRow cols={2}>
             <FormField label="Type">
-              <SegmentedSwitch value={type} options={PROJECT_TYPES} onChange={setType} />
+              <SegmentedControl value={type} options={PROJECT_TYPES} onChange={setType} />
             </FormField>
             <FormField label="Short code" hint="(optional)">
               <TextField placeholder="WEB" />
@@ -86,11 +91,15 @@ export const Default: Story = {
   render: () => <SimpleDialog footerInfo="Members are notified after creation" />,
 }
 
-export const SuccessVariant: Story = {
-  render: () => <SimpleDialog submitVariant="success" footerInfo="Goes live immediately" />,
+export const SuccessTone: Story = {
+  render: () => <SimpleDialog submitTone="success" footerInfo="Goes live immediately" />,
 }
 
-export const DestructiveVariant: Story = {
+export const CustomSubmitIcon: Story = {
+  render: () => <SimpleDialog submitIcon={Star} />,
+}
+
+export const DestructiveTone: Story = {
   render: () => {
     function DestructiveDemo() {
       const [open, setOpen] = useState(true)
@@ -103,7 +112,7 @@ export const DestructiveVariant: Story = {
             caption="Delete project"
             title="Delete “Website relaunch”?"
             submitLabel="Delete permanently"
-            submitVariant="destructive"
+            submitTone="destructive"
             onSubmit={() => setOpen(false)}
           >
             <p className="body-sm text-muted-foreground">
@@ -117,8 +126,8 @@ export const DestructiveVariant: Story = {
   },
 }
 
-export const Pending: Story = {
-  render: () => <SimpleDialog submitPending />,
+export const Busy: Story = {
+  render: () => <SimpleDialog submitTone="success" submitBusy />,
 }
 
 export const SubmitDisabled: Story = {
@@ -148,7 +157,7 @@ export const WithHeroTint: Story = {
               </div>
             }
             submitLabel="Create project"
-            submitVariant="success"
+            submitTone="success"
             onSubmit={() => setOpen(false)}
           >
             <FormSection title="Source">

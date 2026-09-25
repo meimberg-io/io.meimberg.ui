@@ -4,9 +4,14 @@ import {ComingSoon} from './ComingSoon'
 const meta: Meta<typeof ComingSoon> = {
   title: 'Atoms/ComingSoon',
   component: ComingSoon,
-  args: {
-    title: 'Activity feed',
-  },
+  parameters: {layout: 'padded'},
+  args: {title: 'Activity feed'},
+  argTypes: {size: {control: 'inline-radio', options: ['sm', 'md', 'lg']}},
+  render: args => (
+    <div className="w-[420px]">
+      <ComingSoon {...args} />
+    </div>
+  ),
 }
 
 export default meta
@@ -22,20 +27,12 @@ export const CustomDescription: Story = {
   args: {title: 'Reports', description: 'Available in the next release'},
 }
 
-export const Wide: Story = {
-  args: {title: 'Throughput', aspectRatio: '16 / 5'},
-  render: args => (
-    <div className="w-[480px]">
-      <ComingSoon {...args} />
-    </div>
-  ),
-}
-
-export const Square: Story = {
-  args: {title: 'Donut', aspectRatio: '1 / 1'},
-  render: args => (
-    <div className="w-[200px]">
-      <ComingSoon {...args} />
+export const Sizes: Story = {
+  render: () => (
+    <div className="grid w-[420px] gap-3">
+      <ComingSoon size="sm" title="Small" />
+      <ComingSoon size="md" title="Medium" />
+      <ComingSoon size="lg" title="Large" />
     </div>
   ),
 }

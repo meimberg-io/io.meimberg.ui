@@ -44,12 +44,10 @@ export const WithActionNoIcon: Story = {
 export const WithChildren: Story = {
   render: () => (
     <PageHeader title="Messages" description="Filters on the right">
-      <Button variant="outline">
-        <Inbox className="size-4" />
+      <Button variant="outline" icon={Inbox}>
         Filter
       </Button>
-      <Button>
-        <Plus className="size-4" />
+      <Button icon={Plus}>
         New
       </Button>
     </PageHeader>
@@ -94,4 +92,34 @@ export const WithJsxDescription: Story = {
       <Button>Quick add</Button>
     </PageHeader>
   ),
+}
+
+export const WithLeading: Story = {
+  name: 'leading (glyph before the title block)',
+  args: {
+    title: 'Marketing site',
+    description: 'Project workspace',
+    leading: (
+      <div className="flex size-12 items-center justify-center rounded-xl bg-surface-2 border border-border">
+        <FolderKanban className="size-6 text-muted-foreground" />
+      </div>
+    ),
+  },
+}
+
+export const WithMeta: Story = {
+  name: 'meta (row below the description)',
+  args: {
+    title: 'Marketing site',
+    description: 'Relaunch of the public website.',
+    meta: (
+      <>
+        <span className="caption text-muted-foreground">Updated 2 days ago</span>
+        <span className="caption text-muted-foreground">·</span>
+        <span className="caption text-muted-foreground">4 members</span>
+      </>
+    ),
+    actionLabel: 'Edit',
+    onAction: () => {},
+  },
 }

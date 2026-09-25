@@ -5,20 +5,21 @@
 // Identity (name/email/avatarUrl) and menu links come in as props, the
 // sign-out action as `footer` slot (auth stays with the consumer — the
 // package knows nothing about auth). Initials are derived from the name.
-// Link renderer as slot (default `<a>`).
+// Link renderer as slot (default `<a>`). Items are either links (`href`) or
+// actions (`onSelect`, optionally `tone="destructive"`); activating any item
+// closes the popover.
 
-import type {ComponentType, ReactNode} from 'react'
-import {Avatar, AvatarFallback, AvatarImage} from '../ui/avatar'
+import {useState, type ComponentType, type ReactNode} from 'react'
+import {Avatar} from '../atoms/Avatar'
 import {Popover, PopoverContent, PopoverTrigger} from '../ui/popover'
 import {Separator} from '../ui/separator'
 import {useLabels} from '../i18n/context'
 import {cn} from '../lib/cn'
+import type {IconComponent} from '../lib/variants'
 
-export interface UserMenuItem {
-  label: string
-  href: string
-  icon?: ReactNode
-}
+export type UserMenuItem =
+  | {label: string; icon?: IconComponent; href: string; onSelect?: undefined; tone?: undefined}
+  | {label: string; icon?: IconComponent; onSelect: () => void; tone?: 'neutral' | 'destructive'; href?: undefined}
 
 export type UserMenuLinkComponent = ComponentType<{
   href: string
@@ -47,8 +48,17 @@ export interface UserMenuProps {
   onNavigate?: () => void
   /** Footer in the popover (e.g. a sign-out `<form action={signOut}>`). */
   footer?: ReactNode
+  /** Extra classes for the trigger button. */
+  className?: string
   labels?: Partial<UserMenuLabels>
 }
+
+const ITEM_CLS =
+  'flex w-full items-center gap-2 rounded-sm px-2 py-2 body text-left cursor-pointer focus-visible:outline-none'
+const ITEM_TONE_CLS = {
+  neutral: 'hover:bg-accent focus-visible:bg-accent',
+  destructive: 'text-destructive hover:bg-destructive/10 focus-visible:bg-destructive/10',
+} as const
 
 const DefaultLink: UserMenuLinkComponent = ({href, children, ...rest}) => (
   <a href={href} {...rest}>
@@ -77,29 +87,29 @@ export function UserMenu({
   linkComponent: Link = DefaultLink,
   onNavigate,
   footer,
+  className,
   labels,
 }: UserMenuProps) {
   const l = useLabels('userMenu', defaultLabels, labels)
+  const [open, setOpen] = useState(false)
   const label = name.trim().length > 0 ? name : email
   const initialsLabel = initials(name, email)
 
-  const avatar = (size: string) => (
-    <Avatar className={size}>
-      {avatarUrl ? <AvatarImage src={avatarUrl} alt={label} /> : null}
-      <AvatarFallback className="bg-primary/15 text-primary caption font-bold">{initialsLabel}</AvatarFallback>
-    </Avatar>
+  const avatar = (size: 'md' | 'lg') => (
+    <Avatar src={avatarUrl} initials={initialsLabel} label={label} size={size} shape="circle" tone="primary" showTitle={false} />
   )
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className={cn(
           'flex w-full items-center gap-3 rounded-md px-2 py-2 transition-colors cursor-pointer',
           'hover:bg-sidebar-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          className,
         )}
         aria-label={l.trigger}
       >
-        {avatar('h-8 w-8')}
+        {avatar('md')}
         {!collapsed && (
           <div className="min-w-0 flex-1 text-left">
             <p className="body font-medium text-sidebar-accent-foreground truncate">{label}</p>
@@ -109,7 +119,7 @@ export function UserMenu({
       </PopoverTrigger>
       <PopoverContent side="right" align="end" sideOffset={8} className="w-64 p-0">
         <div className="flex items-center gap-3 p-3">
-          {avatar('h-10 w-10')}
+          {avatar('lg')}
           <div className="min-w-0">
             <p className="body font-semibold truncate">{label}</p>
             <p className="caption text-muted-foreground truncate">{email}</p>
@@ -117,17 +127,44 @@ export function UserMenu({
         </div>
         {(items.length > 0 || footer) && <Separator />}
         <div className="flex flex-col p-1">
-          {items.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className="flex items-center gap-2 rounded-sm px-2 py-2 body hover:bg-accent focus-visible:outline-none focus-visible:bg-accent"
-            >
-              {item.icon ? <span className="flex h-4 w-4 items-center justify-center">{item.icon}</span> : null}
-              {item.label}
-            </Link>
-          ))}
+          {items.map((item, i) => {
+            const ItemIcon = item.icon
+            const content = (
+              <>
+                {ItemIcon ? <ItemIcon className="size-4 shrink-0" /> : null}
+                {item.label}
+              </>
+            )
+            if (item.href !== undefined) {
+              return (
+                <Link
+                  key={`${i}-${item.href}`}
+                  href={item.href}
+                  onClick={() => {
+                    setOpen(false)
+                    onNavigate?.()
+                  }}
+                  className={cn(ITEM_CLS, ITEM_TONE_CLS.neutral)}
+                >
+                  {content}
+                </Link>
+              )
+            }
+            const {onSelect} = item
+            return (
+              <button
+                key={`${i}-${item.label}`}
+                type="button"
+                onClick={() => {
+                  setOpen(false)
+                  onSelect()
+                }}
+                className={cn(ITEM_CLS, ITEM_TONE_CLS[item.tone ?? 'neutral'])}
+              >
+                {content}
+              </button>
+            )
+          })}
           {items.length > 0 && footer ? <Separator className="my-1" /> : null}
           {footer}
         </div>

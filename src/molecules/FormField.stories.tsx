@@ -60,3 +60,11 @@ export const Combined: Story = {
     children: <TextField defaultValue="Backlog" />,
   },
 }
+
+/** A single raw element without `id` receives the field id via `cloneElement`. */
+export const RawTextarea: Story = {
+  args: {
+    label: 'Notes',
+    children: <textarea className="field-shell focus-ring h-24 py-2" placeholder="Plain <textarea>" />,
+  },
+}

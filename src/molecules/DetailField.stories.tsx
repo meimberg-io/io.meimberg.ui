@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {DetailField} from './DetailField'
-import {Badge} from '../ui/badge'
+import {Badge} from '../atoms/Badge'
 
 const meta: Meta<typeof DetailField> = {
   title: 'Molecules/DetailField',
@@ -23,7 +23,7 @@ export const WithBadge: Story = {
     label: 'Status',
     align: 'center',
     children: (
-      <Badge variant="outline" className="caption border-success/30 text-success">
+      <Badge variant="outline" tone="success">
         Connected
       </Badge>
     ),
@@ -62,7 +62,7 @@ export const Stack: Story = {
         <span className="body font-mono break-all">jane.doe@example.com</span>
       </DetailField>
       <DetailField label="Status" align="center">
-        <Badge variant="outline" className="caption border-success/30 text-success">
+        <Badge variant="outline" tone="success">
           Connected
         </Badge>
       </DetailField>

@@ -33,13 +33,12 @@ export default tseslint.config(
                 'PUL-462 (AK 6): kein Import aus dem App-Baum (app/src) ins DS-Package.',
             },
             {
-              // PUL-397/PUL-462: shadcn-<Select>/<Calendar> sind Vendor-
-              // Primitives — Konsumenten nutzen `<Dropdown>`/`<DatePicker>`
-              // aus `molecules/form`. Nur die beiden Wrapper dürfen die rohen
-              // Primitives importieren (Override unten).
-              group: ['**/ui/select', '**/ui/calendar'],
+              // PUL-397/PUL-462: shadcn-<Calendar> ist ein Vendor-Primitive —
+              // Konsumenten nutzen `<DatePicker>` (atoms/). Nur der Wrapper
+              // darf das rohe Primitive importieren (Override unten).
+              group: ['**/ui/calendar'],
               message:
-                'PUL-397/PUL-464: `ui/select`/`ui/calendar` sind Vendor-Primitives — nutze `<SelectField>`/`<DatePicker>` (atoms/). Whitelist: atoms/SelectField.tsx, atoms/DatePicker.tsx.',
+                'PUL-397/PUL-464: `ui/calendar` ist ein Vendor-Primitive — nutze `<DatePicker>` (atoms/). Whitelist: atoms/DatePicker.tsx.',
             },
           ],
         },
@@ -53,13 +52,12 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
-  // PUL-397/PUL-464: Whitelist — die beiden Select-/Date-Wrapper dürfen ihr
-  // jeweiliges Vendor-Primitive importieren. Domain-Grenze (@/*, app/src)
-  // bleibt via der globalen Regel bestehen; hier wird `no-restricted-imports`
-  // nur ohne die select/calendar-Sperre neu deklariert (ESLint merged Rule-
-  // Optionen nicht).
+  // PUL-397/PUL-464: Whitelist — der Date-Wrapper darf sein Vendor-Primitive
+  // importieren. Domain-Grenze (@/*, app/src) bleibt via der globalen Regel
+  // bestehen; hier wird `no-restricted-imports` nur ohne die calendar-Sperre
+  // neu deklariert (ESLint merged Rule-Optionen nicht).
   {
-    files: ['src/atoms/SelectField.tsx', 'src/atoms/DatePicker.tsx'],
+    files: ['src/atoms/DatePicker.tsx'],
     rules: {
       'no-restricted-imports': [
         'error',

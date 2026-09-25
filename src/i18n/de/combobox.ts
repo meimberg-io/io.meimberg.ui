@@ -1,6 +1,6 @@
-import type {RichSelectLabels} from '../../atoms/RichSelect'
+import type {ComboboxLabels} from '../../atoms/Combobox'
 
-export const richSelect: RichSelectLabels = {
+export const combobox: ComboboxLabels = {
   placeholder: 'Wählen…',
   searchPlaceholder: 'Suchen…',
   noResults: 'Nichts gefunden',

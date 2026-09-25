@@ -1,7 +1,6 @@
 // Owned by area forms — add keys of components in this area here.
 
 import type {ComingSoonLabels} from '../../atoms/ComingSoon'
-import type {ComingSoonCardLabels} from '../../ui/coming-soon'
 import type {DatePickerLabels} from '../../atoms/DatePicker'
 import type {EditableInlineHeadingLabels} from '../../atoms/EditableInlineHeading'
 import type {EditableSectionLabels} from '../../atoms/EditableSection'
@@ -13,7 +12,6 @@ import type {WeightDotsLabels} from '../../atoms/WeightDots'
 
 export interface FormsMessages {
   comingSoon: ComingSoonLabels
-  comingSoonCard: ComingSoonCardLabels
   datePicker: DatePickerLabels
   editableInlineHeading: EditableInlineHeadingLabels
   editableSection: EditableSectionLabels

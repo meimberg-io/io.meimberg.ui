@@ -50,4 +50,11 @@ describe('Donut atom', () => {
     const {container} = render(<Donut segments={segments} />)
     expect(container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
   })
+
+  it('merges className with the rotation class', () => {
+    const {container} = render(<Donut segments={segments} className="text-muted-foreground" />)
+    const cls = container.querySelector('svg')!.getAttribute('class')
+    expect(cls).toContain('-rotate-90')
+    expect(cls).toContain('text-muted-foreground')
+  })
 })

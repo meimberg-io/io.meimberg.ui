@@ -30,4 +30,9 @@ describe('AppShell', () => {
     renderWithProviders(<AppShell sidebar={null}>content</AppShell>, {messages: {appShell: appShellDe}})
     expect(screen.getByRole('button', {name: appShellDe.toggleSidebar})).toBeInTheDocument()
   })
+
+  it('merges className on the frame', () => {
+    renderWithProviders(<AppShell sidebar={null} className='bg-background'>content</AppShell>)
+    expect(screen.getByRole('main').parentElement!.parentElement!.className).toContain('bg-background')
+  })
 })

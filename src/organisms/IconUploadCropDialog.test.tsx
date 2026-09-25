@@ -54,4 +54,13 @@ describe('IconUploadCropDialog', () => {
     expect(screen.getByText('Pick avatar')).toBeInTheDocument()
     expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument()
   })
+
+  it('applies className to the dialog content', async () => {
+    const {container, user} = renderWithProviders(
+      <IconUploadCropDialog open onOpenChange={vi.fn()} onSubmit={vi.fn()} className="custom-crop" />,
+    )
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement
+    await user.upload(input, new File(['x'], 'a.png', {type: 'image/png'}))
+    expect(await screen.findByRole('dialog')).toHaveClass('custom-crop', 'max-w-md')
+  })
 })

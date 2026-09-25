@@ -8,7 +8,6 @@
 
 import type {ReactNode} from 'react'
 import {Pencil, Plus} from './icons'
-import {Button} from './Button'
 import {IconButton} from './IconButton'
 import {cn} from '../lib/cn'
 import {useLabels} from '../i18n/context'
@@ -23,7 +22,7 @@ const defaultLabels: EditableSectionLabels = {
   edit: 'Edit',
 }
 
-interface Props {
+export interface EditableSectionProps {
   title: ReactNode
   subtitle?: ReactNode
   /** Optional: nur rendern wenn `editing === false`. Wenn editing-Toggle leer,
@@ -36,6 +35,8 @@ interface Props {
   onToggleEdit?: () => void
   /** Überschreibt `labels.edit`. */
   editLabel?: string
+  /** Extra-Klassen am Header (z. B. anderer Abstand als `mb-3`). */
+  className?: string
   labels?: Partial<EditableSectionLabels>
 }
 
@@ -47,13 +48,14 @@ export function EditableSection({
   editing = false,
   onToggleEdit,
   editLabel,
+  className,
   labels,
-}: Props) {
+}: EditableSectionProps) {
   const l = useLabels('editableSection', defaultLabels, labels)
   const add = addLabel ?? l.add
   const edit = editLabel ?? l.edit
   return (
-    <header className="flex items-baseline justify-between mb-3">
+    <header className={cn('flex items-baseline justify-between mb-3', className)}>
       <div>
         {typeof title === 'string' ? (
           <h2 className="heading-3 text-foreground">{title}</h2>
@@ -71,16 +73,19 @@ export function EditableSection({
           </IconButton>
         )}
         {onToggleEdit && (
-          <Button
-            variant={editing ? 'solid' : 'ghost'}
-            size="sm"
-            icon={Pencil}
-            className={cn('w-8 px-0', !editing && 'text-muted-foreground')}
+          // Aktiv (Edit-Modus): Ton schon in Ruhe sichtbar (`ghost` +
+          // `primary`), sonst gedämpft bis Hover.
+          <IconButton
+            variant={editing ? 'ghost' : 'quiet'}
+            tone={editing ? 'primary' : 'neutral'}
+            className={cn(editing && 'bg-primary/10')}
             onClick={onToggleEdit}
             aria-pressed={editing}
             aria-label={edit}
             title={edit}
-          />
+          >
+            <Pencil aria-hidden />
+          </IconButton>
         )}
       </div>
     </header>

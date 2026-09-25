@@ -1,4 +1,4 @@
-import {describe, expect, it} from 'vitest'
+import {describe, expect, it, vi} from 'vitest'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '../test/render'
 import {SubNavLayout, type SubNavItem} from './SubNavLayout'
@@ -34,5 +34,19 @@ describe('SubNavLayout', () => {
       </SubNavLayout>,
     )
     expect(screen.getByRole('navigation', {name: 'Account'})).toBeInTheDocument()
+  })
+
+  it('navigates via the mobile select', async () => {
+    const onNavigate = vi.fn()
+    const {user} = renderWithProviders(
+      <SubNavLayout items={items} currentPath="/settings/profile" onNavigate={onNavigate}>
+        content
+      </SubNavLayout>,
+    )
+    const select = screen.getByRole('combobox')
+    expect(select).toHaveTextContent('Profile')
+    await user.click(select)
+    await user.click(screen.getByRole('option', {name: 'Team'}))
+    expect(onNavigate).toHaveBeenCalledWith('/settings/team')
   })
 })

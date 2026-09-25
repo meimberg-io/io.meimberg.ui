@@ -5,7 +5,7 @@
 import type {Meta, StoryObj} from '@storybook/react-vite'
 import {DataTable, type DataTableColumn} from './DataTable'
 import {Button} from '../atoms/Button'
-import {Pill} from '../atoms/Pill'
+import {Badge} from '../atoms/Badge'
 
 const meta: Meta<typeof DataTable> = {
   title: 'Organisms/DataTable',
@@ -33,7 +33,7 @@ const ROWS: Job[] = [
 
 const COLUMNS: DataTableColumn<Job>[] = [
   {key: 'target', header: 'Target', cell: r => r.target},
-  {key: 'status', header: 'Status', cell: r => <Pill>{r.status}</Pill>},
+  {key: 'status', header: 'Status', cell: r => <Badge variant="outline">{r.status}</Badge>},
   {key: 'http', header: 'HTTP', cell: r => <span className="caption">{r.http ?? '—'}</span>},
   {key: 'attempts', header: 'Attempts', cell: r => <span className="caption">{r.attempts}</span>},
   {

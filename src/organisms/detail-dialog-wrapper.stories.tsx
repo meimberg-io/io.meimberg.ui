@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/react-vite'
 import {useState} from 'react'
 import {DetailDialogWrapper} from './detail-dialog-wrapper'
 import {Button} from '../atoms/Button'
-import {MetaPill} from '../atoms/MetaPill'
+import {Badge} from '../atoms/Badge'
 import {Zap, Rocket, FileText} from '../atoms/icons'
 
 const meta: Meta<typeof DetailDialogWrapper> = {
@@ -130,9 +130,9 @@ export const BlockDescription: Story = {
             title="Document: Thursday planning"
             description={
               <div className="flex flex-wrap items-center gap-2 mt-1">
-                <MetaPill icon={<FileText size={12} />}>Note</MetaPill>
+                <Badge shape="rounded" leading={<FileText size={12} />}>Note</Badge>
                 <span className="caption text-muted-foreground">Shared drive · 14:32</span>
-                <MetaPill title="Linked items">→ 2</MetaPill>
+                <Badge shape="rounded" title="Linked items">→ 2</Badge>
               </div>
             }
           >
