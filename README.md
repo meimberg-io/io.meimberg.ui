@@ -199,9 +199,7 @@ Verbindlich für **neue** Komponenten (Bestehendes migriert nur bei Bedarf):
 
 ## Komponenten-Inventar
 
-Source of Truth pro Komponente ist **Storybook** (`pnpm --filter @meimberg/ui
-storybook`) — Varianten, States, Props live. Foundations (Colors/Spacing/
-Typography/Radius) dokumentieren `@meimberg/ui/tokens` app-agnostisch.
+Source of Truth pro Komponente ist **Storybook** (`make storybook`, http://localhost:6007) — Varianten, States, Props live. Foundations (Colors/Spacing/Typography/Radius/Responsive) dokumentieren `@meimberg/ui/tokens` app-agnostisch. Alle Entwicklungs-Befehle (Checks, Changeset, Release): `make help`.
 
 ## Vendor-Kuration (`ui/`)
 
