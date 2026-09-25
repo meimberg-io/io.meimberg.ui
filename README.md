@@ -1,45 +1,30 @@
 # @meimberg/ui
 
-Produktneutrales Design-System (Komponenten) auf Basis von `@meimberg/ui/tokens`
-(Foundations). Aus der Pulse-App extrahiert (PUL-462/464), damit weitere Apps
-dasselbe Look-and-Feel — inklusive App-Gerüst — ohne Copy-Paste konsumieren
-können. Wird von der App via Next `transpilePackages` aus der Quelle gebaut
-(kein separater Build-Step).
+Produktneutrales Design-System (Komponenten) auf Basis von `@meimberg/ui/tokens` (Foundations). Aus der Pulse-App extrahiert, damit weitere Apps dasselbe Look-and-Feel — inklusive App-Gerüst — ohne Copy-Paste konsumieren können. Wird von der App via Next `transpilePackages` aus der Quelle gebaut (kein separater Build-Step).
 
-**Domain-frei:** kein Import aus einem App-Baum (`@/*`), keine Fachlichkeit —
-erzwungen per `eslint.config.mjs` + `tsc`. Produktspezifische Semantik (bei
-Pulse: Prio/Stage/Vocab-Farb-Tokens, Auth, Queries) bleibt in der jeweiligen
-App.
+**Domain-frei:** kein Import aus einem App-Baum (`@/*`), keine Fachlichkeit — erzwungen per `eslint.config.mjs` + `tsc`. Produktspezifische Semantik (bei Pulse: Prio-/Stage-/Vokabular-Farb-Tokens, Auth, Queries) bleibt in der jeweiligen App.
 
 ## Struktur
 
-Volle Atomic-Design-Dreiteilung (nach **Komposition**, nicht nach Feature-Topf):
+Atomic Design, geschnitten nach **Komposition**:
 
-- `src/ui/` — shadcn-Vendor-Primitives (as-is portiert, kuratiert — siehe unten).
-- `src/atoms/` — **ein Element**: Controls (`TextField`, `SelectField`,
-  `RichSelect`, `DatePicker`, `SegmentedSwitch`, `Dropdown`, `ThemeToggle`,
-  `SearchInput`, …) + Anzeige (`Icon`, `Pill`, `Chip`, `IconBadge`, `Avatar`,
-  `Sparkline`, …) + Layout-Primitives (`PageContainer`, `ScrollableContent`)
-  + `atoms/icons` (Lucide-Re-Export).
-- `src/molecules/` — **Kompositionen aus 2+ Elementen** (`FormField`/`FormRow`/
-  `FormSection`, `KpiTile`, `EmptyState`, `SectionCardHeader`, `TileGrid`,
-  `PageHeader`, …).
-- `src/organisms/` — **App-Gerüst + große Kompositionen/Modals** (`AppShell`,
-  `AppSidebar`, `Breadcrumbs`, `UserMenu`, `SubNavLayout`, `FilterBar`,
-  `FormDialog`, `DataTable`, `IconUploadCropDialog`, `markdown-editor`, …).
+- `src/ui/` — reine shadcn-/Radix-Vendor-Primitives (Dialog, Popover, Sheet, Sidebar, Card, …). Eigenbauten liegen nie hier; Abweichungen von Upstream stehen unter „Vendor-Änderungen".
+- `src/atoms/` — **ein Element**: Controls (`Button`, `IconButton`, `Select`, `Combobox`, `TextField`, `DatePicker`, `SearchInput`, `SegmentedControl`, `Chip`, `ThemeToggle`, …), Anzeige (`Badge`, `Avatar`, `Icon`, `IconByName`, `Donut`, `Sparkline`, …), Layout-Primitives (`PageContainer`, `ScrollableContent`) und `atoms/icons` (Lucide-Re-Export plus semantische Aliase).
+- `src/molecules/` — **Kompositionen aus 2+ Elementen** (`FormField`/`FormRow`/`FormSection`, `FormActions`, `FilterBar`, `KpiTile`, `EmptyState`, `PageHeader`, `CardActions`, …).
+- `src/organisms/` — **App-Gerüst und große Kompositionen** (`AppShell`, `AppSidebar`, `Breadcrumbs`, `UserMenu`, `SubNavLayout`, `FormDialog`, `DataTable`, `IconUploadCropDialog`, `markdown-editor`, …).
 
 ## Import-Pfade
 
 | Import | Inhalt |
 | --- | --- |
-| `@meimberg/ui` | Root-Barrel: **alles** (atoms/molecules/organisms) + `cn`/`useIsMobile` + `UiProviders` + `Toaster`/`toast`. Auch das Form-System läuft hierüber (kein `/form`-Subpath). |
-| `@meimberg/ui/atoms/icons` | Lucide-Icons (separates Barrel wegen Namens-Kollisionen `Pill`/`Tag`/`Donut`). |
-| `@meimberg/ui/ui/*` | Einzelne shadcn-Primitives (`button`, `dialog`, …). |
-| `@meimberg/ui/organisms/markdown-editor` \| `@meimberg/ui/molecules/markdown-renderer` | Schwere Bundles (TipTap / react-markdown) — bewusst nur per Subpath, nicht im Root-Barrel. |
+| `@meimberg/ui` | Root-Barrel: alle Atoms, Molecules und Organisms außer den schweren Subpaths unten, dazu `cn`, `useIsMobile`, `UiProviders`, die i18n-Hooks, `Toaster`/`toast` und die Vokabular-Typen (`ControlSize`, `Tone`, `Breakpoint`, `IconComponent`). |
+| `@meimberg/ui/atoms/icons` | Lucide-Icons plus semantische Aliase (`SaveIcon`, `DeleteIcon`, `EditIcon`, `AddIcon`, `CloseIcon`, `CancelIcon`, `OpenExternalIcon`); separates Barrel wegen Namens-Kollisionen. |
+| `@meimberg/ui/organisms/markdown-editor` · `@meimberg/ui/molecules/markdown-renderer` · `@meimberg/ui/molecules/icon-picker` | Schwere Bundles (TipTap, react-markdown, komplette Lucide-Registry) — bewusst nur per Subpath. |
+| `@meimberg/ui/ui/*` | Einzelne Vendor-Primitives (`dialog`, `popover`, `card`, `alert-dialog`, …) für Fälle ohne eigene Komponente. |
 | `@meimberg/ui/providers` | Provider-Contract (`UiProviders`). |
 | `@meimberg/ui/i18n/de` | Deutsches Sprachpaket (`de` für `<UiProviders {...de}>`). |
-| `@meimberg/ui/tokens` | Foundations/Preset (Tailwind-v4-Tokens, Custom-Variants, Base-Resets) — als CSS `@import`. |
-| `@meimberg/ui/styles.css` | DS-Stylesheet (Tailwind v4 + `@meimberg/ui/tokens` + Radix-Animationen). |
+| `@meimberg/ui/tokens` | Foundations/Preset (Tailwind-v4-Tokens, Custom-Variants, Base-Resets, Utilities) — als CSS `@import`. |
+| `@meimberg/ui/styles.css` | Stylesheet des DS-Storybooks (Tailwind + Tokens + Radix-Animationen). |
 
 ## Getting Started — neue App aufsetzen
 
@@ -190,8 +175,8 @@ export function Shell({ children }: { children: ReactNode }) {
           groups={groups}
           currentPath={path}
           linkComponent={Link}
-          header={collapsed => <span className="heading-3">{collapsed ? 'A' : 'App'}</span>}
-          footer={collapsed => <UserMenu name="Ada Lovelace" email="ada@example.com" collapsed={collapsed} linkComponent={Link} />}
+          header={({ collapsed }) => <span className="heading-3">{collapsed ? 'A' : 'App'}</span>}
+          footer={({ collapsed }) => <UserMenu name="Ada Lovelace" email="ada@example.com" collapsed={collapsed} linkComponent={Link} />}
         />
       }
       headerStart={<Breadcrumbs rootLabel="App" rootHref="/" items={[{ label: 'Home' }]} linkComponent={Link} />}
@@ -203,7 +188,7 @@ export function Shell({ children }: { children: ReactNode }) {
 }
 ```
 
-Sekundär-Navigation (Settings-Stil): `<SubNavLayout items currentPath linkComponent onNavigate>`. Fehlerseite: `app/error.tsx` rendert `<RouteErrorState error reset />`.
+`header`/`footer` bekommen `{ collapsed, isMobile, closeMobile }` — `closeMobile()` schließt die Sidebar auf dem Handy, z. B. nach einer Aktion im Footer. Sekundär-Navigation (Settings-Stil): `<SubNavLayout items currentPath linkComponent onNavigate>`. Filterleisten: `<FilterBar>` mit `<Select variant="pill">`, `<Chip>` und `<SearchInput size="xs">`. Fehlerseite: `app/error.tsx` rendert `<RouteErrorState error reset />`.
 
 ### 7. Toast
 
@@ -233,19 +218,31 @@ Die Label-Typen heißen `<Komponente>Labels` (z. B. `DatePickerLabels`), der Ges
 
 ## API-Konventionen
 
-Verbindlich für **neue** Komponenten (Bestehendes migriert nur bei Bedarf):
+Verbindlich für alle Komponenten.
 
-- **Größen:** `sm` / `md` / `lg`. Dokumentierte Ausnahmen: `Avatar` (`xs`–`xl` — eigenständige Avatar-Skala), `Dropdown` (`sm`/`md`/`chip` — `chip` ist der Filter-Pill-Kontext), sowie die shadcn-Erblasten `Button`/`IconButton` (`default` statt `md`). Die Vereinheitlichung über alle Controls folgt in Phase 3 der Konsolidierung (`docs/konsolidierung.md`).
+**`size` — eine Control-Skala.** Button, IconButton, Select, Chip, DatePicker, SearchInput, SegmentedControl und ItemActionsMenu nutzen dieselben Stufen (je Komponente eine Teilmenge):
+
+| size | Höhe | Text | Icon | typischer Ort |
+| --- | --- | --- | --- | --- |
+| `xs` | 26 px | `caption` | 12 px | Filterleisten (Pills, Suche, Chips) |
+| `sm` | 32 px | `body-sm` | 14 px | Property-Bars in Dialogen, IconButtons |
+| `md` | 36 px | `body` | 16 px | Page-Toolbars, Header-Aktionen (Button-Default) |
+| `lg` | 40 px | `body` | 16 px | Formularfelder |
+
+Eigene Skalen haben nur Anzeige-Elemente: `Icon` (`xs`–`lg`, 12–20 px), `Avatar` (`xs`–`2xl`, 20–80 px), `DetailDialogWrapper` (Dialog-Breiten). `Badge` hat keine Größe, nur `compact`.
+
+**`tone` — semantische Farbe:** `neutral | primary | success | warning | info | destructive`, jeweils auf das gleichnamige Token gemappt (`neutral` auf Secondary/Muted). **`variant` — nur die Form**, nie die Farbe: Button `solid | outline | ghost | link`, IconButton `quiet | ghost`, Badge `solid | soft | outline | plain`, Select `field | pill`, EmptyState `plain | dashed`, InfoBanner `muted | subtle`.
+
+**Weitere Regeln:**
+
+- **Werte:** Controls sind `value` + `onChange(next)`; nur das Compound `Select.Root` behält Radix' `onValueChange`.
+- **Icons:** Eine Prop `icon` ist immer eine Komponenten-Referenz (`IconComponent`, z. B. `icon={Inbox}`), die Größe setzt das DS. Beliebige Visuals (Dots, Glyphen, Avatare) gehen als `ReactNode` in `leading`/`trailing`.
+- **Zustände:** `busy` an Button/IconButton (Spinner, keine Disabled-Optik), `compactBelow` an Select-Pill und Chip (Label unterhalb des Breakpoints ausgeblendet).
+- **`className`** hat jede Komponente — als Escape-Hatch für Layout, nicht als Styling-Mechanismus. Einzige legitime Farb-Nutzung: produkteigene Tints auf `Badge variant="outline"`.
+- **Test-IDs:** Das DS verdrahtet keine `data-testid`; `data-*`/`aria-*` werden aufs primäre Element durchgereicht, interne Teile tragen `data-slot`.
 - **Texte:** nie hart kodiert — englische Defaults als `<Komponente>Labels`, aufgelöst über `useLabels`, überschreibbar per `labels`-Prop; deutsche Fassung in `src/i18n/de/`.
-- **Farbe/Zustand:** semantische `variant`/`tone`-Props, **nicht** per-Call-Site-
-  `className`. `className` bleibt reiner Escape-Hatch (Layout-Klassen), kein
-  Styling-Mechanismus.
-- **Slots:** `children` = primärer Inhalt/Label; benannte `xSlot`/`render*`-Props
-  für Zusatz-Regionen (z. B. `leading` an `IconBadge`, `header`/`footer` an
-  `AppSidebar`). Framework-Kopplung (Routing) NIE hart im Package — Pfad als
-  Prop (`currentPath`), Links als `linkComponent`-Slot.
-- **Story-Pflicht:** jede Komponente in `atoms/`/`molecules/`/`organisms/` hat
-  eine sibling `.stories.tsx` (Drift-Schutz `pnpm check:stories`).
+- **Slots und Routing:** `children` = primärer Inhalt; benannte Slots (`leading`, `meta`, `header`/`footer`) für Zusatz-Regionen. Framework-Kopplung nie hart im Package — Pfad als Prop (`currentPath`), Links als `linkComponent`.
+- **Story-Pflicht:** jede Komponente in `atoms/`/`molecules/`/`organisms/` hat eine sibling `.stories.tsx` (`make check-stories`).
 
 ## Komponenten-Inventar
 
@@ -253,7 +250,19 @@ Source of Truth pro Komponente ist **Storybook** (`make storybook`, http://local
 
 ## Vendor-Kuration (`ui/`)
 
-`ui/` enthält nur die **real genutzten** shadcn-Primitives; ungenutzte wurden entfernt. Wird ein weiteres gebraucht, aus Upstream nach `src/ui/` kopieren und an die Tokens anpassen — die `./ui/*`-Export-Map nimmt es automatisch auf.
+`ui/` enthält nur die **real genutzten** shadcn-/Radix-Primitives. Wird ein weiteres gebraucht, aus Upstream nach `src/ui/` kopieren und an die Tokens anpassen — die `./ui/*`-Export-Map nimmt es automatisch auf.
+
+### Vendor-Änderungen
+
+Abweichungen von Upstream, damit Updates aus shadcn nachvollziehbar bleiben:
+
+- Alle Primitives: Typografie-Rollen (`body`/`body-sm`/`caption`) statt Tailwind-Textgrößen, Tap-Target `pointer-coarse:min-h-tap`, Close-/Aktions-Icons aus `atoms/icons`, Screenreader-Texte über `useLabels`.
+- `card`: `interactive` (Hover-Akzent + Pointer).
+- `alert-dialog`: `AlertDialogAction` nimmt `variant`/`tone`/`size` des Buttons.
+- `dialog`: Bottom-Sheet auf Mobile (`disableMobileSheet` schaltet es ab).
+- `popover`: exportiert `PopoverAnchor`.
+- `slider`: `tone`.
+- `sidebar`: Trigger als `IconButton`.
 
 ## Provider-Contract
 
