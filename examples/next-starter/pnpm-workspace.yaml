@@ -1,0 +1,4 @@
+# Native build scripts are not needed for the starter (prebuilt binaries suffice).
+allowBuilds:
+  sharp: false
+  unrs-resolver: false

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { renderWithProviders } from '../test/render'
+import { renderWithUi } from '../testing'
 import { RouteErrorState } from './route-error-state'
 
 describe('RouteErrorState', () => {
@@ -18,7 +18,7 @@ describe('RouteErrorState', () => {
   })
 
   it('renders the default title and description', () => {
-    renderWithProviders(
+    renderWithUi(
       <RouteErrorState error={new Error('boom')} reset={vi.fn()} />,
     )
     expect(screen.getByRole('heading', { name: /Something went wrong/ })).toBeInTheDocument()
@@ -28,7 +28,7 @@ describe('RouteErrorState', () => {
 
   it('calls reset when the action button is clicked', async () => {
     const reset = vi.fn()
-    renderWithProviders(
+    renderWithUi(
       <RouteErrorState error={new Error('boom')} reset={reset} />,
     )
     await userEvent.click(screen.getByRole('button', { name: /Try again/ }))
@@ -36,7 +36,7 @@ describe('RouteErrorState', () => {
   })
 
   it('overrides labels via the labels prop', () => {
-    renderWithProviders(
+    renderWithUi(
       <RouteErrorState error={new Error('boom')} reset={vi.fn()} labels={{ title: 'Oops', retry: 'Reload' }} />,
     )
     expect(screen.getByRole('heading', { name: 'Oops' })).toBeInTheDocument()
@@ -44,7 +44,7 @@ describe('RouteErrorState', () => {
   })
 
   it('merges className on the root', () => {
-    renderWithProviders(
+    renderWithUi(
       <RouteErrorState error={new Error('boom')} reset={vi.fn()} className='py-8' />,
     )
     const root = screen.getByRole('heading').parentElement!

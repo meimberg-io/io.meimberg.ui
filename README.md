@@ -24,7 +24,9 @@ Atomic Design, geschnitten nach **Komposition**:
 | `@meimberg/ui/providers` | Provider-Contract (`UiProviders`). |
 | `@meimberg/ui/i18n/de` | Deutsches Sprachpaket (`de` für `<UiProviders {...de}>`). |
 | `@meimberg/ui/tokens` | Foundations/Preset (Tailwind-v4-Tokens, Custom-Variants, Base-Resets, Utilities) — als CSS `@import`. |
+| `@meimberg/ui/eslint` | ESLint-Regeln für Apps (siehe § ESLint-Regeln für Apps). |
 | `@meimberg/ui/styles.css` | Stylesheet des DS-Storybooks (Tailwind + Tokens + Radix-Animationen). |
+| `@meimberg/ui/testing` · `@meimberg/ui/testing/setup` | Test-Helper (`renderWithUi`) und Vitest-Setup (jest-dom + jsdom-Polyfills), siehe „Testen in Apps". |
 
 ## Getting Started — neue App aufsetzen
 
@@ -216,6 +218,55 @@ Einzelne Texte lassen sich an zwei Stellen überschreiben, die spätere gewinnt:
 
 Die Label-Typen heißen `<Komponente>Labels` (z. B. `DatePickerLabels`), der Gesamt-Typ ist `UiMessages`. Eigene Komponenten einer App können denselben Mechanismus über `useLabels`, `useUiLocale` und `useDateLocale` nutzen.
 
+## Testen in Apps
+
+Das Package bringt das Test-Setup mit, das es selbst nutzt. Voraussetzung sind die optionalen Peers `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/jest-dom` und `@testing-library/user-event` als devDependencies der App.
+
+**Setup.** `@meimberg/ui/testing/setup` registriert die jest-dom-Matcher und polyfillt in jsdom fehlende Browser-APIs (`matchMedia`, `ResizeObserver`, Pointer-Capture, `scrollIntoView`, Range-Rects). Es polyfillt nur, was fehlt.
+
+```ts
+// vitest.config.ts: test: { environment: 'jsdom', globals: true, setupFiles: ['./vitest.setup.ts'] }
+// vitest.setup.ts
+import '@meimberg/ui/testing/setup'
+// … danach app-eigene Mocks
+```
+
+**Rendern.** `renderWithUi(ui, options?)` mountet in `UiProviders` und gibt das Testing-Library-Ergebnis plus eine `userEvent`-Instanz (`user`) zurück.
+
+| Option | Wirkung |
+| --- | --- |
+| `providers` | Komplette `UiProviders`-Props (`theme`, `locale`, `dateLocale`, `messages`, `tooltipDelayDuration`), z. B. `{...de}`. |
+| `messages` · `locale` · `dateLocale` | Kurzformen, gewinnen gegen `providers`. |
+| `withToaster` | `<Toaster>` innerhalb der Provider mitmounten (Default `false`). |
+| `wrapper` | App-Provider (QueryClient, …), liegt außen um `UiProviders`. |
+| übrige | Wie `render()` von Testing Library (`container`, `baseElement`, …). |
+
+```tsx
+import { de } from '@meimberg/ui/i18n/de'
+import { renderWithUi } from '@meimberg/ui/testing'
+
+const { user } = renderWithUi(<MyForm />, { providers: de, wrapper: QueryWrapper })
+await user.click(screen.getByRole('button', { name: 'Speichern' }))
+```
+
+Ein app-eigener Helper baut darauf auf und ergänzt nur, was die App zusätzlich braucht (Pulse: `renderWithProviders` mit QueryClient).
+
+**Story-Pflicht prüfen.** Das Bin `meimberg-ui-check-stories` (plain Node, keine Dependencies) prüft, dass jede `.tsx` in den Layer-Ordnern eine sibling `.stories.tsx` hat und keine Story ohne Komponente existiert. Server-Components sind ausgenommen (`import 'server-only'` oder async-Export ohne `'use client'`); eine Story für sie ist ein Fehler.
+
+```jsonc
+// package.json der App
+"scripts": { "check:stories": "meimberg-ui-check-stories --src src/components --allowlist scripts/check-stories-allowlist.json" }
+```
+
+| Option | Default |
+| --- | --- |
+| `--root <dir>` | Aufruf-Verzeichnis; Basis aller relativen Pfade |
+| `--src <dir>` | `src` |
+| `--layers <liste>` | `atoms,molecules,organisms` (fehlende Ordner werden übersprungen, keiner vorhanden ist ein Fehler) |
+| `--ignore <liste>` | `index.ts,index.tsx,icons.ts` |
+| `--ignore-dirs <liste>` | `__tests__` |
+| `--allowlist <datei>` | keine; JSON `{"files": ["molecules/Foo.tsx"]}`, Pfade relativ zu `--src`. Einträge, die inzwischen eine Story haben oder gelöscht sind, schlagen fehl. |
+
 ## API-Konventionen
 
 Verbindlich für alle Komponenten.
@@ -244,9 +295,40 @@ Eigene Skalen haben nur Anzeige-Elemente: `Icon` (`xs`–`lg`, 12–20 px), `Ava
 - **Slots und Routing:** `children` = primärer Inhalt; benannte Slots (`leading`, `meta`, `header`/`footer`) für Zusatz-Regionen. Framework-Kopplung nie hart im Package — Pfad als Prop (`currentPath`), Links als `linkComponent`.
 - **Story-Pflicht:** jede Komponente in `atoms/`/`molecules/`/`organisms/` hat eine sibling `.stories.tsx` (`make check-stories`).
 
+## ESLint-Regeln für Apps
+
+`@meimberg/ui/eslint` liefert die Regeln, die korrekte DS-Nutzung erzwingen — als ESLint-Core-Regeln (`no-restricted-imports`, `no-restricted-syntax`), ohne Plugin und ohne Build-Step.
+
+| Export | Inhalt |
+| --- | --- |
+| `restrictedImportPaths` | Einträge für `no-restricted-imports` → `paths`: `lucide-react` (→ `@meimberg/ui/atoms/icons` + `Icon`), `@radix-ui/react-dialog` (→ `FormDialog`, `ui/dialog`, `ui/alert-dialog`), `@meimberg/ui/ui/avatar` (→ `Avatar`), `@meimberg/ui/ui/calendar` und `react-day-picker` (→ `DatePicker`), `@meimberg/ui/ui/sonner` (→ `Toaster`/`toast` aus dem Root-Barrel). |
+| `restrictedImportPatterns` | Einträge für `patterns`: pfadbasierte `KpiTile`-Importe (→ Root-Barrel), sonstige `@radix-ui/*` (→ `@meimberg/ui/ui/*`). |
+| `restrictedSyntax` | Selektoren für `no-restricted-syntax`: rohes `<input>`/`<textarea>`/`<select>` (→ `TextField`, `Select`, `Combobox`), `<h1 className="heading-1">` (→ `PageHeader`), `max-w-[1440px]` (→ `PageContainer`), Inline-Card-Frame `bg-card border rounded-lg shadow-card` (→ `Card`/`DashboardCard`), `hover-lift` (→ `Card interactive`), `setTheme(...)` (→ `ThemeToggle`). |
+| `recommended` (auch Default-Export) | Fertiges Flat-Config-Array für `**/*.{ts,tsx}` aus allen drei Listen. |
+
+Einfache App (Parser kommt aus `eslint-config-next`), vollständig in `examples/next-starter/eslint.config.mjs`:
+
+```js
+import {recommended as meimbergUi} from '@meimberg/ui/eslint'
+
+export default defineConfig([...nextVitals, ...nextTs, ...meimbergUi])
+```
+
+**Eigene Restriktionen:** Flat Config merged Rule-Optionen nicht — ein späterer Block, der `no-restricted-imports` oder `no-restricted-syntax` für dieselben Dateien setzt, ersetzt die frühere Einstellung. Apps mit eigenen Listen nutzen deshalb nicht `recommended`, sondern spreaden die Bausteine in **jeden** Block, der diese Regeln setzt:
+
+```js
+'no-restricted-imports': ['error', {
+  paths: [...restrictedImportPaths, ...appPaths],
+  patterns: [...restrictedImportPatterns, ...appPatterns],
+}],
+'no-restricted-syntax': ['error', ...restrictedSyntax, ...appSelectors],
+```
+
+**Ausnahmen:** nur inline mit Begründung, z. B. `// eslint-disable-next-line no-restricted-syntax -- native file input, kein DS-Pendant`. Keine Datei-Whitelists für DS-Regeln in der App; fehlt dem DS etwas, gehört die Erweiterung ins DS.
+
 ## Komponenten-Inventar
 
-Source of Truth pro Komponente ist **Storybook** (`make storybook`, http://localhost:6007) — Varianten, States, Props live. Foundations (Colors/Spacing/Typography/Radius/Responsive) dokumentieren `@meimberg/ui/tokens` app-agnostisch. Alle Entwicklungs-Befehle (Checks, Changeset, Release): `make help`.
+Source of Truth pro Komponente ist **Storybook** — veröffentlicht unter https://meimberg-io.github.io/io.meimberg.ui/ (Stand des letzten Release-Tags), lokal mit `make storybook` (http://localhost:6007) — Varianten, States, Props live. Foundations (Colors/Spacing/Typography/Radius/Responsive) dokumentieren `@meimberg/ui/tokens` app-agnostisch. Alle Entwicklungs-Befehle (Checks, Changeset, Release): `make help`.
 
 ## Vendor-Kuration (`ui/`)
 

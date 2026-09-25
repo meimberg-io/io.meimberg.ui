@@ -1,11 +1,11 @@
 import {describe, expect, it, vi} from 'vitest'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {DetailDialogWrapper} from './detail-dialog-wrapper'
 
 describe('DetailDialogWrapper', () => {
   it('renders nothing when closed', () => {
-    renderWithProviders(
+    renderWithUi(
       <DetailDialogWrapper open={false} onOpenChange={vi.fn()} title="Details">
         Body
       </DetailDialogWrapper>,
@@ -14,7 +14,7 @@ describe('DetailDialogWrapper', () => {
   })
 
   it('renders title, description, icon, header aside, body and footer', () => {
-    renderWithProviders(
+    renderWithUi(
       <DetailDialogWrapper
         open
         onOpenChange={vi.fn()}
@@ -36,7 +36,7 @@ describe('DetailDialogWrapper', () => {
   })
 
   it('renders block content in the description without a <p> wrapper', () => {
-    renderWithProviders(
+    renderWithUi(
       <DetailDialogWrapper open onOpenChange={vi.fn()} title="T" description={<div>Block</div>}>
         Body
       </DetailDialogWrapper>,
@@ -45,7 +45,7 @@ describe('DetailDialogWrapper', () => {
   })
 
   it('applies size, iconBgClass and className', () => {
-    renderWithProviders(
+    renderWithUi(
       <DetailDialogWrapper
         open
         onOpenChange={vi.fn()}
@@ -65,7 +65,7 @@ describe('DetailDialogWrapper', () => {
   })
 
   it('defaults to size md and omits the footer when not given', () => {
-    renderWithProviders(
+    renderWithUi(
       <DetailDialogWrapper open onOpenChange={vi.fn()} title="T">
         Body
       </DetailDialogWrapper>,
@@ -76,7 +76,7 @@ describe('DetailDialogWrapper', () => {
 
   it('calls onOpenChange(false) on Escape', async () => {
     const onOpenChange = vi.fn()
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <DetailDialogWrapper open onOpenChange={onOpenChange} title="T">
         Body
       </DetailDialogWrapper>,

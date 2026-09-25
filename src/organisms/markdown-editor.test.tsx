@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest'
 import {screen, waitFor} from '@testing-library/react'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {MarkdownEditor} from './markdown-editor'
 
 // Tiptap/ProseMirror's contentEditable handling depends on selection APIs that
@@ -9,18 +9,18 @@ import {MarkdownEditor} from './markdown-editor'
 
 describe('MarkdownEditor', () => {
   it('mounts and renders the toolbar with English titles', async () => {
-    renderWithProviders(<MarkdownEditor value='Hello' onChange={vi.fn()} />)
+    renderWithUi(<MarkdownEditor value='Hello' onChange={vi.fn()} />)
     expect(await screen.findByRole('button', {name: 'Bold (⌘B)'})).toBeInTheDocument()
     expect(screen.getByRole('button', {name: 'Insert image'})).toBeInTheDocument()
   })
 
   it('overrides toolbar titles via the labels prop', async () => {
-    renderWithProviders(<MarkdownEditor value='' onChange={vi.fn()} labels={{bold: 'Strong'}} />)
+    renderWithUi(<MarkdownEditor value='' onChange={vi.fn()} labels={{bold: 'Strong'}} />)
     expect(await screen.findByRole('button', {name: 'Strong'})).toBeInTheDocument()
   })
 
   it('reflects the disabled prop on the wrapper', () => {
-    const {container} = renderWithProviders(
+    const {container} = renderWithUi(
       <MarkdownEditor value='' onChange={vi.fn()} disabled />,
     )
     // The contenteditable area should be marked non-editable.
@@ -32,7 +32,7 @@ describe('MarkdownEditor', () => {
 
   it('inserts an image via the inline URL popover (Enter submits)', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(<MarkdownEditor value='Hello' onChange={onChange} />)
+    const {user} = renderWithUi(<MarkdownEditor value='Hello' onChange={onChange} />)
     await user.click(await screen.findByRole('button', {name: 'Insert image'}))
     const input = await screen.findByLabelText('Image URL')
     await user.clear(input)
@@ -43,7 +43,7 @@ describe('MarkdownEditor', () => {
 
   it('closes the URL popover on Escape without changing content', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(<MarkdownEditor value='Hello' onChange={onChange} />)
+    const {user} = renderWithUi(<MarkdownEditor value='Hello' onChange={onChange} />)
     await user.click(await screen.findByRole('button', {name: 'Link'}))
     const input = await screen.findByLabelText('Link URL')
     expect(input).toHaveValue('https://')

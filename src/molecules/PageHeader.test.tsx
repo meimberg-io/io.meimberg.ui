@@ -1,23 +1,23 @@
 import {describe, expect, it, vi} from 'vitest'
 import {screen} from '@testing-library/react'
 import {Plus} from '../atoms/icons'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {PageHeader} from './PageHeader'
 
 describe('PageHeader', () => {
   it('renders the title', () => {
-    renderWithProviders(<PageHeader title='My page' />)
+    renderWithUi(<PageHeader title='My page' />)
     expect(screen.getByRole('heading', {name: 'My page'})).toBeInTheDocument()
   })
 
   it('renders the description', () => {
-    renderWithProviders(<PageHeader title='X' description='A description' />)
+    renderWithUi(<PageHeader title='X' description='A description' />)
     expect(screen.getByText('A description')).toBeInTheDocument()
   })
 
   it('renders the action button when actionLabel + onAction are given', async () => {
     const onAction = vi.fn()
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <PageHeader title='X' actionLabel='Add' actionIcon={Plus} onAction={onAction} />,
     )
     const button = screen.getByRole('button', {name: /Add/})
@@ -28,12 +28,12 @@ describe('PageHeader', () => {
   })
 
   it('renders no action area without actions', () => {
-    renderWithProviders(<PageHeader title='X' />)
+    renderWithUi(<PageHeader title='X' />)
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('renders leading and meta slots', () => {
-    const {container} = renderWithProviders(
+    const {container} = renderWithUi(
       <PageHeader title='Project' leading={<span>Glyph</span>} meta={<span>3 members</span>} />,
     )
     expect(container.querySelector('[data-slot="leading"]')).toHaveTextContent('Glyph')
@@ -41,7 +41,7 @@ describe('PageHeader', () => {
   })
 
   it('passes className and HTML attributes through to the root', () => {
-    renderWithProviders(<PageHeader title='X' className='mb-4' data-testid='header' />)
+    renderWithUi(<PageHeader title='X' className='mb-4' data-testid='header' />)
     const root = screen.getByTestId('header')
     expect(root.className).toContain('mb-4')
     expect(root.className).not.toContain('mb-8')

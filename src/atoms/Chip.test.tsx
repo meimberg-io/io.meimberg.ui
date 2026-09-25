@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {describe, expect, it, vi} from 'vitest'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {de} from '../i18n/de'
 import {Chip} from './Chip'
 import {Folder} from './icons'
@@ -126,12 +126,12 @@ describe('Chip — removable', () => {
   })
 
   it('uses the German package via UiI18nProvider', () => {
-    renderWithProviders(<Chip onRemove={() => {}}>x</Chip>, {messages: de.messages})
+    renderWithUi(<Chip onRemove={() => {}}>x</Chip>, {messages: de.messages})
     expect(screen.getByRole('button', {name: 'Filter entfernen'})).toBeTruthy()
   })
 
   it('instance labels win over app messages', () => {
-    renderWithProviders(<Chip onRemove={() => {}} labels={{remove: 'Weg'}}>x</Chip>, {messages: de.messages})
+    renderWithUi(<Chip onRemove={() => {}} labels={{remove: 'Weg'}}>x</Chip>, {messages: de.messages})
     expect(screen.getByRole('button', {name: 'Weg'})).toBeTruthy()
   })
 })

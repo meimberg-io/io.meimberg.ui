@@ -1,12 +1,12 @@
 import {describe, expect, it} from 'vitest'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {breadcrumbs as breadcrumbsDe} from '../i18n/de/breadcrumbs'
 import {Breadcrumbs} from './Breadcrumbs'
 
 describe('Breadcrumbs', () => {
   it('renders root link, intermediate links and the current page', () => {
-    renderWithProviders(
+    renderWithUi(
       <Breadcrumbs rootLabel="Home" items={[{label: 'Settings', href: '/settings'}, {label: 'Team'}]} />,
     )
     expect(screen.getByRole('navigation', {name: 'Breadcrumb'})).toBeInTheDocument()
@@ -16,12 +16,12 @@ describe('Breadcrumbs', () => {
   })
 
   it('overrides the nav label via the labels prop', () => {
-    renderWithProviders(<Breadcrumbs items={[{label: 'Projects'}]} labels={{navigation: 'You are here'}} />)
+    renderWithUi(<Breadcrumbs items={[{label: 'Projects'}]} labels={{navigation: 'You are here'}} />)
     expect(screen.getByRole('navigation', {name: 'You are here'})).toBeInTheDocument()
   })
 
   it('renders links through the linkComponent slot (root + intermediate, not the current page)', () => {
-    const {container} = renderWithProviders(
+    const {container} = renderWithUi(
       <Breadcrumbs
         rootLabel="Home"
         rootHref="/start"
@@ -45,18 +45,18 @@ describe('Breadcrumbs', () => {
   })
 
   it('renders entries without href as plain text and omits the root without rootLabel', () => {
-    const {container} = renderWithProviders(<Breadcrumbs items={[{label: 'Projects'}, {label: 'Alpha'}]} />)
+    const {container} = renderWithUi(<Breadcrumbs items={[{label: 'Projects'}, {label: 'Alpha'}]} />)
     expect(container.querySelectorAll('a')).toHaveLength(0)
     expect(screen.getByText('Alpha')).toHaveAttribute('aria-current', 'page')
   })
 
   it('reads app-wide German labels', () => {
-    renderWithProviders(<Breadcrumbs items={[{label: 'Projekte'}]} />, {messages: {breadcrumbs: breadcrumbsDe}})
+    renderWithUi(<Breadcrumbs items={[{label: 'Projekte'}]} />, {messages: {breadcrumbs: breadcrumbsDe}})
     expect(screen.getByRole('navigation', {name: breadcrumbsDe.navigation})).toBeInTheDocument()
   })
 
   it('merges className on the nav', () => {
-    renderWithProviders(<Breadcrumbs items={[{label: 'Projects'}]} className="hidden md:block" />)
+    renderWithUi(<Breadcrumbs items={[{label: 'Projects'}]} className="hidden md:block" />)
     expect(screen.getByRole('navigation').className).toContain('md:block')
   })
 })

@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {SubNavLayout, type SubNavItem} from './SubNavLayout'
 
 const items: SubNavItem[] = [
@@ -10,7 +10,7 @@ const items: SubNavItem[] = [
 
 describe('SubNavLayout', () => {
   it('marks the current item and uses the default nav label', () => {
-    renderWithProviders(
+    renderWithUi(
       <SubNavLayout items={items} currentPath="/settings/team/members">
         content
       </SubNavLayout>,
@@ -22,7 +22,7 @@ describe('SubNavLayout', () => {
   })
 
   it('overrides the nav label via the labels prop, ariaLabel wins over labels', () => {
-    const {rerender} = renderWithProviders(
+    const {rerender} = renderWithUi(
       <SubNavLayout items={items} currentPath="/" labels={{navigation: 'Settings'}}>
         content
       </SubNavLayout>,
@@ -38,7 +38,7 @@ describe('SubNavLayout', () => {
 
   it('navigates via the mobile select', async () => {
     const onNavigate = vi.fn()
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <SubNavLayout items={items} currentPath="/settings/profile" onNavigate={onNavigate}>
         content
       </SubNavLayout>,

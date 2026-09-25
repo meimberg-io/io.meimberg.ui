@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest'
 import {screen, within} from '@testing-library/react'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {deMessages} from '../i18n/de'
 import {Dialog, DialogContent, DialogTitle} from '../ui/dialog'
 import {FormDialog} from '../organisms/FormDialog'
@@ -20,7 +20,7 @@ function activeOption(owner: HTMLElement): HTMLElement | null {
 
 describe('Combobox', () => {
   it('renders the trigger as a combobox with listbox popup and the default placeholder', () => {
-    renderWithProviders(<Combobox items={items} value={null} onChange={() => {}} data-testid="picker" />)
+    renderWithUi(<Combobox items={items} value={null} onChange={() => {}} data-testid="picker" />)
     const trigger = screen.getByTestId('picker')
     expect(trigger).toHaveAttribute('role', 'combobox')
     expect(trigger).toHaveAttribute('aria-haspopup', 'listbox')
@@ -30,7 +30,7 @@ describe('Combobox', () => {
   })
 
   it('renders the selected item via renderSelected', () => {
-    renderWithProviders(
+    renderWithUi(
       <Combobox items={items} value="c" onChange={() => {}} renderSelected={item => <b>Picked {item.label}</b>} />,
     )
     expect(screen.getByRole('combobox')).toHaveTextContent('Picked Charlie')
@@ -38,7 +38,7 @@ describe('Combobox', () => {
 
   it('opens with the listbox focused and navigates with arrows, Home/End, skipping disabled items', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(<Combobox items={items} value={null} onChange={onChange} />)
+    const {user} = renderWithUi(<Combobox items={items} value={null} onChange={onChange} />)
     const trigger = screen.getByRole('combobox')
     await user.click(trigger)
 
@@ -67,7 +67,7 @@ describe('Combobox', () => {
   })
 
   it('starts on the selected item and opens from the trigger with ArrowDown', async () => {
-    const {user} = renderWithProviders(<Combobox items={items} value="d" onChange={() => {}} />)
+    const {user} = renderWithUi(<Combobox items={items} value="d" onChange={() => {}} />)
     screen.getByRole('combobox').focus()
     await user.keyboard('{ArrowDown}')
     const listbox = screen.getByRole('listbox')
@@ -76,7 +76,7 @@ describe('Combobox', () => {
   })
 
   it('closes on Escape and Tab and returns focus to the trigger', async () => {
-    const {user} = renderWithProviders(<Combobox items={items} value={null} onChange={() => {}} />)
+    const {user} = renderWithUi(<Combobox items={items} value={null} onChange={() => {}} />)
     const trigger = screen.getByRole('combobox')
     await user.click(trigger)
     await user.keyboard('{Escape}')
@@ -91,7 +91,7 @@ describe('Combobox', () => {
 
   it('ignores clicks on disabled items and selects enabled ones', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(<Combobox items={items} value={null} onChange={onChange} />)
+    const {user} = renderWithUi(<Combobox items={items} value={null} onChange={onChange} />)
     await user.click(screen.getByRole('combobox'))
     await user.click(screen.getByRole('option', {name: 'Bravo'}))
     expect(onChange).not.toHaveBeenCalled()
@@ -101,7 +101,7 @@ describe('Combobox', () => {
 
   it('focuses the search input when searchable, filters and resets the query on close', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(<Combobox items={items} value={null} onChange={onChange} searchable />)
+    const {user} = renderWithUi(<Combobox items={items} value={null} onChange={onChange} searchable />)
     await user.click(screen.getByRole('combobox'))
     const input = screen.getByPlaceholderText('Search…')
     expect(input).toHaveFocus()
@@ -124,7 +124,7 @@ describe('Combobox', () => {
   })
 
   it('uses a custom filterItem', async () => {
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <Combobox items={items} value={null} onChange={() => {}} searchable filterItem={(item, q) => item.id === q} />,
     )
     await user.click(screen.getByRole('combobox'))
@@ -133,7 +133,7 @@ describe('Combobox', () => {
   })
 
   it('generates unique listbox and option ids per instance', async () => {
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <>
         <Combobox items={items} value={null} onChange={() => {}} data-testid="one" />
         <Combobox items={items} value={null} onChange={() => {}} data-testid="two" />
@@ -152,7 +152,7 @@ describe('Combobox', () => {
   })
 
   it('prefers props over labels and labels over defaults', async () => {
-    const {user, rerender} = renderWithProviders(
+    const {user, rerender} = renderWithUi(
       <Combobox items={[]} value={null} onChange={() => {}} labels={{placeholder: 'Choose', noOptions: 'Nothing here'}} />,
     )
     expect(screen.getByRole('combobox')).toHaveTextContent('Choose')
@@ -164,7 +164,7 @@ describe('Combobox', () => {
   })
 
   it('renders German labels from the app-wide messages', async () => {
-    const {user} = renderWithProviders(<Combobox items={[]} value={null} onChange={() => {}} searchable />, {
+    const {user} = renderWithUi(<Combobox items={[]} value={null} onChange={() => {}} searchable />, {
       messages: deMessages,
     })
     expect(screen.getByRole('combobox')).toHaveTextContent('Wählen…')
@@ -175,7 +175,7 @@ describe('Combobox', () => {
 
   it('works inside a Radix dialog', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <Dialog open>
         <DialogContent aria-describedby={undefined}>
           <DialogTitle>Edit</DialogTitle>
@@ -193,7 +193,7 @@ describe('Combobox', () => {
   it('stacks above FormDialog and keeps the dialog open on select and Escape', async () => {
     const onChange = vi.fn()
     const onOpenChange = vi.fn()
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <FormDialog open onOpenChange={onOpenChange} title="Create item">
         <Combobox items={items} value={null} onChange={onChange} data-testid="in-dialog" />
       </FormDialog>,

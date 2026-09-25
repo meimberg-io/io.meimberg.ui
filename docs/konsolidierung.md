@@ -111,6 +111,8 @@ Die Phasen bauen aufeinander auf. Phase 1 ist klein und nicht-brechend; ab Phase
 
 ### Phase 4 — Tooling teilen
 
+**Erledigt mit v2.1.0 (2026-09-26).** ESLint-Bausteine unter `@meimberg/ui/eslint` (Pulse spreizt sie in seine Blöcke, die DS-Regeln gelten dort jetzt in allen Layern), Test-Setup unter `@meimberg/ui/testing` und `@meimberg/ui/testing/setup`, Story-Check als Bin `meimberg-ui-check-stories`. Das Storybook veröffentlicht der Workflow `storybook.yml` bei jedem Release-Tag auf GitHub Pages. Offen für später: `sonner` direkt importieren ist noch erlaubt (65 Stellen in Pulse); Pulses `TagSelector` hat noch ein rohes `<input>` (Migration auf `SearchInput size="xs"`).
+
 1. ESLint-Config `@meimberg/ui/eslint` mit den DS-Nutzungsregeln; Pulse konsumiert sie, veraltete Pulse-Overrides und Meldungen raus.
 2. Test-Setup (`vitest.setup`, `renderWithProviders`) und Story-Coverage-Check als Export; Pulse-Duplikate raus.
 3. Storybook veröffentlichen (GitHub Pages).

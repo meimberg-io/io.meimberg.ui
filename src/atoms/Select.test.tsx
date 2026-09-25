@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {FormField} from '../molecules/FormField'
 import {Select} from './Select'
 
@@ -14,7 +14,7 @@ type Status = (typeof OPTIONS)[number]['value']
 
 describe('Select', () => {
   it('renders the field look at lg by default and takes the id from FormField', () => {
-    renderWithProviders(
+    renderWithUi(
       <FormField label="Status">
         <Select<Status> value={null} onChange={() => {}} options={OPTIONS} placeholder="Pick a status" />
       </FormField>,
@@ -25,7 +25,7 @@ describe('Select', () => {
   })
 
   it('maps size onto the control scale for both variants', () => {
-    const {rerender} = renderWithProviders(
+    const {rerender} = renderWithUi(
       <Select<Status> value="open" onChange={() => {}} options={OPTIONS} size="sm" />,
     )
     expect(screen.getByRole('combobox')).toHaveClass('h-8')
@@ -36,7 +36,7 @@ describe('Select', () => {
   })
 
   it('hides the pill label below the compactBelow breakpoint', () => {
-    const {container} = renderWithProviders(
+    const {container} = renderWithUi(
       <Select<Status> variant="pill" compactBelow="md" value="open" onChange={() => {}} options={OPTIONS} />,
     )
     const label = container.querySelector('[data-slot="select-label"]')
@@ -44,7 +44,7 @@ describe('Select', () => {
   })
 
   it('prefixes the pill aria-label with clearLabel and passes rest props to the trigger', () => {
-    renderWithProviders(
+    renderWithUi(
       <Select<Status>
         variant="pill"
         value="open"
@@ -61,7 +61,7 @@ describe('Select', () => {
 
   it('shows the clearLabel without a selection and emits null from the clear row', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <Select<Status> variant="pill" value="open" onChange={onChange} options={OPTIONS} clearLabel="All statuses" />,
     )
     await user.click(screen.getByRole('combobox'))
@@ -71,7 +71,7 @@ describe('Select', () => {
 
   it('emits the picked value and renders meta and disabled rows', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(<Select<Status> value={null} onChange={onChange} options={OPTIONS} />)
+    const {user} = renderWithUi(<Select<Status> value={null} onChange={onChange} options={OPTIONS} />)
     await user.click(screen.getByRole('combobox'))
     expect(screen.getByRole('option', {name: /Blocked/})).toHaveAttribute('data-disabled')
     expect(screen.getByText('D')).toBeInTheDocument()
@@ -81,7 +81,7 @@ describe('Select', () => {
 
   it('selects via keyboard', async () => {
     const onChange = vi.fn()
-    const {user} = renderWithProviders(<Select<Status> value="open" onChange={onChange} options={OPTIONS} />)
+    const {user} = renderWithUi(<Select<Status> value="open" onChange={onChange} options={OPTIONS} />)
     screen.getByRole('combobox').focus()
     await user.keyboard('{Enter}')
     expect(screen.getByRole('listbox')).toBeInTheDocument()
@@ -91,7 +91,7 @@ describe('Select', () => {
 
   it('composes the compound parts with a border-flush trigger icon sized by the trigger', async () => {
     const onValueChange = vi.fn()
-    const {user, container} = renderWithProviders(
+    const {user, container} = renderWithUi(
       <Select.Root value={null} onValueChange={onValueChange}>
         <Select.Trigger variant="pill" size="sm" leading={<Select.TriggerIcon tone="primary">F</Select.TriggerIcon>}>
           All folders
@@ -113,7 +113,7 @@ describe('Select', () => {
   })
 
   it('names the icon trigger via its tooltip', () => {
-    renderWithProviders(
+    renderWithUi(
       <Select.Root value="a" onValueChange={() => {}}>
         <Select.IconTrigger tooltip="Switch workspace">W</Select.IconTrigger>
         <Select.Content>

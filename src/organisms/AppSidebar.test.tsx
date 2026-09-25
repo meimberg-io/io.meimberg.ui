@@ -1,6 +1,6 @@
 import {afterEach, describe, expect, it, vi} from 'vitest'
 import {screen, waitFor, within} from '@testing-library/react'
-import {renderWithProviders} from '../test/render'
+import {renderWithUi} from '../testing'
 import {SidebarProvider} from '../ui/sidebar'
 import {AppShell} from './AppShell'
 import {AppSidebar, type AppSidebarSlotContext, type SidebarNavGroup} from './AppSidebar'
@@ -27,7 +27,7 @@ afterEach(() => setViewport(DESKTOP_WIDTH))
 
 describe('AppSidebar', () => {
   it('renders group labels, items, icons and badges', () => {
-    renderWithProviders(
+    renderWithUi(
       <SidebarProvider>
         <AppSidebar groups={groups} currentPath="/" />
       </SidebarProvider>,
@@ -39,7 +39,7 @@ describe('AppSidebar', () => {
   })
 
   it('marks the active item with aria-current (prefix match, exact for /)', () => {
-    renderWithProviders(
+    renderWithUi(
       <SidebarProvider>
         <AppSidebar groups={groups} currentPath="/projects/42" />
       </SidebarProvider>,
@@ -50,7 +50,7 @@ describe('AppSidebar', () => {
   })
 
   it('uses a custom isActive heuristic', () => {
-    renderWithProviders(
+    renderWithUi(
       <SidebarProvider>
         <AppSidebar groups={groups} currentPath="/anything" isActive={href => href === '/settings'} />
       </SidebarProvider>,
@@ -60,7 +60,7 @@ describe('AppSidebar', () => {
 
   it('renders links through the linkComponent slot and calls onNavigate', async () => {
     const onNavigate = vi.fn()
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <SidebarProvider>
         <AppSidebar
           groups={groups}
@@ -83,7 +83,7 @@ describe('AppSidebar', () => {
   it('passes the expanded desktop context to header and footer', () => {
     const header = vi.fn((ctx: AppSidebarSlotContext) => <span>{ctx.collapsed ? 'A' : 'Acme'}</span>)
     const footer = vi.fn(() => <span>Footer</span>)
-    renderWithProviders(
+    renderWithUi(
       <SidebarProvider>
         <AppSidebar groups={groups} currentPath="/" header={header} footer={footer} />
       </SidebarProvider>,
@@ -95,7 +95,7 @@ describe('AppSidebar', () => {
   })
 
   it('collapsed: hides labels and badges, header gets collapsed=true', () => {
-    renderWithProviders(
+    renderWithUi(
       <SidebarProvider defaultOpen={false}>
         <AppSidebar groups={groups} currentPath="/" header={({collapsed}) => <span>{collapsed ? 'A' : 'Acme'}</span>} />
       </SidebarProvider>,
@@ -109,7 +109,7 @@ describe('AppSidebar', () => {
 
   it('mobile: ctx.closeMobile closes the off-canvas sheet', async () => {
     setViewport(MOBILE_WIDTH)
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <AppShell
         sidebar={
           <AppSidebar
@@ -134,7 +134,7 @@ describe('AppSidebar', () => {
 
   it('mobile: navigating closes the off-canvas sheet', async () => {
     setViewport(MOBILE_WIDTH)
-    const {user} = renderWithProviders(
+    const {user} = renderWithUi(
       <AppShell
         sidebar={
           <AppSidebar
