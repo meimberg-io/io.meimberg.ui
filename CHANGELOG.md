@@ -1,5 +1,11 @@
 # @meimberg/ui
 
+## 2.0.0-next.1
+
+### Patch Changes
+
+- e1de300: Deutsches Paket: Der Schließen-Button oben rechts im Dialog heißt „Dialog schließen", damit er sich von einem „Schließen" im Footer unterscheidet.
+
 ## 2.0.0-next.0
 
 ### Major Changes

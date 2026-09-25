@@ -5,6 +5,7 @@
     "@meimberg/ui": "1.3.0"
   },
   "changesets": [
+    "dialog-close-de",
     "phase-2-neutral"
   ]
 }
