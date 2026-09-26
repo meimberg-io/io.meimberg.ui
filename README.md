@@ -295,6 +295,12 @@ Eigene Skalen haben nur Anzeige-Elemente: `Icon` (`xs`–`lg`, 12–20 px), `Ava
 - **Slots und Routing:** `children` = primärer Inhalt; benannte Slots (`leading`, `meta`, `header`/`footer`) für Zusatz-Regionen. Framework-Kopplung nie hart im Package — Pfad als Prop (`currentPath`), Links als `linkComponent`.
 - **Story-Pflicht:** jede Komponente in `atoms/`/`molecules/`/`organisms/` hat eine sibling `.stories.tsx` (`make check-stories`).
 
+**Listen-Seiten** (Seitenaufbau, den Apps einheitlich halten):
+
+- `PageHeader` steht immer im `PageContainer` — sonst fehlt ihm das Seiten-Padding. Die primäre Anlegen-Aktion („Neu …") sitzt im `PageHeader`, nicht in der Filterleiste.
+- `FilterBar` in dieser Reihenfolge: links Filter und Sortierung als `Select variant="pill"`, an/aus-Filter als `Chip`, Ansichts-Umschalter (Liste/Wolke, Board/Liste) als `SegmentedControl size="xs"`; rechts (`ml-auto`) die Suche als `SearchInput size="xs"`, danach sekundäre Aktionen als `Button variant="ghost" size="xs"`.
+- Sortierung ist nie ein `SegmentedControl` — Optionen einer Sortierung sind Werte, keine Ansichten. Die Option benennt die Sortierung selbst („Nach Häufigkeit", „Alphabetisch").
+
 ## ESLint-Regeln für Apps
 
 `@meimberg/ui/eslint` liefert die Regeln, die korrekte DS-Nutzung erzwingen — als ESLint-Core-Regeln (`no-restricted-imports`, `no-restricted-syntax`), ohne Plugin und ohne Build-Step.
