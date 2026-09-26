@@ -9,7 +9,7 @@ Produktneutrales Design-System (Komponenten) auf Basis von `@meimberg/ui/tokens`
 Atomic Design, geschnitten nach **Komposition**:
 
 - `src/ui/` — reine shadcn-/Radix-Vendor-Primitives (Dialog, Popover, Sheet, Sidebar, Card, …). Eigenbauten liegen nie hier; Abweichungen von Upstream stehen unter „Vendor-Änderungen".
-- `src/atoms/` — **ein Element**: Controls (`Button`, `IconButton`, `Select`, `Combobox`, `TextField`, `DatePicker`, `SearchInput`, `SegmentedControl`, `Chip`, `ThemeToggle`, …), Anzeige (`Badge`, `Avatar`, `Icon`, `IconByName`, `Donut`, `Sparkline`, …), Layout-Primitives (`PageContainer`, `ScrollableContent`) und `atoms/icons` (Lucide-Re-Export plus semantische Aliase).
+- `src/atoms/` — **ein Element**: Controls (`Button`, `IconButton`, `DragHandle`, `Select`, `Combobox`, `TextField`, `DatePicker`, `SearchInput`, `SegmentedControl`, `Chip`, `ThemeToggle`, …), Anzeige (`Badge`, `Avatar`, `Icon`, `IconByName`, `Donut`, `Sparkline`, …), Layout-Primitives (`PageContainer`, `ScrollableContent`) und `atoms/icons` (Lucide-Re-Export plus semantische Aliase).
 - `src/molecules/` — **Kompositionen aus 2+ Elementen** (`FormField`/`FormRow`/`FormSection`, `FormActions`, `FilterBar`, `KpiTile`, `EmptyState`, `PageHeader`, `CardActions`, …).
 - `src/organisms/` — **App-Gerüst und große Kompositionen** (`AppShell`, `AppSidebar`, `Breadcrumbs`, `UserMenu`, `SubNavLayout`, `Page`, `ListPage`, `FormDialog`, `DataTable`, `IconUploadCropDialog`, `markdown-editor`, …).
 
@@ -280,18 +280,21 @@ Verbindlich für alle Komponenten.
 | `md` | 36 px | `body` | 16 px | Page-Toolbars, Header-Aktionen (Button-Default) |
 | `lg` | 40 px | `body` | 16 px | Formularfelder |
 
+Keine Zwischengrößen: IconButton hat genau diese vier Boxen mit fester Icon-Zuordnung, ohne Icon-Override — krumme Stufen waren die Drift-Quelle. Einzige bewusste Ausnahme ist `DragHandle` (24×32 px, hochkant).
+
 Eigene Skalen haben nur Anzeige-Elemente: `Icon` (`xs`–`lg`, 12–20 px), `Avatar` (`xs`–`2xl`, 20–80 px), `DetailDialogWrapper` (Dialog-Breiten). `Badge` hat keine Größe, nur `compact`.
 
-**`tone` — semantische Farbe:** `neutral | primary | success | warning | info | destructive`, jeweils auf das gleichnamige Token gemappt (`neutral` auf Secondary/Muted). **`variant` — nur die Form**, nie die Farbe: Button `solid | outline | ghost | link`, IconButton `quiet | ghost`, Badge `solid | soft | outline | plain`, Select `field | pill`, EmptyState `plain | dashed`, InfoBanner `muted | subtle`.
+**`tone` — semantische Farbe:** `neutral | primary | success | warning | info | destructive`, jeweils auf das gleichnamige Token gemappt (`neutral` auf Secondary/Muted). **`variant` — nur die Form**, nie die Farbe: Button `solid | outline | ghost | link`, IconButton `quiet | ghost | outline | solid` (quiet: Ton erst bei Hover, ghost: Ton in Ruhe, outline: Rahmen + Ton bei Hover, solid: mit dem Ton gefüllt), Badge `solid | soft | outline | plain`, Select `field | pill`, EmptyState `plain | dashed`, InfoBanner `muted | subtle`.
 
 **Weitere Regeln:**
 
 - **Werte:** Controls sind `value` + `onChange(next)`; nur das Compound `Select.Root` behält Radix' `onValueChange`.
 - **Icons:** Eine Prop `icon` ist immer eine Komponenten-Referenz (`IconComponent`, z. B. `icon={Inbox}`), die Größe setzt das DS. Beliebige Visuals (Dots, Glyphen, Avatare) gehen als `ReactNode` in `leading`/`trailing`.
-- **Zustände:** `busy` an Button/IconButton (Spinner, keine Disabled-Optik), `compactBelow` an Select-Pill und Chip (Label unterhalb des Breakpoints ausgeblendet).
+- **Zustände:** `busy` an Button/IconButton (Spinner, keine Disabled-Optik), `pressed` an IconButton (Toggle: `aria-pressed` + `data-state="on|off"`, „an" hält den Ton in Ruhe; Hover-Reveal-Wrapper verstecken einen gedrückten Button besser nicht — das entscheidet die Aufrufstelle), `compactBelow` an Select-Pill und Chip (Label unterhalb des Breakpoints ausgeblendet).
 - **`className`** hat jede Komponente — als Escape-Hatch für Layout, nicht als Styling-Mechanismus. Einzige legitime Farb-Nutzung: produkteigene Tints auf `Badge variant="outline"`.
 - **Test-IDs:** Das DS verdrahtet keine `data-testid`; `data-*`/`aria-*` werden aufs primäre Element durchgereicht, interne Teile tragen `data-slot`.
 - **Texte:** nie hart kodiert — englische Defaults als `<Komponente>Labels`, aufgelöst über `useLabels`, überschreibbar per `labels`-Prop; deutsche Fassung in `src/i18n/de/`.
+- **Form und Rendering:** IconButton `shape` `rounded` (Default) | `circle`; `asChild` an Button und IconButton rendert das einzige Kind (z. B. `next/link`) mit derselben Optik, `type="button"` nur ohne `asChild`.
 - **Slots und Routing:** `children` = primärer Inhalt; benannte Slots (`leading`, `meta`, `header`/`footer`) für Zusatz-Regionen. Framework-Kopplung nie hart im Package — Pfad als Prop (`currentPath`), Links als `linkComponent`.
 - **Story-Pflicht:** jede Komponente in `atoms/`/`molecules/`/`organisms/` hat eine sibling `.stories.tsx` (`make check-stories`).
 

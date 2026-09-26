@@ -19,6 +19,7 @@ export { Toaster, toast } from '../ui/sonner'
 
 export * from '../atoms/Button'
 export * from '../atoms/IconButton'
+export * from '../atoms/DragHandle'
 export { Icon } from '../atoms/Icon'
 export type { IconProps, IconSize } from '../atoms/Icon'
 export * from '../atoms/IconByName'

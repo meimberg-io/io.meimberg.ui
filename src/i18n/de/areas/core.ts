@@ -2,11 +2,13 @@
 
 import type {CoreMessages} from '../../areas/core'
 import {dialog} from '../dialog'
+import {dragHandle} from '../dragHandle'
 import {markdownEditor} from '../markdownEditor'
 import {sheet} from '../sheet'
 
 export const coreMessages: CoreMessages = {
   dialog,
+  dragHandle,
   markdownEditor,
   sheet,
 }
