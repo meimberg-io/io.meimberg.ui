@@ -162,6 +162,91 @@ export function pageComposition(files, {ignores = []} = {}) {
 }
 
 /** Ready-made flat config for apps without own restriction lists. Needs a TS/JSX parser from the app config (e.g. eslint-config-next). */
+// Icon-Props der DS-Komponenten (`icon`, `actionIcon`, `submitIcon`) sind
+// Komponenten-Referenzen. Eine Server-Komponente kann eine Funktion nicht an
+// eine Client-Komponente übergeben — Next.js bricht dann erst zur Laufzeit ab
+// ("Functions cannot be passed directly to Client Components"), Build und
+// Typecheck merken nichts. Die Regel meldet solche Übergaben in Dateien ohne
+// `'use client'`. Abhilfe: das Stück in eine eigene Client-Komponente ziehen
+// (oder, wenn die Datei ohnehin nur aus Client-Code importiert wird,
+// `'use client'` ergänzen).
+const DEFAULT_ICON_PROPS = ['icon', 'actionIcon', 'submitIcon']
+
+function isUseClient(program) {
+  return program.body.some(
+    node => node.type === 'ExpressionStatement' && node.directive === 'use client',
+  )
+}
+
+/** Komponenten-Referenz: `Inbox`, `Icons.Inbox` (Großbuchstabe am Ende). */
+function isComponentRef(expr) {
+  if (expr.type === 'Identifier') return /^[A-Z]/.test(expr.name)
+  if (expr.type === 'MemberExpression' && !expr.computed && expr.property.type === 'Identifier') {
+    return /^[A-Z]/.test(expr.property.name)
+  }
+  return false
+}
+
+const noServerIconProps = {
+  meta: {
+    type: 'problem',
+    docs: {description: 'Disallow passing icon components from Server Components to @meimberg/ui client components.'},
+    schema: [
+      {
+        type: 'object',
+        properties: {props: {type: 'array', items: {type: 'string'}}},
+        additionalProperties: false,
+      },
+    ],
+    messages: {
+      serverIcon:
+        '`{{prop}}={{{name}}}` passes a component from a Server Component to a client component — Next.js fails at runtime. Move this JSX into a client component, or add `\'use client\'` if the file is only imported from client code.',
+    },
+  },
+  create(context) {
+    const props = new Set(context.options[0]?.props ?? DEFAULT_ICON_PROPS)
+    let server = false
+    return {
+      Program(node) {
+        server = !isUseClient(node)
+      },
+      JSXAttribute(node) {
+        if (!server || node.name.type !== 'JSXIdentifier' || !props.has(node.name.name)) return
+        const value = node.value
+        if (!value || value.type !== 'JSXExpressionContainer' || !isComponentRef(value.expression)) return
+        context.report({
+          node,
+          messageId: 'serverIcon',
+          data: {prop: node.name.name, name: context.sourceCode.getText(value.expression)},
+        })
+      },
+    }
+  },
+}
+
+/** ESLint-Plugin mit den DS-eigenen Regeln (`meimberg/<regel>`). */
+export const plugin = {
+  meta: {name: '@meimberg/ui'},
+  rules: {'no-server-icon-props': noServerIconProps},
+}
+
+/**
+ * Flat-Config-Block für Next-Route-Dateien (z. B. `app/**\/*.tsx`): meldet
+ * Icon-Komponenten, die aus Server-Komponenten an Client-Komponenten gehen.
+ * Opt-in wie `pageComposition`, weil er vom Datei-Layout der App abhängt.
+ */
+export function serverComponentRules(files, {ignores = [], props} = {}) {
+  return [
+    {
+      name: '@meimberg/ui/server-components',
+      files,
+      ignores,
+      plugins: {meimberg: plugin},
+      rules: {'meimberg/no-server-icon-props': ['error', props ? {props} : {}]},
+    },
+  ]
+}
+
 export const recommended = [
   {
     name: '@meimberg/ui/recommended',

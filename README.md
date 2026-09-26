@@ -360,6 +360,15 @@ export default defineConfig([...nextVitals, ...nextTs, ...meimbergUi])
 'no-restricted-syntax': ['error', ...restrictedSyntax, ...appSelectors],
 ```
 
+**Icons aus Server-Komponenten (opt-in):** `icon`, `actionIcon` und `submitIcon` nehmen Komponenten-Referenzen (`icon={Inbox}`). Eine Server-Komponente kann eine Funktion nicht an eine Client-Komponente übergeben — Next.js bricht dann erst zur Laufzeit ab, Build und Typecheck merken nichts. `serverComponentRules(files)` aktiviert die Regel `meimberg/no-server-icon-props`: Sie meldet solche Übergaben in Dateien ohne `'use client'`. Abhilfe ist eine kleine Client-Komponente für das betroffene Stück, oder `'use client'`, wenn die Datei ohnehin nur aus Client-Code importiert wird. Das Plugin selbst ist als `plugin` exportiert (eigene Regel-Namen, kollidiert nicht mit `no-restricted-syntax`-Listen der App).
+
+```js
+export default defineConfig([
+  ...nextVitals, ...nextTs, ...meimbergUi,
+  ...serverComponentRules(['app/**/*.tsx'], {ignores: ['app/**/*.test.tsx']}),
+])
+```
+
 **Seiten-Komposition (opt-in):** Die Regel gilt nur für die Routen-/Seiten-Dateien der App und ist deshalb nicht in `recommended` — welche Dateien Seiten sind, hängt vom Datei-Layout ab (Next: `app/**`). Komponenten, die bewusst einen `PageHeader` in einem bestehenden Container rendern (Hero-Header), liegen außerhalb der `files` oder stehen in `ignores`:
 
 ```js
