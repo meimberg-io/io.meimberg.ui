@@ -1,5 +1,11 @@
 # @meimberg/ui
 
+## 3.2.0
+
+### Minor Changes
+
+- 7f4d47f: ESLint: neue Regel `meimberg/no-server-icon-props` (Plugin-Export `plugin`, Block-Helfer `serverComponentRules(files, {ignores, props})`). Sie meldet Icon-Komponenten (`icon`, `actionIcon`, `submitIcon`), die aus Dateien ohne `'use client'` übergeben werden — Next.js scheitert daran erst zur Laufzeit.
+
 ## 3.1.0
 
 ### Minor Changes
