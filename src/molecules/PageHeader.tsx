@@ -58,7 +58,7 @@ export function PageHeader({
         </div>
       </div>
       {hasActions && (
-        <div className="flex items-center gap-2">
+        <div data-slot="actions" className="flex items-center gap-2">
           {children}
           {actionLabel && onAction && (
             <Button onClick={onAction} icon={actionIcon}>

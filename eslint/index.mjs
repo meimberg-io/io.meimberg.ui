@@ -86,12 +86,12 @@ export const restrictedSyntax = [
   {
     selector: "JSXOpeningElement[name.name='h1'] > JSXAttribute[name.name='className'] > Literal[value=/\\bheading-1\\b/]",
     message:
-      '`<h1 className="heading-1">` belongs in `<PageHeader>` from `@meimberg/ui`. Use its `leading` / `meta` slots for hero variants.',
+      '`<h1 className="heading-1">` belongs in the page header. Compose pages with `<Page>` / `<ListPage>` from `@meimberg/ui` (`leading` / `meta` slots for hero variants).',
   },
   {
     selector: 'Literal[value=/max-w-\\[1440px\\]/]',
     message:
-      '`max-w-[1440px]` lives only in `<PageContainer>` from `@meimberg/ui`. Use `<PageContainer>` (default padding) or `<PageContainer padded={false}>`.',
+      '`max-w-[1440px]` lives only in `<PageContainer>` from `@meimberg/ui`. Compose pages with `<Page>` / `<ListPage>` (they bring the container), otherwise `<PageContainer>` / `<PageContainer padded={false}>`.',
   },
   {
     // The four card-frame classes in any order within one string literal.
@@ -110,6 +110,56 @@ export const restrictedSyntax = [
     message: 'Theme switching goes through `<ThemeToggle>` from `@meimberg/ui`; do not call `setTheme(...)` in app code.',
   },
 ]
+
+/**
+ * Entries for `no-restricted-imports` → `paths`: page files compose the page
+ * skeleton via `Page` / `ListPage` instead of stacking `PageContainer` and
+ * `PageHeader` by hand. Opt-in, because it only applies to the app's route
+ * files (e.g. Next `app/**`); components that intentionally render a
+ * `PageHeader` inside an existing container (hero headers) stay outside the
+ * file set or are listed in `ignores`. `FilterBar` stays allowed — its slots
+ * fix the control order.
+ */
+export const pageCompositionPaths = [
+  {
+    name: '@meimberg/ui',
+    importNames: ['PageHeader'],
+    message:
+      'Pages use `<Page>` / `<ListPage>` from `@meimberg/ui` (props `title`, `description`, `leading`, `meta`, `actions`) instead of `<PageHeader>`.',
+  },
+  {
+    name: '@meimberg/ui',
+    importNames: ['PageContainer'],
+    message:
+      'Pages use `<Page>` / `<ListPage>` from `@meimberg/ui`; they bring the `PageContainer` (`contained={false}` when a layout already provides it).',
+  },
+]
+
+/**
+ * Flat-config block for the page-composition rule. Carries the base DS lists
+ * as well, because a later `no-restricted-imports` setting replaces an
+ * earlier one for the same files: place it after `recommended`.
+ *
+ *   ...pageComposition(['app/**\/*.tsx'], {ignores: ['app/**\/_components/**']})
+ *
+ * @param {string[]} files Globs of the app's route/page files.
+ * @param {{ignores?: string[]}} [options] Globs exempt from the rule (hero components etc.).
+ */
+export function pageComposition(files, {ignores = []} = {}) {
+  return [
+    {
+      name: '@meimberg/ui/page-composition',
+      files,
+      ignores,
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {paths: [...restrictedImportPaths, ...pageCompositionPaths], patterns: restrictedImportPatterns},
+        ],
+      },
+    },
+  ]
+}
 
 /** Ready-made flat config for apps without own restriction lists. Needs a TS/JSX parser from the app config (e.g. eslint-config-next). */
 export const recommended = [

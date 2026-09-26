@@ -11,7 +11,7 @@ Atomic Design, geschnitten nach **Komposition**:
 - `src/ui/` — reine shadcn-/Radix-Vendor-Primitives (Dialog, Popover, Sheet, Sidebar, Card, …). Eigenbauten liegen nie hier; Abweichungen von Upstream stehen unter „Vendor-Änderungen".
 - `src/atoms/` — **ein Element**: Controls (`Button`, `IconButton`, `Select`, `Combobox`, `TextField`, `DatePicker`, `SearchInput`, `SegmentedControl`, `Chip`, `ThemeToggle`, …), Anzeige (`Badge`, `Avatar`, `Icon`, `IconByName`, `Donut`, `Sparkline`, …), Layout-Primitives (`PageContainer`, `ScrollableContent`) und `atoms/icons` (Lucide-Re-Export plus semantische Aliase).
 - `src/molecules/` — **Kompositionen aus 2+ Elementen** (`FormField`/`FormRow`/`FormSection`, `FormActions`, `FilterBar`, `KpiTile`, `EmptyState`, `PageHeader`, `CardActions`, …).
-- `src/organisms/` — **App-Gerüst und große Kompositionen** (`AppShell`, `AppSidebar`, `Breadcrumbs`, `UserMenu`, `SubNavLayout`, `FormDialog`, `DataTable`, `IconUploadCropDialog`, `markdown-editor`, …).
+- `src/organisms/` — **App-Gerüst und große Kompositionen** (`AppShell`, `AppSidebar`, `Breadcrumbs`, `UserMenu`, `SubNavLayout`, `Page`, `ListPage`, `FormDialog`, `DataTable`, `IconUploadCropDialog`, `markdown-editor`, …).
 
 ## Import-Pfade
 
@@ -295,11 +295,36 @@ Eigene Skalen haben nur Anzeige-Elemente: `Icon` (`xs`–`lg`, 12–20 px), `Ava
 - **Slots und Routing:** `children` = primärer Inhalt; benannte Slots (`leading`, `meta`, `header`/`footer`) für Zusatz-Regionen. Framework-Kopplung nie hart im Package — Pfad als Prop (`currentPath`), Links als `linkComponent`.
 - **Story-Pflicht:** jede Komponente in `atoms/`/`molecules/`/`organisms/` hat eine sibling `.stories.tsx` (`make check-stories`).
 
-**Listen-Seiten** (Seitenaufbau, den Apps einheitlich halten):
+**Seiten und Listen-Seiten** (Seitenaufbau, den Apps nicht frei komponieren):
 
-- `PageHeader` steht immer im `PageContainer` — sonst fehlt ihm das Seiten-Padding. Die primäre Anlegen-Aktion („Neu …") sitzt im `PageHeader`, nicht in der Filterleiste.
-- `FilterBar` in dieser Reihenfolge: links Filter und Sortierung als `Select variant="pill"`, an/aus-Filter als `Chip`, Ansichts-Umschalter (Liste/Wolke, Board/Liste) als `SegmentedControl size="xs"`; rechts (`ml-auto`) die Suche als `SearchInput size="xs"`, danach sekundäre Aktionen als `Button variant="ghost" size="xs"`.
+- Jede Top-Level-Seite ist ein `Page`: `PageContainer` > `PageHeader` > `children`. Props `title`, `description`, `leading`, `meta`, `actions` (Action-Bereich des Headers: die primäre Anlegen-Aktion „Neu …", ggf. weitere Header-Buttons), `contained` (Default `true`; `false`, wenn ein Layout den Container schon stellt, z. B. eine Settings-Shell mit `SubNavLayout`). Seiten stapeln `PageContainer` und `PageHeader` nicht selbst — erzwingbar per `pageComposition` (§ ESLint-Regeln für Apps).
+- Listen-Seiten sind ein `ListPage`: alles aus `Page`, dazu `intro` (zwischen Header und Filterleiste: KPI-Leiste, Shortcut-Tabs), die Filterleisten-Slots `filters`, `view`, `search`, `filterActions` sowie `filterTint`/`filterBelow`; `children` ist die Liste. Die `FilterBar` erscheint nur, wenn mindestens einer der vier Slots gesetzt ist. Rhythmus: Header `mb-8`, Intro `mb-4`, FilterBar `mb-5`.
+- `FilterBar` hat keine freien `children`, sondern Slots mit fester Reihenfolge **filters → view → [rechtsbündig: search → actions]**:
+
+| Slot | Inhalt |
+| --- | --- |
+| `filters` | Filter und Sortierung als `Select variant="pill"`, an/aus-Filter als `Chip` |
+| `view` | Ansichts-Umschalter (Liste/Wolke, Board/Liste) als `SegmentedControl size="xs"` |
+| `search` | `SearchInput size="xs"`; beginnt die rechtsbündige Gruppe (`ml-auto`) |
+| `actions` | sekundäre Aktionen nach der Suche als `Button variant="ghost" size="xs"` |
+
+Unter `md` bricht alles um, die Suche nimmt die volle Breite. Jede Gruppe trägt `data-slot` (`filters`, `view`, `end` mit `search`/`actions`). Außerhalb von `ListPage` (Toolbars innerhalb einer Seite, z. B. über einer Mitglieder-Liste) wird `FilterBar` direkt mit denselben Slots genutzt.
+
 - Sortierung ist nie ein `SegmentedControl` — Optionen einer Sortierung sind Werte, keine Ansichten. Die Option benennt die Sortierung selbst („Nach Häufigkeit", „Alphabetisch").
+
+```tsx
+<ListPage
+  title="Aufgaben"
+  actions={<Button icon={AddIcon} onClick={create}>Neue Aufgabe</Button>}
+  intro={<KpiStrip />}
+  filters={<><Select variant="pill" … /><Select variant="pill" … /><Chip … /></>}
+  view={<SegmentedControl size="xs" … />}
+  search={<SearchInput size="xs" value={q} onChange={setQ} />}
+  filterActions={<Button variant="ghost" size="xs">Export</Button>}
+>
+  <TaskList rows={rows} />
+</ListPage>
+```
 
 ## ESLint-Regeln für Apps
 
@@ -309,8 +334,10 @@ Eigene Skalen haben nur Anzeige-Elemente: `Icon` (`xs`–`lg`, 12–20 px), `Ava
 | --- | --- |
 | `restrictedImportPaths` | Einträge für `no-restricted-imports` → `paths`: `lucide-react` (→ `@meimberg/ui/atoms/icons` + `Icon`), `@radix-ui/react-dialog` (→ `FormDialog`, `ui/dialog`, `ui/alert-dialog`), `@meimberg/ui/ui/avatar` (→ `Avatar`), `@meimberg/ui/ui/calendar` und `react-day-picker` (→ `DatePicker`), `@meimberg/ui/ui/sonner` (→ `Toaster`/`toast` aus dem Root-Barrel). |
 | `restrictedImportPatterns` | Einträge für `patterns`: pfadbasierte `KpiTile`-Importe (→ Root-Barrel), sonstige `@radix-ui/*` (→ `@meimberg/ui/ui/*`). |
-| `restrictedSyntax` | Selektoren für `no-restricted-syntax`: rohes `<input>`/`<textarea>`/`<select>` (→ `TextField`, `Select`, `Combobox`), `<h1 className="heading-1">` (→ `PageHeader`), `max-w-[1440px]` (→ `PageContainer`), Inline-Card-Frame `bg-card border rounded-lg shadow-card` (→ `Card`/`DashboardCard`), `hover-lift` (→ `Card interactive`), `setTheme(...)` (→ `ThemeToggle`). |
+| `restrictedSyntax` | Selektoren für `no-restricted-syntax`: rohes `<input>`/`<textarea>`/`<select>` (→ `TextField`, `Select`, `Combobox`), `<h1 className="heading-1">` (→ `Page`/`ListPage`), `max-w-[1440px]` (→ `Page`/`ListPage` bzw. `PageContainer`), Inline-Card-Frame `bg-card border rounded-lg shadow-card` (→ `Card`/`DashboardCard`), `hover-lift` (→ `Card interactive`), `setTheme(...)` (→ `ThemeToggle`). |
 | `recommended` (auch Default-Export) | Fertiges Flat-Config-Array für `**/*.{ts,tsx}` aus allen drei Listen. |
+| `pageCompositionPaths` | Opt-in-Einträge für `paths`: `PageHeader` und `PageContainer` aus `@meimberg/ui` (per `importNames`) → `Page`/`ListPage`. `FilterBar` bleibt erlaubt, seine Slots legen die Reihenfolge fest. |
+| `pageComposition(files, {ignores?})` | Flat-Config-Array, das `pageCompositionPaths` plus die Basis-Listen für `files` setzt; nach `recommended` einhängen. |
 
 Einfache App (Parser kommt aus `eslint-config-next`), vollständig in `examples/next-starter/eslint.config.mjs`:
 
@@ -330,7 +357,18 @@ export default defineConfig([...nextVitals, ...nextTs, ...meimbergUi])
 'no-restricted-syntax': ['error', ...restrictedSyntax, ...appSelectors],
 ```
 
-**Ausnahmen:** nur inline mit Begründung, z. B. `// eslint-disable-next-line no-restricted-syntax -- native file input, kein DS-Pendant`. Keine Datei-Whitelists für DS-Regeln in der App; fehlt dem DS etwas, gehört die Erweiterung ins DS.
+**Seiten-Komposition (opt-in):** Die Regel gilt nur für die Routen-/Seiten-Dateien der App und ist deshalb nicht in `recommended` — welche Dateien Seiten sind, hängt vom Datei-Layout ab (Next: `app/**`). Komponenten, die bewusst einen `PageHeader` in einem bestehenden Container rendern (Hero-Header), liegen außerhalb der `files` oder stehen in `ignores`:
+
+```js
+export default defineConfig([
+  ...nextVitals, ...nextTs, ...meimbergUi,
+  ...pageComposition(['app/**/*.tsx'], {ignores: ['app/**/_components/*Hero*.tsx']}),
+])
+```
+
+Apps mit eigenen Listen spreaden `pageCompositionPaths` in den `paths` ihres Seiten-Blocks: `paths: [...restrictedImportPaths, ...pageCompositionPaths, ...appPaths]`.
+
+**Ausnahmen:** nur inline mit Begründung, z. B. `// eslint-disable-next-line no-restricted-syntax -- native file input, kein DS-Pendant`. Keine Datei-Whitelists für DS-Regeln in der App (einzige Ausnahme: `ignores` von `pageComposition` für Hero-Header); fehlt dem DS etwas, gehört die Erweiterung ins DS.
 
 ## Komponenten-Inventar
 
